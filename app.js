@@ -168,7 +168,7 @@ const builders={};
 function threeColor(css){return new THREE.Color(css)}
 function sphere(r,color,opacity=1){return new THREE.Mesh(new THREE.SphereGeometry(r,28,20),new THREE.MeshStandardMaterial({color,roughness:.32,metalness:.06,transparent:opacity<1,opacity}))}
 function line3(points,color){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color,transparent:true,opacity:.88}))}
-function clearWorld(){animator=()=>{};if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}}}
+function clearWorld(){animator=()=>{};if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}}
 function randomBall(r){let v;do{v=new THREE.Vector3((Math.random()*2-1)*r,(Math.random()*2-1)*r,(Math.random()*2-1)*r)}while(v.length()>r);return v}
 function cluster(Z,A,size=.16){const g=new THREE.Group(),R=.42+.16*Math.cbrt(Math.min(A,210));for(let i=0;i<A;i++){const m=sphere(size,i<Z?'#ff7777':'#72a9ff');m.position.copy(randomBall(R));g.add(m)}return g}
 function setCamera(z=8){camera.position.set(0,1.3,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
