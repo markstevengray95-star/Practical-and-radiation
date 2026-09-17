@@ -38,7 +38,7 @@ jobs:
             echo "No repair needed"
           else
             git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.email "4189822+github-actions[bot]@users.noreply.github.com"
             git add app.js fallback-engine.js
             git commit -m "Fix simulation engine syntax validation errors"
             git push
@@ -48,5 +48,6 @@ jobs:
           node --check app.js
           node --check fallback-engine.js
           node --check tab-resilience.js
+          node --check aqa-deep-dive.js
       - name: Check required app files
-        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js
+        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js && test -s aqa-deep-dive.js
