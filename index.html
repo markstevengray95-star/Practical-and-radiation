@@ -3,206 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08111f">
-<title>AQA Particle & Radiation Lab</title>
-<meta name="description" content="Interactive AQA A-level Physics particles and radiation 3D simulation, concept map and revision lab.">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-:root{--bg:#07101d;--panel:#0e1a2c;--panel2:#13233a;--border:#263a58;--text:#eef5ff;--muted:#9fb1ca;--accent:#59b8ff;--accent2:#8f7cff;--good:#55d69e;--warn:#ffd166;--bad:#ff6b7a;--proton:#ff6b6b;--neutron:#6fa8ff;--up:#f7b955;--down:#66d39e;--strange:#b48cff}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 20% 0,#10233d 0,#07101d 38%,#050b14 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}.glass{background:rgba(14,26,44,.88);border:1px solid var(--border);backdrop-filter:blur(16px)}.card{background:linear-gradient(145deg,rgba(19,35,58,.9),rgba(10,20,35,.9));border:1px solid var(--border);border-radius:18px}.muted{color:var(--muted)}.tab-active{background:linear-gradient(135deg,rgba(89,184,255,.2),rgba(143,124,255,.18));border-color:var(--accent)!important;color:white}.btn{min-height:44px;border:1px solid var(--border);border-radius:12px;padding:.65rem .9rem;background:#102039;color:var(--text);font-weight:700;transition:.2s}.btn:hover{border-color:var(--accent);transform:translateY(-1px)}.btn.primary{background:linear-gradient(135deg,#1976ba,#6559c8);border-color:#6ec8ff}.chip{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--border);font-size:.75rem;background:#0d1a2d}.viewer{height:470px;min-height:320px;position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:radial-gradient(circle at 50% 45%,#122944,#08121f 70%)}canvas{display:block;width:100%;height:100%;touch-action:pan-y}.equation{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;background:#081421;border:1px solid var(--border);border-radius:12px;padding:.8rem;overflow-wrap:anywhere}.range{width:100%;accent-color:#59b8ff}.select,.input{width:100%;background:#0a1728;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:.65rem;font-size:16px}.section-title{font-size:clamp(1.2rem,2vw,1.65rem);font-weight:900}.specbar{border-left:4px solid var(--accent);padding-left:.75rem}.node{cursor:pointer}.node circle{transition:.2s}.node:hover circle,.node.active circle{stroke:#fff;stroke-width:3}.map-link{stroke:#49688e;stroke-width:2;opacity:.7}.map-link.active{stroke:#72c7ff;stroke-width:4;opacity:1}.quiz-choice{width:100%;text-align:left}.quiz-choice.correct{border-color:var(--good);background:rgba(85,214,158,.12)}.quiz-choice.wrong{border-color:var(--bad);background:rgba(255,107,122,.12)}.stat{font-size:1.35rem;font-weight:900}.tooltip{position:absolute;pointer-events:none;z-index:20;background:#07121f;border:1px solid var(--border);padding:.55rem .7rem;border-radius:10px;font-size:.78rem;max-width:240px;display:none}.progress{height:8px;background:#0a1626;border-radius:999px;overflow:hidden}.progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}@media(max-width:900px){.viewer{height:380px}}@media(max-width:640px){.viewer{height:330px}.mobile-stack{grid-template-columns:1fr!important}}
-</style>
+<meta name="theme-color" content="#07111f">
+<title>AQA Particles & Radiation Learning Lab</title>
+<meta name="description" content="A complete guided AQA A-level Physics Particles and Radiation learning app with interactive 3D simulations, worked examples and exam practice.">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="sticky top-0 z-40 glass">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-    <div><div class="font-black text-lg tracking-tight">Particle & Radiation Lab</div><div class="text-xs muted">AQA A-level Physics 7408 · Sections 3.2 + Rutherford extension</div></div>
-    <div class="flex gap-2"><span class="chip">3D simulations</span><span class="chip">Exam linked</span><span class="chip">No login</span></div>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div>
+      <div class="brand">Particles & Radiation Learning Lab</div>
+      <div class="subtle small">AQA A-level Physics 7408 · complete section 3.2 · Year 12 guided learning</div>
+    </div>
+    <div class="header-actions">
+      <span class="pill">AQA linked</span>
+      <span class="pill">3D simulations</span>
+      <span class="pill">Guided mode</span>
+    </div>
   </div>
 </header>
-<main class="max-w-7xl mx-auto px-4 py-5 pb-16">
-  <section class="grid md:grid-cols-[1.4fr_.6fr] gap-4 mb-5">
-    <div class="card p-5"><div class="chip mb-3">AQA 7408 · Particles and Radiation</div><h1 class="text-3xl md:text-4xl font-black leading-tight">Explore particle physics in an interactive 3D lab</h1><p class="muted mt-3 max-w-3xl">Rotate nuclei, trace alpha scattering, build hadrons from quarks, watch weak decay, test the photoelectric effect, explore quantum energy levels and link every model to the AQA specification.</p></div>
-    <div class="card p-4 grid grid-cols-2 gap-3"><div><div class="stat">9</div><div class="text-xs muted">Interactive models</div></div><div><div class="stat">11</div><div class="text-xs muted">Spec areas</div></div><div><div class="stat">10</div><div class="text-xs muted">Particle cards</div></div><div><div class="stat">12</div><div class="text-xs muted">Quick quiz items</div></div></div>
+
+<main class="wrap main">
+  <section class="hero grid hero-grid">
+    <div class="panel hero-copy">
+      <span class="eyebrow">AQA 3.2 · Particles and radiation</span>
+      <h1>See the physics, then learn how to explain it.</h1>
+      <p>This version is built to make the topic easier to follow: short explanations first, animated models second, then the exact exam language and a quick check.</p>
+      <div class="hero-actions">
+        <button class="button primary" data-jump="course">Start guided course</button>
+        <button class="button" data-jump="lab">Explore simulations</button>
+      </div>
+    </div>
+    <div class="panel progress-card">
+      <div class="progress-head"><strong>Your topic progress</strong><span id="overallProgressText">0 / 11 complete</span></div>
+      <div class="progress-track"><div id="overallProgressBar" class="progress-fill"></div></div>
+      <div class="stat-grid">
+        <div><strong id="simCount">13</strong><span>interactive models</span></div>
+        <div><strong>11</strong><span>AQA spec sections</span></div>
+        <div><strong id="quizCount">24</strong><span>checkpoint questions</span></div>
+        <div><strong>6</strong><span>formula helpers</span></div>
+      </div>
+      <button id="resetProgress" class="text-button">Reset my progress</button>
+    </div>
   </section>
 
-  <nav class="flex gap-2 overflow-x-auto pb-2 mb-4" aria-label="Main app navigation">
-    <button class="btn main-tab tab-active shrink-0" data-view="lab">3D Lab</button>
-    <button class="btn main-tab shrink-0" data-view="map">Interactive Map</button>
-    <button class="btn main-tab shrink-0" data-view="atlas">Particle Atlas</button>
-    <button class="btn main-tab shrink-0" data-view="conserve">Conservation Lab</button>
-    <button class="btn main-tab shrink-0" data-view="quiz">Exam Quiz</button>
-    <button class="btn main-tab shrink-0" data-view="spec">AQA Spec</button>
+  <nav class="main-nav" aria-label="Main app navigation">
+    <button class="nav-button active" data-view="course">Guided course</button>
+    <button class="nav-button" data-view="lab">Simulation lab</button>
+    <button class="nav-button" data-view="map">Topic map</button>
+    <button class="nav-button" data-view="atlas">Particle atlas</button>
+    <button class="nav-button" data-view="conserve">Conservation</button>
+    <button class="nav-button" data-view="formula">Formula coach</button>
+    <button class="nav-button" data-view="quiz">Practice quiz</button>
+    <button class="nav-button" data-view="spec">AQA checklist</button>
   </nav>
 
-  <section id="view-lab">
-    <div id="simNav" class="flex gap-2 overflow-x-auto pb-2 mb-3"></div>
-    <div class="grid xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,.75fr)] gap-4 mobile-stack">
-      <div class="min-w-0">
-        <div class="viewer">
-          <canvas id="sceneCanvas" aria-label="Interactive three dimensional physics visualisation"></canvas>
-          <div id="renderStatus" class="absolute top-3 left-3 chip">Loading 3D engine…</div>
-          <div class="absolute bottom-3 left-3 flex gap-1 flex-wrap"><span class="chip">Drag: rotate</span><span class="chip">Wheel: zoom</span></div>
+  <section id="view-course" class="view active-view">
+    <div class="section-head">
+      <div><span class="eyebrow">Recommended route</span><h2>Learn the whole topic in a sensible order</h2></div>
+      <p class="subtle">Open a lesson, read the short version, try its simulation, then mark it complete.</p>
+    </div>
+    <div class="course-layout">
+      <div id="courseList" class="course-list"></div>
+      <article id="lessonPanel" class="panel lesson-panel"></article>
+    </div>
+  </section>
+
+  <section id="view-lab" class="view">
+    <div class="section-head">
+      <div><span class="eyebrow">Interactive learning</span><h2>Simulation lab</h2></div>
+      <p class="subtle">Drag the model to rotate it. Use the controls to change the physics and watch what changes.</p>
+    </div>
+    <div id="simNav" class="sim-nav"></div>
+    <div class="lab-layout">
+      <div>
+        <div class="viewer-wrap">
+          <canvas id="sceneCanvas" aria-label="Interactive physics simulation"></canvas>
+          <span id="renderStatus" class="viewer-status">Loading 3D engine…</span>
+          <div class="viewer-help"><span>Drag to rotate</span><span>Wheel to zoom</span></div>
         </div>
-        <div class="flex flex-wrap gap-2 mt-2"><button id="rotateLeft" class="btn">↶ Rotate</button><button id="rotateRight" class="btn">Rotate ↷</button><button id="resetView" class="btn">Reset camera</button><button id="pauseMotion" class="btn">Pause</button></div>
-        <p class="text-xs muted mt-2">Models are designed for learning. Nuclear and atomic length scales are intentionally exaggerated. Quarks and exchange particles are schematic representations, not literal visible objects.</p>
+        <div class="viewer-buttons">
+          <button id="rotateLeft" class="button">↶ Rotate</button>
+          <button id="rotateRight" class="button">Rotate ↷</button>
+          <button id="resetView" class="button">Reset view</button>
+          <button id="pauseMotion" class="button">Pause motion</button>
+        </div>
+        <p class="model-note">These are teaching models. Nuclear and atomic scales are deliberately exaggerated. Quarks and exchange particles are represented schematically because they are not tiny visible balls.</p>
       </div>
-      <aside class="min-w-0 space-y-3">
-        <div class="card p-4"><div id="specCode" class="text-xs font-bold text-sky-300">AQA 3.2.1.1</div><h2 id="simTitle" class="section-title mt-1">Atomic structure</h2><div id="simSubtitle" class="text-sm muted mt-1"></div></div>
-        <div id="controls" class="space-y-3"></div>
-        <div id="readout" class="equation"></div>
-        <div class="card p-4"><h3 class="font-black mb-2">What is happening?</h3><div id="explain" class="text-sm leading-6"></div></div>
-        <div class="card p-4"><h3 class="font-black mb-2">AQA exam focus</h3><div id="exam" class="text-sm leading-6"></div></div>
+      <aside class="lab-side">
+        <div class="panel sim-heading">
+          <span id="specCode" class="eyebrow"></span>
+          <h2 id="simTitle"></h2>
+          <p id="simSubtitle" class="subtle"></p>
+        </div>
+        <div id="simControls" class="control-stack"></div>
+        <div id="simReadout" class="equation"></div>
+        <div class="panel learning-box simple-box"><h3>In simple words</h3><div id="simpleExplain"></div></div>
+        <div class="panel learning-box exam-box"><h3>Say it like this in an exam</h3><div id="examExplain"></div></div>
+        <div class="panel learning-box mistake-box"><h3>Common mistake</h3><div id="mistakeExplain"></div></div>
+        <div class="panel learning-box checkpoint-box"><h3>Quick check</h3><div id="simCheck"></div></div>
       </aside>
     </div>
   </section>
 
-  <section id="view-map" class="hidden">
-    <div class="grid lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,.7fr)] gap-4 mobile-stack">
-      <div class="card p-3 overflow-hidden"><svg id="conceptMap" viewBox="0 0 1000 650" class="w-full h-auto" role="img" aria-label="Interactive concept map linking AQA particles and radiation topics"></svg></div>
-      <aside class="space-y-3"><div class="card p-4"><h2 class="section-title">Interactive topic map</h2><p class="text-sm muted mt-2">Select a node to see how that idea links to other AQA topics and jump straight into the matching simulation.</p></div><div id="mapInfo" class="card p-4"></div><button id="openMappedSim" class="btn primary w-full" disabled>Open matching 3D simulation</button></aside>
+  <section id="view-map" class="view">
+    <div class="section-head"><div><span class="eyebrow">Big picture</span><h2>Interactive topic map</h2></div><p class="subtle">Choose any box to see why it matters and jump to the relevant simulation.</p></div>
+    <div class="map-layout">
+      <div class="panel map-card"><svg id="conceptMap" viewBox="0 0 1100 760" role="img" aria-label="Concept map of AQA Particles and Radiation"></svg></div>
+      <aside class="panel" id="mapInfo"></aside>
     </div>
   </section>
 
-  <section id="view-atlas" class="hidden"><div class="card p-4 mb-4"><h2 class="section-title">Particle Atlas</h2><p class="text-sm muted mt-1">Select a particle to compare charge, mass, family, quark structure and conservation quantum numbers.</p></div><div id="particleButtons" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-4"></div><div id="particleInfo" class="card p-5"></div></section>
+  <section id="view-atlas" class="view">
+    <div class="section-head"><div><span class="eyebrow">Reference</span><h2>Particle atlas</h2></div><p class="subtle">Compare families, charge, quark content and quantum numbers without memorising a giant table all at once.</p></div>
+    <div id="particleFilters" class="filter-row"></div>
+    <div id="particleButtons" class="particle-grid"></div>
+    <article id="particleInfo" class="panel particle-info"></article>
+  </section>
 
-  <section id="view-conserve" class="hidden"><div class="grid lg:grid-cols-[.7fr_1.3fr] gap-4 mobile-stack"><div class="card p-4"><h2 class="section-title">Conservation Lab</h2><p class="text-sm muted mt-2">Choose an interaction and test charge, baryon number, electron lepton number, muon lepton number and strangeness.</p><label class="block mt-4 text-sm font-bold">Reaction<select id="reactionSelect" class="select mt-2"></select></label><div id="reactionEquation" class="equation mt-3"></div></div><div id="conservationResult" class="card p-4"></div></div></section>
+  <section id="view-conserve" class="view">
+    <div class="section-head"><div><span class="eyebrow">AQA 3.2.1.7</span><h2>Conservation-law checker</h2></div><p class="subtle">Work across the reaction one quantity at a time: charge, baryon number, lepton number and strangeness.</p></div>
+    <div class="two-col">
+      <div class="panel">
+        <label class="field"><span>Choose a reaction</span><select id="reactionSelect"></select></label>
+        <div id="reactionEquation" class="equation"></div>
+        <div class="tip"><strong>Method:</strong> add each quantum number on the left, then on the right. If one conserved quantity changes, the reaction is not allowed.</div>
+      </div>
+      <div id="conservationResult" class="panel"></div>
+    </div>
+  </section>
 
-  <section id="view-quiz" class="hidden"><div class="grid lg:grid-cols-[.7fr_1.3fr] gap-4 mobile-stack"><div class="card p-4"><h2 class="section-title">Exam Quiz</h2><p class="text-sm muted mt-2">A short AQA-style knowledge check. Explanations appear immediately after each answer.</p><div class="mt-4"><div class="flex justify-between text-sm"><span>Progress</span><span id="quizProgressText">1 / 12</span></div><div class="progress mt-2"><div id="quizProgressBar" style="width:8.3%"></div></div></div><div class="grid grid-cols-2 gap-2 mt-4"><div class="card p-3"><div id="quizScore" class="stat">0</div><div class="text-xs muted">Correct</div></div><div class="card p-3"><div id="quizStreak" class="stat">0</div><div class="text-xs muted">Current streak</div></div></div></div><div class="card p-5"><div id="quizSpec" class="text-xs text-sky-300 font-bold"></div><h3 id="quizQuestion" class="text-xl font-black mt-2"></h3><div id="quizChoices" class="grid gap-2 mt-4"></div><div id="quizFeedback" class="mt-4 hidden"></div><button id="nextQuestion" class="btn primary mt-4 hidden">Next question</button></div></div></section>
+  <section id="view-formula" class="view">
+    <div class="section-head"><div><span class="eyebrow">Maths support</span><h2>Formula coach</h2></div><p class="subtle">Pick a calculation, enter values and the app shows the substitution as well as the answer.</p></div>
+    <div class="formula-layout">
+      <div class="panel"><label class="field"><span>Calculation</span><select id="formulaSelect"></select></label><div id="formulaInputs" class="control-stack"></div></div>
+      <div class="panel"><h3>Worked calculation</h3><div id="formulaWorking" class="worked"></div></div>
+    </div>
+    <div id="formulaCards" class="formula-cards"></div>
+  </section>
 
-  <section id="view-spec" class="hidden"><div class="card p-4 mb-4"><h2 class="section-title">AQA 7408 Specification Map</h2><p class="text-sm muted mt-1">Coverage for Particles and Radiation, plus Rutherford scattering from Nuclear Physics because it directly supports development of the nuclear model.</p></div><div id="specGrid" class="grid md:grid-cols-2 gap-3"></div></section>
+  <section id="view-quiz" class="view">
+    <div class="section-head"><div><span class="eyebrow">Practice</span><h2>Low-pressure knowledge check</h2></div><p class="subtle">You get feedback immediately. Use the hint if you need it before answering.</p></div>
+    <div class="quiz-layout">
+      <div class="panel quiz-stats">
+        <div><span>Question</span><strong id="quizProgressText">1 / 24</strong></div>
+        <div class="progress-track"><div id="quizProgressBar" class="progress-fill"></div></div>
+        <div class="stat-grid two"><div><strong id="quizScore">0</strong><span>correct</span></div><div><strong id="quizStreak">0</strong><span>streak</span></div></div>
+        <button id="restartQuiz" class="button">Restart quiz</button>
+      </div>
+      <div class="panel quiz-main">
+        <span id="quizSpec" class="eyebrow"></span>
+        <h3 id="quizQuestion"></h3>
+        <button id="showHint" class="text-button">Show a hint</button>
+        <div id="quizHint" class="hint hidden"></div>
+        <div id="quizChoices" class="choice-list"></div>
+        <div id="quizFeedback" class="feedback hidden"></div>
+        <button id="nextQuestion" class="button primary hidden">Next question</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-spec" class="view">
+    <div class="section-head"><div><span class="eyebrow">Specification coverage</span><h2>AQA 7408 section 3.2 checklist</h2></div><p class="subtle">Every core Particles and Radiation section is included. Rutherford is kept as a clearly labelled Nuclear Physics extension.</p></div>
+    <div id="specGrid" class="spec-grid"></div>
+    <div class="panel extension-note"><strong>Useful extension:</strong> Rutherford alpha scattering is in AQA 3.8.1.1 Nuclear Physics, not 3.2. It remains in this app because it helps students understand how the nuclear model developed.</div>
+  </section>
 </main>
-<div id="tooltip" class="tooltip"></div>
-<script type="module">
-const root=document.documentElement;
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const h=6.62607015e-34,e=1.602176634e-19,me=9.1093837015e-31,c=299792458;
-const simDefs=[
- {id:'atom',name:'Atomic structure',code:'3.2.1.1'},
- {id:'strong',name:'Nuclear force',code:'3.2.1.2'},
- {id:'rutherford',name:'Rutherford',code:'3.8.1.1'},
- {id:'quarks',name:'Quarks',code:'3.2.1.6'},
- {id:'antimatter',name:'Antimatter',code:'3.2.1.3'},
- {id:'beta',name:'β decay',code:'3.2.1.4/7'},
- {id:'photo',name:'Photoelectric',code:'3.2.2.1'},
- {id:'levels',name:'Energy levels',code:'3.2.2.3'},
- {id:'debroglie',name:'de Broglie',code:'3.2.2.4'}
-];
-$('#simNav').innerHTML=simDefs.map((s,i)=>`<button class="btn sim-tab shrink-0 ${i===0?'tab-active':''}" data-sim="${s.id}"><span class="text-xs muted mr-1">${s.code}</span>${s.name}</button>`).join('');
-const specItems=[
- ['3.2.1.1','Constituents of the atom','Protons, neutrons, electrons, specific charge, proton number Z, nucleon number A, isotopes and nuclide notation.','atom'],
- ['3.2.1.2','Stable and unstable nuclei','Strong nuclear force, short-range attraction, very-short-range repulsion and radioactive changes.','strong'],
- ['3.2.1.3','Particles, antiparticles and photons','Antiparticles, rest energy, annihilation, pair production and photon energy.','antimatter'],
- ['3.2.1.4','Particle interactions','Fundamental interactions and exchange particles including virtual photons and W bosons.','beta'],
- ['3.2.1.5','Particle classification','Hadrons, baryons, mesons, leptons, strange particles and quantum numbers.','quarks'],
- ['3.2.1.6','Quarks and antiquarks','Up, down and strange quarks; proton, neutron, pion and kaon compositions.','quarks'],
- ['3.2.1.7','Conservation laws','Charge, baryon number, lepton number, strangeness, energy and momentum.','beta'],
- ['3.2.2.1','Photoelectric effect','Threshold frequency, work function, maximum kinetic energy and stopping potential.','photo'],
- ['3.2.2.2','Collisions of electrons with atoms','Excitation, ionisation and electron volts.','levels'],
- ['3.2.2.3','Energy levels and photon emission','Discrete states, transitions and line spectra.','levels'],
- ['3.2.2.4','Wave-particle duality','Electron diffraction and de Broglie wavelength.','debroglie'],
- ['3.8.1.1','Rutherford scattering','Alpha scattering and evidence for a small concentrated positive nucleus.','rutherford']
-];
-$('#specGrid').innerHTML=specItems.map(x=>`<button class="card p-4 text-left hover:border-sky-400 transition spec-open" data-sim="${x[3]}"><div class="specbar"><div class="text-xs text-sky-300 font-black">AQA ${x[0]}</div><div class="font-black mt-1">${x[1]}</div><div class="text-sm muted mt-1">${x[2]}</div></div></button>`).join('');
 
-function showView(v){$$('[id^="view-"]').forEach(el=>el.classList.add('hidden'));$('#view-'+v).classList.remove('hidden');$$('.main-tab').forEach(b=>b.classList.toggle('tab-active',b.dataset.view===v));if(v==='map')requestAnimationFrame(drawMap)}
-$$('.main-tab').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-
-let THREE,renderer,scene,camera,world,currentSim='atom',updateMotion=()=>{},paused=false,drag=false,lastX=0,lastY=0,raf;
-const canvas=$('#sceneCanvas');
-function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
-function color(name,fallback){const v=css(name);return v||fallback}
-function disposeObject(o){o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}
-function clearWorld(){updateMotion=()=>{};while(world.children.length){const o=world.children.pop();disposeObject(o)}}
-function sphere(r,col,opacity=1){return new THREE.Mesh(new THREE.SphereGeometry(r,32,24),new THREE.MeshStandardMaterial({color:col,roughness:.28,metalness:.08,transparent:opacity<1,opacity}))}
-function tubeLine(points,col){const curve=new THREE.CatmullRomCurve3(points);return new THREE.Mesh(new THREE.TubeGeometry(curve,32,.035,8,false),new THREE.MeshBasicMaterial({color:col}))}
-function randBall(R){let p;do{p=new THREE.Vector3((Math.random()*2-1)*R,(Math.random()*2-1)*R,(Math.random()*2-1)*R)}while(p.length()>R);return p}
-function cluster(Z,A,r=.15){const g=new THREE.Group(),R=.28+.17*Math.cbrt(A);for(let i=0;i<A;i++){const m=sphere(r,i<Z?color('--proton','#ff6b6b'):color('--neutron','#6fa8ff'));m.position.copy(randBall(R));g.add(m)}return g}
-function cameraReset(z=8){camera.position.set(0,1.35,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
-function setInfo(code,name,subtitle,desc,focus){$('#specCode').textContent='AQA '+code;$('#simTitle').textContent=name;$('#simSubtitle').textContent=subtitle;$('#explain').innerHTML=desc;$('#exam').innerHTML=focus}
-function field(label,html){return `<label class="card p-3 block"><span class="block text-sm font-black mb-2">${label}</span>${html}</label>`}
-function addLabelSprite(text,pos,scale=.8){const cvs=document.createElement('canvas');cvs.width=256;cvs.height=96;const x=cvs.getContext('2d');x.clearRect(0,0,256,96);x.fillStyle='rgba(5,12,22,.84)';x.roundRect(4,8,248,80,20);x.fill();x.fillStyle='white';x.font='700 30px system-ui';x.textAlign='center';x.fillText(text,128,58);const tex=new THREE.CanvasTexture(cvs);const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));spr.position.copy(pos);spr.scale.set(2.2*scale,.82*scale,1);world.add(spr);return spr}
-
-function simAtom(){clearWorld();cameraReset(8);setInfo('3.2.1.1','Atomic structure and isotopes','Nucleus + electron probability cloud',`The central cluster contains <strong>protons and neutrons</strong>. The surrounding points represent where electrons are likely to be found. This avoids the misleading idea that electrons travel around the nucleus on fixed planetary paths.`,`Know proton, neutron and electron charge and mass. Be able to use <strong>Z</strong>, <strong>A</strong>, nuclide notation, isotopes and specific charge.`);$('#controls').innerHTML=field('Choose isotope',`<select id="iso" class="select"><option value="1,1">Hydrogen-1</option><option value="2,4">Helium-4</option><option value="6,12" selected>Carbon-12</option><option value="6,14">Carbon-14</option><option value="8,16">Oxygen-16</option><option value="79,197">Gold-197</option></select>`);let cloud,nucleus;function build(){clearWorld();const [Z,A]=$('#iso').value.split(',').map(Number);nucleus=cluster(Z,A,A>50?.07:.17);world.add(nucleus);const pts=[];const N=Math.min(2200,320+Z*16);for(let i=0;i<N;i++){let v=randBall(4.1);if(v.length()<1.3)v.setLength(1.3+Math.random()*2.4);pts.push(v.x,v.y,v.z)}const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));cloud=new THREE.Points(geo,new THREE.PointsMaterial({color:color('--accent','#59b8ff'),size:.045,transparent:true,opacity:.32,depthWrite:false}));world.add(cloud);$('#readout').innerHTML=`Z = ${Z} &nbsp; A = ${A} &nbsp; neutrons = ${A-Z} &nbsp; electrons (neutral atom) = ${Z}`;updateMotion=t=>{cloud.rotation.y=t*.055;nucleus.rotation.y=-t*.04}}$('#iso').addEventListener('change',build);build()}
-function simStrong(){clearWorld();cameraReset(7);setInfo('3.2.1.2','Strong nuclear force','Short range, attractive then repulsive',`The distance slider changes the separation of two nucleons. At ordinary nuclear separations the strong nuclear force is attractive; at extremely short range it becomes repulsive; beyond a few femtometres it rapidly becomes negligible.`,`For AQA, remember the qualitative regions: <strong>repulsive below about 0.5 fm</strong>, <strong>attractive up to about 3 fm</strong>, negligible beyond that.`);$('#controls').innerHTML=field('Nucleon separation',`<input id="sep" class="range" type="range" min="20" max="400" value="120"><div id="sepVal" class="text-sm muted mt-1"></div>`);const a=sphere(.5,color('--proton','#ff6b6b')),b=sphere(.5,color('--neutron','#6fa8ff'));world.add(a,b);let arrows=[];function build(){arrows.forEach(x=>world.remove(x));arrows=[];const d=Number($('#sep').value)/100;a.position.x=-d*.8;b.position.x=d*.8;const state=d<.5?'repulsive':d<=3?'attractive':'negligible';$('#sepVal').textContent=`${d.toFixed(2)} fm · ${state}`;$('#readout').innerHTML=`r = ${d.toFixed(2)} fm → force is <strong>${state}</strong>`;if(state!=='negligible'){const toward=state==='attractive';const A=new THREE.ArrowHelper(new THREE.Vector3(toward?1:-1,0,0),a.position.clone(),.9,color('--accent','#59b8ff'),.2,.12);const B=new THREE.ArrowHelper(new THREE.Vector3(toward?-1:1,0,0),b.position.clone(),.9,color('--accent','#59b8ff'),.2,.12);world.add(A,B);arrows=[A,B]}}$('#sep').addEventListener('input',build);build()}
-function trajectory(b,Z){let p=new THREE.Vector3(-6,b,0),v=new THREE.Vector3(.105,0,0);const out=[];for(let i=0;i<260;i++){out.push(p.clone());const r=Math.max(.25,p.length());const acc=p.clone().normalize().multiplyScalar(.00008*Z/(r*r));v.add(acc);p.add(v);if(p.x>6||Math.abs(p.y)>6)break}return out}
-function simRutherford(){clearWorld();cameraReset(10);setInfo('3.8.1.1','Rutherford alpha scattering','Classical Coulomb-path model',`The alpha particle is positively charged, so a close pass by the compact positive nucleus produces a much larger electrostatic deflection. Paths further from the nucleus change little.`,`Interpret the evidence: <strong>most passed through → atom mostly empty space</strong>; <strong>some large deflections → positive charge concentrated</strong>; <strong>very few backscattered → nucleus tiny compared with atom</strong>.`);$('#controls').innerHTML=field('Impact parameter',`<input id="impact" class="range" type="range" min="15" max="180" value="65"><div id="impactV" class="text-sm muted mt-1"></div>`)+field('Nuclear charge Z',`<input id="chargeZ" class="range" type="range" min="10" max="90" value="79"><div id="chargeZV" class="text-sm muted mt-1"></div>`);const nucleus=cluster(79,197,.065);world.add(nucleus);function rebuild(){world.children.filter(x=>x.userData.path).forEach(x=>{world.remove(x);disposeObject(x)});const b=Number($('#impact').value)/100,Z=Number($('#chargeZ').value);$('#impactV').textContent=`b = ${b.toFixed(2)} scaled units`;$('#chargeZV').textContent=`Z = ${Z}${Z===79?' (gold)':''}`;[-1.7,-1.2,-.8,.8,1.2,1.7].forEach(v=>{const l=tubeLine(trajectory(v,Z),color('--muted','#9fb1ca'));l.userData.path=1;world.add(l)});const hi=tubeLine(trajectory(b,Z),color('--accent','#59b8ff'));hi.userData.path=1;world.add(hi);$('#readout').innerHTML='Smaller impact parameter + larger Z → greater electrostatic deflection';}$('#impact').addEventListener('input',rebuild);$('#chargeZ').addEventListener('input',rebuild);rebuild();updateMotion=t=>nucleus.rotation.y=t*.08}
-function simQuarks(){clearWorld();cameraReset(7);setInfo('3.2.1.5–3.2.1.6','Quarks and hadrons','Build baryons and mesons',`Quarks are confined constituents of hadrons. Baryons contain three quarks; mesons contain a quark and an antiquark. The tubes in this model represent confinement qualitatively, not literal strings visible in an experiment.`,`AQA requires <strong>u, d and s</strong> quarks and corresponding antiquarks. Charges: u = +⅔e, d = −⅓e, s = −⅓e. Know structures of protons, neutrons, pions and kaons.`);$('#controls').innerHTML=field('Choose hadron',`<select id="hadron" class="select"><option value="p">Proton p = uud</option><option value="n">Neutron n = udd</option><option value="pip">Pion π⁺ = u d̄</option><option value="pim">Pion π⁻ = d ū</option><option value="kp">Kaon K⁺ = u s̄</option><option value="k0">Kaon K⁰ = d s̄</option></select>`);const map={p:['u','u','d'],n:['u','d','d'],pip:['u','d̄'],pim:['d','ū'],kp:['u','s̄'],k0:['d','s̄']},charge={u:'+⅔e',d:'−⅓e',s:'−⅓e','ū':'−⅔e','d̄':'+⅓e','s̄':'+⅓e'};function qc(q){return q.includes('u')?color('--up','#f7b955'):q.includes('s')?color('--strange','#b48cff'):color('--down','#66d39e')}function build(){clearWorld();const qs=map[$('#hadron').value],g=new THREE.Group();const pos=qs.length===3?[[-1,0,0],[.65,.85,0],[.65,-.85,0]]:[[-.9,0,0],[.9,0,0]];qs.forEach((q,i)=>{const m=sphere(.52,qc(q));m.position.set(...pos[i]);g.add(m);addLabelSprite(q,new THREE.Vector3(pos[i][0],pos[i][1]+.78,0),.65)});for(let i=0;i<pos.length;i++)for(let j=i+1;j<pos.length;j++)g.add(tubeLine([new THREE.Vector3(...pos[i]),new THREE.Vector3(...pos[j])],color('--accent','#59b8ff')));world.add(g);$('#readout').innerHTML=`${qs.join(' + ')} &nbsp; | &nbsp; ${qs.map(q=>`${q}: ${charge[q]}`).join(' · ')}`;updateMotion=t=>{g.rotation.y=t*.2;g.rotation.x=Math.sin(t*.25)*.12}}$('#hadron').addEventListener('change',build);build()}
-function simAntimatter(){clearWorld();cameraReset(8);setInfo('3.2.1.3','Antiparticles, annihilation & pair production','Matter–antimatter transformations',`A particle and its antiparticle have the same rest mass but opposite relevant quantum numbers. Electron–positron annihilation can produce two photons. Pair production is the reverse type of process and requires enough photon energy.`,`For an electron–positron pair, the minimum rest-energy requirement is <strong>1.022 MeV</strong>. Both energy and momentum must be conserved.`);$('#controls').innerHTML=field('Process',`<select id="antiMode" class="select"><option value="ann">e⁻ + e⁺ → γ + γ</option><option value="pair">γ → e⁻ + e⁺</option></select>`)+`<button id="runAnti" class="btn primary w-full">Run animation</button>`;let parts=[],start=0;function build(){clearWorld();parts=[];const mode=$('#antiMode').value;if(mode==='ann'){const a=sphere(.3,color('--proton','#ff6b6b')),b=sphere(.3,color('--neutron','#6fa8ff'));a.position.x=-3.7;b.position.x=3.7;world.add(a,b);parts=[a,b];$('#readout').innerHTML='e⁻ + e⁺ → γ + γ · minimum rest energy = 1.022 MeV'}else{const ph=sphere(.19,color('--accent','#59b8ff'));ph.position.x=-4;world.add(ph);parts=[ph];$('#readout').innerHTML='γ → e⁻ + e⁺ · Eγ ≥ 1.022 MeV'}start=performance.now();updateMotion=()=>{const q=Math.min(1,(performance.now()-start)/2600),m=$('#antiMode').value;if(m==='ann'){if(parts.length===2&&q<.5){parts[0].position.x=-3.7+q*7.4;parts[1].position.x=3.7-q*7.4}else if(q>=.5&&parts.length===2){parts.forEach(x=>world.remove(x));const g1=sphere(.16,color('--accent','#59b8ff')),g2=sphere(.16,color('--accent','#59b8ff'));world.add(g1,g2);parts=[g1,g2]}if(q>=.5&&parts.length===2){const k=(q-.5)*8;parts[0].position.x=-k;parts[1].position.x=k}}else{if(parts.length===1&&q<.5)parts[0].position.x=-4+q*8;else if(q>=.5&&parts.length===1){world.remove(parts[0]);const a=sphere(.3,color('--proton','#ff6b6b')),b=sphere(.3,color('--neutron','#6fa8ff'));world.add(a,b);parts=[a,b]}if(q>=.5&&parts.length===2){const k=(q-.5)*6;parts[0].position.set(k,k*.45,0);parts[1].position.set(k,-k*.45,0)}}}}$('#runAnti').addEventListener('click',build);$('#antiMode').addEventListener('change',build);build()}
-function simBeta(){clearWorld();cameraReset(8);setInfo('3.2.1.4 / 3.2.1.7','Beta-minus decay','Weak interaction at quark level',`In β⁻ decay a neutron becomes a proton. At quark level one down quark changes to an up quark and emits a <strong>W⁻</strong>. The W⁻ then produces an electron and an electron antineutrino.`,`Know both descriptions: <strong>n → p + e⁻ + ν̄ₑ</strong> and <strong>d → u + W⁻</strong>. Apply conservation of charge, baryon number and electron lepton number.`);$('#controls').innerHTML=`<button id="runBeta" class="btn primary w-full">Run β⁻ decay</button>`;$('#readout').innerHTML='udd → uud + e⁻ + ν̄ₑ';let g,W,el,nu,start;function build(){clearWorld();g=new THREE.Group();[['u',-1,0],['d',.7,.8],['d',.7,-.8]].forEach(([q,x,y])=>{const m=sphere(.48,q==='u'?color('--up','#f7b955'):color('--down','#66d39e'));m.position.set(x,y,0);g.add(m)});world.add(g);W=sphere(.23,color('--strange','#b48cff'));el=sphere(.2,color('--proton','#ff6b6b'));nu=sphere(.12,color('--neutron','#6fa8ff'));W.visible=el.visible=nu.visible=false;world.add(W,el,nu);start=performance.now();updateMotion=()=>{const t=Math.min(1,(performance.now()-start)/3200);g.rotation.y=t*.5;if(t>.3){g.children[2].material.color.set(color('--up','#f7b955'));W.visible=true;W.position.set(1.2+(t-.3)*2,0,0)}if(t>.58){W.visible=false;el.visible=nu.visible=true;el.position.set(2+(t-.58)*6,1+(t-.58)*2,0);nu.position.set(2+(t-.58)*6,-1-(t-.58)*2,0)}}}$('#runBeta').addEventListener('click',build);build()}
-function simPhoto(){clearWorld();cameraReset(8);setInfo('3.2.2.1','Photoelectric effect','Photon energy and threshold frequency',`Each photon has energy <strong>E = hf</strong>. One photon transfers its energy to one electron. Emission only occurs if photon energy is at least equal to the metal work function φ.`,`Use <strong>hf = φ + KEmax</strong>, <strong>KEmax = eVs</strong> and <strong>f₀ = φ/h</strong>. Increasing intensity increases photon rate, not photon energy.`);$('#controls').innerHTML=field('Frequency',`<input id="freq" class="range" type="range" min="2" max="15" value="8" step=".1"><div id="freqV" class="text-sm muted"></div>`)+field('Work function φ',`<input id="phi" class="range" type="range" min="1" max="5" value="2.3" step=".1"><div id="phiV" class="text-sm muted"></div>`);const plate=new THREE.Mesh(new THREE.BoxGeometry(.35,5,5),new THREE.MeshStandardMaterial({color:0x66778f,metalness:.75,roughness:.25}));plate.position.x=1;world.add(plate);const photon=sphere(.16,color('--accent','#59b8ff')),el=sphere(.19,color('--proton','#ff6b6b'));world.add(photon,el);el.visible=false;let start=performance.now();function calc(){const f=Number($('#freq').value)*1e14,phi=Number($('#phi').value),Ev=h*f/e,ke=Math.max(0,Ev-phi);$('#freqV').textContent=`${(f/1e14).toFixed(1)} × 10¹⁴ Hz`;$('#phiV').textContent=`${phi.toFixed(1)} eV`;$('#readout').innerHTML=ke>0?`hf = ${Ev.toFixed(2)} eV → KEmax = ${ke.toFixed(2)} eV · Vs ≈ ${ke.toFixed(2)} V`:`hf = ${Ev.toFixed(2)} eV < φ → no emission`;start=performance.now();updateMotion=()=>{const t=((performance.now()-start)%2600)/2600;photon.position.set(-4+t*5,0,0);el.visible=ke>0&&t>.78;el.position.set(1+(t-.78)*8,(t-.78)*2,0)}}$('#freq').addEventListener('input',calc);$('#phi').addEventListener('input',calc);calc()}
-function simLevels(){clearWorld();cameraReset(8);setInfo('3.2.2.2–3.2.2.3','Atomic energy levels','Quantised transitions and line spectra',`The horizontal discs are an energy-level diagram shown in 3D, not electron orbits. A transition to a lower level emits a photon whose energy equals the difference between the two energy states.`,`Use <strong>ΔE = hf = hc/λ</strong>. Discrete spectral lines provide evidence for quantised atomic energy levels.`);$('#controls').innerHTML=field('Hydrogen transition',`<select id="transition" class="select"><option value="3,2">n=3 → n=2</option><option value="4,2">n=4 → n=2</option><option value="2,1">n=2 → n=1</option><option value="3,1">n=3 → n=1</option></select>`);function build(){clearWorld();for(let n=1;n<=4;n++){const y=-2+(n-1)*1.25;const disc=new THREE.Mesh(new THREE.CylinderGeometry(2.5,2.5,.025,64),new THREE.MeshBasicMaterial({color:0x55708f,transparent:true,opacity:.28}));disc.position.y=y;world.add(disc);addLabelSprite('n='+n,new THREE.Vector3(3,y,0),.55)}const [ni,nf]=$('#transition').value.split(',').map(Number),yi=-2+(ni-1)*1.25,yf=-2+(nf-1)*1.25;const marker=sphere(.2,color('--proton','#ff6b6b')),ph=sphere(.13,color('--accent','#59b8ff'));marker.position.y=yi;ph.visible=false;world.add(marker,ph);const d=Math.abs((-13.6/(nf*nf))-(-13.6/(ni*ni))),lambda=h*c/(d*e)*1e9;$('#readout').innerHTML=`ΔE = ${d.toFixed(3)} eV · λ = ${lambda.toFixed(1)} nm`;const start=performance.now();updateMotion=()=>{const t=((performance.now()-start)%3000)/3000;if(t<.55){marker.position.y=yi+(yf-yi)*(t/.55);ph.visible=false}else{marker.position.y=yf;ph.visible=true;const q=(t-.55)/.45;ph.position.set(q*4,(yi+yf)/2+q*.4,0)}}}$('#transition').addEventListener('change',build);build()}
-function simDebroglie(){clearWorld();cameraReset(8);setInfo('3.2.2.4','de Broglie wavelength','Matter waves and electron diffraction',`Moving particles possess a wavelength <strong>λ = h/p</strong>. The sinusoidal line is a visual representation of wavelength, not a physical rope-like wave attached to the electron.`,`Increasing momentum decreases de Broglie wavelength. Electron diffraction provides evidence that matter can display wave behaviour.`);$('#controls').innerHTML=field('Electron accelerating voltage',`<input id="volt" class="range" type="range" min="50" max="5000" value="200" step="50"><div id="voltV" class="text-sm muted"></div>`);function build(){clearWorld();const V=Number($('#volt').value),p=Math.sqrt(2*me*e*V),lambda=h/p;$('#voltV').textContent=V+' V';const vis=Math.max(.32,3/Math.sqrt(V/50)),pts=[];for(let x=-5;x<=5;x+=.04)pts.push(new THREE.Vector3(x,.48*Math.sin(x*Math.PI*2/vis),0));world.add(tubeLine(pts,color('--accent','#59b8ff')));const el=sphere(.2,color('--proton','#ff6b6b'));world.add(el);$('#readout').innerHTML=`p = ${p.toExponential(3)} kg m s⁻¹ · λ = ${(lambda*1e10).toFixed(3)} Å`;const start=performance.now();updateMotion=()=>{const t=((performance.now()-start)%3000)/3000,x=-5+t*10;el.position.set(x,.48*Math.sin(x*Math.PI*2/vis),0)}}$('#volt').addEventListener('input',build);build()}
-const sims={atom:simAtom,strong:simStrong,rutherford:simRutherford,quarks:simQuarks,antimatter:simAntimatter,beta:simBeta,photo:simPhoto,levels:simLevels,debroglie:simDebroglie};
-function activateSim(id){currentSim=id;$$('.sim-tab').forEach(b=>b.classList.toggle('tab-active',b.dataset.sim===id));sims[id]?.()}
-$$('.sim-tab').forEach(b=>b.addEventListener('click',()=>activateSim(b.dataset.sim)));
-$$('.spec-open').forEach(b=>b.addEventListener('click',()=>{showView('lab');activateSim(b.dataset.sim)}));
-
-try{THREE=await import('https://cdn.jsdelivr.net/npm/three@0.181.1/+esm');renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(42,1,.1,100);world=new THREE.Group();scene.add(world);scene.add(new THREE.HemisphereLight(0xffffff,0x223344,1.8));const dl=new THREE.DirectionalLight(0xffffff,2.2);dl.position.set(5,8,6);scene.add(dl);new ResizeObserver(()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(Math.max(10,r.width),Math.max(10,r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}).observe(canvas.parentElement);$('#renderStatus').textContent='3D ready';setTimeout(()=>$('#renderStatus').style.display='none',1000);let clock=new THREE.Clock();function animate(){raf=requestAnimationFrame(animate);const t=clock.getElapsedTime();if(!paused)updateMotion(t);renderer.render(scene,camera)}animate();canvas.addEventListener('pointerdown',ev=>{drag=true;lastX=ev.clientX;lastY=ev.clientY;canvas.setPointerCapture(ev.pointerId)});canvas.addEventListener('pointermove',ev=>{if(!drag)return;world.rotation.y+=(ev.clientX-lastX)*.008;world.rotation.x+=(ev.clientY-lastY)*.006;world.rotation.x=Math.max(-1.2,Math.min(1.2,world.rotation.x));lastX=ev.clientX;lastY=ev.clientY});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('wheel',ev=>{ev.preventDefault();camera.position.z=Math.max(4,Math.min(16,camera.position.z+ev.deltaY*.01))},{passive:false});$('#rotateLeft').onclick=()=>world.rotation.y-=.3;$('#rotateRight').onclick=()=>world.rotation.y+=.3;$('#resetView').onclick=()=>cameraReset(currentSim==='rutherford'?10:8);$('#pauseMotion').onclick=ev=>{paused=!paused;ev.currentTarget.textContent=paused?'Resume':'Pause'};activateSim('atom')}catch(err){$('#renderStatus').textContent='3D renderer unavailable';$('#readout').textContent='Your browser could not initialise WebGL/Three.js. The Map, Atlas, Conservation and Quiz sections still work.';console.error(err)}
-
-const particles={
- proton:{symbol:'p',name:'Proton',family:'Baryon / hadron',charge:'+1e',mass:'1.673 × 10⁻²⁷ kg',structure:'uud',B:'+1',Le:'0',Lm:'0',S:'0',note:'Stable baryon. Strong and electromagnetic interactions apply.'},
- neutron:{symbol:'n',name:'Neutron',family:'Baryon / hadron',charge:'0',mass:'1.675 × 10⁻²⁷ kg',structure:'udd',B:'+1',Le:'0',Lm:'0',S:'0',note:'Free neutron can undergo beta-minus decay.'},
- electron:{symbol:'e⁻',name:'Electron',family:'Lepton',charge:'−1e',mass:'9.109 × 10⁻³¹ kg',structure:'fundamental',B:'0',Le:'+1',Lm:'0',S:'0',note:'Fundamental lepton; does not experience the strong interaction.'},
- positron:{symbol:'e⁺',name:'Positron',family:'Antilepton',charge:'+1e',mass:'9.109 × 10⁻³¹ kg',structure:'fundamental',B:'0',Le:'−1',Lm:'0',S:'0',note:'Electron antiparticle.'},
- muon:{symbol:'μ⁻',name:'Muon',family:'Lepton',charge:'−1e',mass:'≈207 electron masses',structure:'fundamental',B:'0',Le:'0',Lm:'+1',S:'0',note:'Unstable charged lepton.'},
- nue:{symbol:'νₑ',name:'Electron neutrino',family:'Lepton',charge:'0',mass:'very small',structure:'fundamental',B:'0',Le:'+1',Lm:'0',S:'0',note:'Electron-family neutrino involved in weak interactions.'},
- numu:{symbol:'νμ',name:'Muon neutrino',family:'Lepton',charge:'0',mass:'very small',structure:'fundamental',B:'0',Le:'0',Lm:'+1',S:'0',note:'Muon-family neutrino.'},
- pion:{symbol:'π⁺',name:'Positive pion',family:'Meson / hadron',charge:'+1e',mass:'≈140 MeV/c²',structure:'u d̄',B:'0',Le:'0',Lm:'0',S:'0',note:'Meson made from a quark-antiquark pair.'},
- kaon:{symbol:'K⁺',name:'Positive kaon',family:'Strange meson',charge:'+1e',mass:'≈494 MeV/c²',structure:'u s̄',B:'0',Le:'0',Lm:'0',S:'+1',note:'Contains an antistrange quark, hence strangeness +1.'},
- photon:{symbol:'γ',name:'Photon',family:'Photon',charge:'0',mass:'zero rest mass',structure:'fundamental',B:'0',Le:'0',Lm:'0',S:'0',note:'Quantum of electromagnetic radiation; E = hf.'}
-};
-$('#particleButtons').innerHTML=Object.entries(particles).map(([k,p])=>`<button class="btn particle-btn text-left" data-p="${k}"><span class="text-xl font-black">${p.symbol}</span><span class="block text-xs muted">${p.family}</span></button>`).join('');
-function showParticle(k){const p=particles[k];$('#particleInfo').innerHTML=`<div class="flex flex-wrap justify-between items-start gap-3"><div><div class="text-3xl font-black">${p.symbol}</div><div class="font-black">${p.name}</div><div class="text-sm muted">${p.family}</div></div><span class="chip">${p.structure}</span></div><div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5 text-sm"><div><div class="muted text-xs">Charge</div><strong>${p.charge}</strong></div><div><div class="muted text-xs">Mass</div><strong>${p.mass}</strong></div><div><div class="muted text-xs">Baryon number</div><strong>${p.B}</strong></div><div><div class="muted text-xs">Strangeness</div><strong>${p.S}</strong></div><div><div class="muted text-xs">Electron lepton no.</div><strong>${p.Le}</strong></div><div><div class="muted text-xs">Muon lepton no.</div><strong>${p.Lm}</strong></div><div><div class="muted text-xs">Structure</div><strong>${p.structure}</strong></div></div><p class="text-sm mt-4">${p.note}</p>`}
-$$('.particle-btn').forEach(b=>b.onclick=()=>showParticle(b.dataset.p));showParticle('proton');
-
-const reactions={
- betaMinus:{eq:'n → p + e⁻ + ν̄ₑ',rows:[['Charge','0','+1 −1 +0',true],['Baryon number','1','1 + 0 + 0',true],['Electron lepton no.','0','0 +1 −1',true],['Muon lepton no.','0','0',true],['Strangeness','0','0',true]],note:'Allowed weak interaction. A down quark changes into an up quark.'},
- betaPlus:{eq:'p → n + e⁺ + νₑ',rows:[['Charge','+1','0 +1 +0',true],['Baryon number','1','1 +0 +0',true],['Electron lepton no.','0','0 −1 +1',true],['Muon lepton no.','0','0',true],['Strangeness','0','0',true]],note:'Allowed at particle level when energetically possible in a nucleus.'},
- annihilation:{eq:'e⁻ + e⁺ → γ + γ',rows:[['Charge','−1 +1','0',true],['Baryon number','0','0',true],['Electron lepton no.','+1 −1','0',true],['Muon lepton no.','0','0',true],['Strangeness','0','0',true]],note:'Energy and momentum must also be conserved.'},
- kaon:{eq:'K⁺ → π⁺ + π⁰',rows:[['Charge','+1','+1 +0',true],['Baryon number','0','0',true],['Electron lepton no.','0','0',true],['Muon lepton no.','0','0',true],['Strangeness','+1','0',false]],note:'This decay is weak, so strangeness may change.'},
- forbidden:{eq:'p → e⁺ + γ',rows:[['Charge','+1','+1 +0',true],['Baryon number','1','0',false],['Electron lepton no.','0','−1',false],['Muon lepton no.','0','0',true],['Strangeness','0','0',true]],note:'Not allowed in the Standard Model process set used here: baryon and lepton numbers fail.'}
-};
-$('#reactionSelect').innerHTML=Object.entries(reactions).map(([k,r])=>`<option value="${k}">${r.eq}</option>`).join('');
-function drawReaction(){const r=reactions[$('#reactionSelect').value];$('#reactionEquation').textContent=r.eq;$('#conservationResult').innerHTML=`<div class="grid grid-cols-4 gap-2 text-xs font-black border-b border-slate-700 pb-2"><div>Quantity</div><div>Before</div><div>After</div><div>Result</div></div>${r.rows.map(x=>`<div class="grid grid-cols-4 gap-2 text-sm py-3 border-b border-slate-800"><div>${x[0]}</div><div>${x[1]}</div><div>${x[2]}</div><div class="font-black ${x[3]?'text-emerald-300':'text-amber-300'}">${x[3]?'Conserved':'Changes'}</div></div>`).join('')}<div class="mt-4 text-sm muted">${r.note}</div>`}
-$('#reactionSelect').onchange=drawReaction;drawReaction();
-
-const quiz=[
- ['3.2.1.1','Which quantity is the same for isotopes of the same element?',['Nucleon number','Neutron number','Proton number','Mass'],2,'Isotopes have the same proton number Z but different neutron numbers.'],
- ['3.2.1.2','At a nucleon separation much greater than about 3 fm, the strong nuclear force is…',['strongly attractive','strongly repulsive','effectively negligible','electromagnetic'],2,'The strong nuclear force is short range and becomes negligible beyond a few femtometres.'],
- ['3.2.1.3','What minimum rest energy corresponds to creating an electron–positron pair?',['0.511 MeV','1.022 MeV','2.044 MeV','13.6 eV'],1,'Each particle has rest energy 0.511 MeV, so the pair requires at least 1.022 MeV.'],
- ['3.2.1.5','Which is a baryon?',['pion','kaon','proton','electron'],2,'The proton is a baryon containing three quarks.'],
- ['3.2.1.6','What is the quark structure of a neutron?',['uud','udd','uds','u d̄'],1,'A neutron contains one up and two down quarks: udd.'],
- ['3.2.1.6','What is the charge of an up quark?',['+⅓e','−⅓e','+⅔e','−⅔e'],2,'Up quarks carry +⅔e.'],
- ['3.2.1.7','Which quantity may change in a weak decay of a strange particle?',['charge','baryon number','strangeness','energy'],2,'Strangeness can change in weak interactions.'],
- ['3.2.2.1','Increasing light intensity above threshold primarily increases…',['photon energy','maximum electron KE','number of emitted electrons per second','threshold frequency'],2,'Higher intensity means more photons per second, so more electrons may be emitted.'],
- ['3.2.2.1','The maximum photoelectron kinetic energy is given by…',['hf + φ','φ − hf','hf − φ','h/f'],2,'Einstein’s photoelectric equation is hf = φ + KEmax.'],
- ['3.2.2.3','An emitted photon from an atomic transition has energy…',['equal to the lower level','equal to the upper level','equal to the difference between levels','independent of levels'],2,'Photon energy equals the energy difference ΔE between the states.'],
- ['3.2.2.4','If particle momentum doubles, its de Broglie wavelength…',['doubles','halves','stays constant','quadruples'],1,'λ = h/p, so doubling p halves λ.'],
- ['3.8.1.1','Large-angle alpha scattering showed that…',['electrons are massive','positive charge is spread uniformly','positive charge is concentrated in a tiny nucleus','atoms contain no empty space'],2,'Rare large deflections require a highly concentrated positive charge.']
-];
-let qi=0,score=0,streak=0,locked=false;
-function loadQuiz(){locked=false;const q=quiz[qi];$('#quizSpec').textContent='AQA '+q[0];$('#quizQuestion').textContent=q[1];$('#quizChoices').innerHTML=q[2].map((x,i)=>`<button class="btn quiz-choice" data-i="${i}">${String.fromCharCode(65+i)}. ${x}</button>`).join('');$('#quizFeedback').classList.add('hidden');$('#nextQuestion').classList.add('hidden');$('#quizProgressText').textContent=`${qi+1} / ${quiz.length}`;$('#quizProgressBar').style.width=`${((qi+1)/quiz.length)*100}%`;$$('.quiz-choice').forEach(b=>b.onclick=()=>answerQuiz(Number(b.dataset.i)))}
-function answerQuiz(i){if(locked)return;locked=true;const q=quiz[qi],ok=i===q[3];if(ok){score++;streak++}else streak=0;$('#quizScore').textContent=score;$('#quizStreak').textContent=streak;$$('.quiz-choice').forEach((b,j)=>{if(j===q[3])b.classList.add('correct');else if(j===i)b.classList.add('wrong')});$('#quizFeedback').innerHTML=`<div class="p-3 rounded-xl border ${ok?'border-emerald-500/50 bg-emerald-500/10':'border-amber-500/50 bg-amber-500/10'}"><strong>${ok?'Correct':'Not quite'}</strong><div class="text-sm mt-1">${q[4]}</div></div>`;$('#quizFeedback').classList.remove('hidden');$('#nextQuestion').textContent=qi===quiz.length-1?'Restart quiz':'Next question';$('#nextQuestion').classList.remove('hidden')}
-$('#nextQuestion').onclick=()=>{if(qi===quiz.length-1){qi=0;score=0;streak=0;$('#quizScore').textContent='0';$('#quizStreak').textContent='0'}else qi++;loadQuiz()};loadQuiz();
-
-const mapNodes=[
- {id:'atom',label:'Atomic\nstructure',x:130,y:120,sim:'atom',code:'3.2.1.1',desc:'Protons, neutrons, electrons, isotopes and specific charge.'},
- {id:'nucleus',label:'Nuclear\nforce',x:340,y:90,sim:'strong',code:'3.2.1.2',desc:'Short-range strong interaction and nuclear stability.'},
- {id:'rutherford',label:'Rutherford\nscattering',x:570,y:105,sim:'rutherford',code:'3.8.1.1',desc:'Evidence for a compact, positively charged nucleus.'},
- {id:'antimatter',label:'Antiparticles\n& photons',x:820,y:120,sim:'antimatter',code:'3.2.1.3',desc:'Antiparticles, annihilation, pair production and photon energy.'},
- {id:'class',label:'Particle\nclassification',x:165,y:335,sim:'quarks',code:'3.2.1.5',desc:'Hadrons, baryons, mesons and leptons.'},
- {id:'quarks',label:'Quarks &\nantiquarks',x:390,y:340,sim:'quarks',code:'3.2.1.6',desc:'u, d and s quarks and hadron structure.'},
- {id:'interaction',label:'Interactions &\nexchange',x:625,y:330,sim:'beta',code:'3.2.1.4',desc:'Fundamental interactions, virtual photons and W bosons.'},
- {id:'conserve',label:'Conservation\nlaws',x:845,y:335,sim:'beta',code:'3.2.1.7',desc:'Charge, baryon number, lepton number, strangeness, energy and momentum.'},
- {id:'photo',label:'Photoelectric\neffect',x:210,y:555,sim:'photo',code:'3.2.2.1',desc:'Photon model, threshold frequency, work function and stopping potential.'},
- {id:'levels',label:'Energy levels\n& spectra',x:495,y:550,sim:'levels',code:'3.2.2.2–3',desc:'Excitation, ionisation, quantised levels and photon transitions.'},
- {id:'dual',label:'Wave-particle\nduality',x:780,y:555,sim:'debroglie',code:'3.2.2.4',desc:'Electron diffraction and de Broglie wavelength.'}
-];
-const edges=[['atom','nucleus'],['atom','rutherford'],['nucleus','rutherford'],['class','quarks'],['quarks','interaction'],['interaction','conserve'],['antimatter','interaction'],['antimatter','photo'],['photo','levels'],['levels','dual'],['interaction','levels'],['quarks','conserve'],['atom','class']];
-let selectedNode=null;
-function drawMap(){const svg=$('#conceptMap');if(svg.dataset.ready)return;svg.dataset.ready='1';svg.innerHTML=`<defs><radialGradient id="nodeGrad"><stop offset="0" stop-color="#1a3655"/><stop offset="1" stop-color="#0b1b30"/></radialGradient></defs>${edges.map(([a,b])=>{const A=mapNodes.find(n=>n.id===a),B=mapNodes.find(n=>n.id===b);return `<line class="map-link" data-a="${a}" data-b="${b}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`}).join('')}${mapNodes.map(n=>`<g class="node" data-id="${n.id}" tabindex="0" role="button"><circle cx="${n.x}" cy="${n.y}" r="67" fill="url(#nodeGrad)" stroke="#416388" stroke-width="2"/><text x="${n.x}" y="${n.y-6}" fill="white" text-anchor="middle" font-size="18" font-weight="800">${n.label.split('\n').map((s,i)=>`<tspan x="${n.x}" dy="${i?22:0}">${s}</tspan>`).join('')}</text><text x="${n.x}" y="${n.y+45}" fill="#85cdfa" text-anchor="middle" font-size="12">${n.code}</text></g>`).join('')}`;svg.querySelectorAll('.node').forEach(g=>{g.addEventListener('click',()=>selectNode(g.dataset.id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectNode(g.dataset.id)}})})}
-function selectNode(id){selectedNode=mapNodes.find(n=>n.id===id);$$('#conceptMap .node').forEach(g=>g.classList.toggle('active',g.dataset.id===id));$$('#conceptMap .map-link').forEach(l=>l.classList.toggle('active',l.dataset.a===id||l.dataset.b===id));const linked=edges.filter(e=>e.includes(id)).map(e=>e[0]===id?e[1]:e[0]).map(k=>mapNodes.find(n=>n.id===k).label.replace('\n',' '));$('#mapInfo').innerHTML=`<div class="text-xs font-black text-sky-300">AQA ${selectedNode.code}</div><h3 class="text-xl font-black mt-1">${selectedNode.label.replace('\n',' ')}</h3><p class="text-sm muted mt-2">${selectedNode.desc}</p><div class="mt-3 text-xs muted">Direct links</div><div class="flex flex-wrap gap-1 mt-1">${linked.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`;$('#openMappedSim').disabled=false}
-$('#openMappedSim').onclick=()=>{if(!selectedNode)return;showView('lab');activateSim(selectedNode.sim)};
-</script>
+<footer class="wrap footer">Built as a teaching model for AQA A-level Physics. Always use your teacher's course materials alongside the simulations.</footer>
+<script type="module" src="app.js"></script>
 </body>
 </html>
