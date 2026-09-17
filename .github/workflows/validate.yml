@@ -54,5 +54,6 @@ jobs:
           node --check classroom-upgrades.js
           node --check spec-mastery.js
           node --check advanced-learning.js
+          node --check diagnostic-teacher.js
       - name: Check required app files
-        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js && test -s aqa-deep-dive.js && test -s simulation-guide.js && test -s accuracy-visuals.js && test -s classroom-upgrades.js && test -s spec-mastery.js && test -s advanced-learning.js
+        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js && test -s aqa-deep-dive.js && test -s simulation-guide.js && test -s accuracy-visuals.js && test -s classroom-upgrades.js && test -s spec-mastery.js && test -s advanced-learning.js && test -s diagnostic-teacher.js
