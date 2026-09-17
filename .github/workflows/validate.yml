@@ -51,5 +51,6 @@ jobs:
           node --check aqa-deep-dive.js
           node --check simulation-guide.js
           node --check accuracy-visuals.js
+          node --check classroom-upgrades.js
       - name: Check required app files
-        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js && test -s aqa-deep-dive.js && test -s simulation-guide.js && test -s accuracy-visuals.js
+        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js && test -s aqa-deep-dive.js && test -s simulation-guide.js && test -s accuracy-visuals.js && test -s classroom-upgrades.js
