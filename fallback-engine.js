@@ -98,7 +98,7 @@
     },
     quarks(){
       const opts=[['p','proton p = uud',true],['n','neutron n = udd'],['pip','π⁺ = u d̄'],['pim','π⁻ = d ū'],['kp','K⁺ = u s̄'],['km','K⁻ = s ū']];setControls(control('Build a hadron',select('fbHad',opts)));
-      const data={p:['u','u','d'],n:['u','d','d'],pip:['u','d̄'],pim:['d','ū'],kp:['u','s̄'],km:['s','ū']},charge:{u:2/3,d:-1/3,s:-1/3,'ū':-2/3,'d̄':1/3,'s̄':1/3},strange:{u:0,d:0,s:-1,'ū':0,'d̄':0,'s̄':1};
+      const data={p:['u','u','d'],n:['u','d','d'],pip:['u','d̄'],pim:['d','ū'],kp:['u','s̄'],km:['s','ū']},charge={u:2/3,d:-1/3,s:-1/3,'ū':-2/3,'d̄':1/3,'s̄':1/3},strange={u:0,d:0,s:-1,'ū':0,'d̄':0,'s̄':1};
       const update=()=>{const qs=data[$('#fbHad').value],Q=qs.reduce((a,q)=>a+charge[q],0),B=qs.reduce((a,q)=>a+(q.includes('̄')?-1/3:1/3),0),S=qs.reduce((a,q)=>a+strange[q],0);setReadout(`${qs.join(' + ')} · charge = ${Q.toFixed(2)}e · B = ${B.toFixed(0)} · S = ${S}`);animate(t=>{clear('Quark builder');const [w,h]=size(),cx=w/2,cy=h/2,R=70,rot=t*.2;qs.forEach((q,i)=>{const a=rot+i*Math.PI*2/qs.length,col=q.startsWith('u')||q.startsWith('ū')?palette.orange:q.startsWith('s')||q.startsWith('s̄')?palette.purple:palette.green;circle(cx+Math.cos(a)*R,cy+Math.sin(a)*R,32,col,q)});ctx.strokeStyle=palette.electron;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,R+45,0,Math.PI*2);ctx.stroke()})};$('#fbHad').onchange=update;update();
     },
     photo(){
