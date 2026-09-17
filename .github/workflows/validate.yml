@@ -47,5 +47,6 @@ jobs:
         run: |
           node --check app.js
           node --check fallback-engine.js
+          node --check tab-resilience.js
       - name: Check required app files
-        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js
+        run: test -s index.html && test -s styles.css && test -s app.js && test -s fallback-engine.js && test -s tab-resilience.js
