@@ -145,7 +145,7 @@
     const text=(st.textContent||'').toLowerCase();
     if(text.includes('unavailable')||text.includes('error')||text.includes('failed')) return startFallback('3D library unavailable');
     if(text.includes('3d model ready')) return;
-    if(performance.now()-boot>5000) return startFallback('3D start timed out');
+    if(window.PARTICLELAB_3D_READY) return; if(performance.now()-boot>8000) return startFallback('3D start timed out');
     setTimeout(monitor,350);
   }
   const boot=performance.now();
