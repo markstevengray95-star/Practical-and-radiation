@@ -45,6 +45,7 @@
             <button class="button" id="ruthFireBeam">Fire beam</button>
             <button class="button" id="ruthPause">Pause</button>
             <button class="button" id="ruthReset">Reset</button>
+            <button class="button" id="ruthOpen3D">Open 3D nucleus view</button>
           </div>
         </div>
 
@@ -76,6 +77,13 @@
                 <div><span class="ruth-number">3</span><span><strong>Thin gold foil</strong>Thin foil reduces repeated scattering through many atoms.</span></div>
                 <div><span class="ruth-number">4</span><span><strong>Fluorescent screen</strong>Alpha impacts create tiny flashes that reveal scattering direction.</span></div>
               </div>
+            </div>
+
+            <div class="panel ruth-card ruth-click-card">
+              <span class="eyebrow">Click the experiment</span>
+              <h3 id="ruthClickTitle">Select a part of the apparatus</h3>
+              <p id="ruthClickInfo">Click the alpha source, collimator, gold foil, detector, nucleus or a particle path to see exactly what it does and what the observation means.</p>
+              <div id="ruthClickScience" class="ruth-click-science"><strong>Science:</strong> the experiment links observations to the nuclear model of the atom.</div>
             </div>
 
             <div class="panel ruth-card">
@@ -189,8 +197,13 @@
       if (running) animate();
     });
     $('#ruthReset')?.addEventListener('click', reset);
+    $('#ruthOpen3D')?.addEventListener('click', () => {
+      document.querySelector('[data-view="lab"]')?.click();
+      setTimeout(() => document.querySelector('.sim-tab[data-sim="rutherford"]')?.click(), 60);
+    });
+    $('#rutherfordExperimentCanvas')?.addEventListener('click', handleRuthClick);
 
-    $$('[data-ruth-mode]').forEach(btn => btn.addEventListener('click', () => {
+    $('[data-ruth-mode]').forEach(btn => btn.addEventListener('click', () => {
       mode = btn.dataset.ruthMode;
       $$('[data-ruth-mode]').forEach(x => x.classList.toggle('active', x === btn));
       $('#ruthStageLabel').textContent = mode === 'apparatus' ? 'Apparatus view' : 'Single-nucleus close-up';
@@ -213,6 +226,93 @@
     });
     window.addEventListener('resize', resizeCanvas);
     updateAngle();
+  }
+
+
+  const ruthClickData = {
+    source:{
+      title:'Alpha source',
+      info:'The source emits alpha particles: helium nuclei containing two protons and two neutrons, with charge +2e.',
+      science:'Alpha particles are positively charged, so they are repelled by the positively charged gold nucleus.'
+    },
+    collimator:{
+      title:'Lead collimator',
+      info:'The shielding and narrow slit form a directed beam so the incoming alpha-particle direction is known.',
+      science:'A narrow initial direction makes the scattering angle meaningful.'
+    },
+    foil:{
+      title:'Very thin gold foil',
+      info:'Gold can be made extremely thin. Thin foil reduces the chance that one alpha particle is scattered repeatedly by many different atoms.',
+      science:'The observed direction can therefore be interpreted mainly as a single close encounter.'
+    },
+    detector:{
+      title:'Fluorescent detector screen',
+      info:'The detector produces a tiny flash when an alpha particle arrives, allowing the scattering direction to be measured.',
+      science:'Counting impacts at different angles gives the experimental evidence.'
+    },
+    straight:{
+      title:'Almost-straight alpha path',
+      info:'Most alpha particles travel through the foil with little or no deflection.',
+      science:'This shows that most of the atom is empty space.'
+    },
+    deflected:{
+      title:'Deflected alpha path',
+      info:'An alpha particle that passes closer to a nucleus experiences stronger electrostatic repulsion and changes direction.',
+      science:'This shows that positive charge is concentrated rather than spread evenly through the atom.'
+    },
+    nucleus:{
+      title:'Gold nucleus',
+      info:'This tiny central region contains the positive nuclear charge and almost all of the atomic mass.',
+      science:'Rare very large-angle deflections require a tiny, dense, positively charged nucleus.'
+    },
+    impact:{
+      title:'Impact parameter',
+      info:'Impact parameter b is the sideways offset between the incoming path and the nucleus centre if the alpha continued straight.',
+      science:'Smaller b means a closer encounter and therefore a larger Coulomb deflection.'
+    },
+    trajectory:{
+      title:'Coulomb-scattered trajectory',
+      info:'The path curves because both the alpha particle and nucleus are positively charged, producing electrostatic repulsion.',
+      science:'Increasing alpha energy reduces the scattering angle; increasing nuclear charge increases it.'
+    }
+  };
+
+  function showRuthClickInfo(key){
+    const d=ruthClickData[key]||ruthClickData.nucleus;
+    if($('#ruthClickTitle')) $('#ruthClickTitle').textContent=d.title;
+    if($('#ruthClickInfo')) $('#ruthClickInfo').textContent=d.info;
+    if($('#ruthClickScience')) $('#ruthClickScience').innerHTML='<strong>Science:</strong> '+d.science;
+  }
+
+  function handleRuthClick(e){
+    const canvas=$('#rutherfordExperimentCanvas');
+    if(!canvas)return;
+    const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top,w=rect.width,h=rect.height,cy=h*.52;
+    if(mode==='closeup'){
+      const cx=w*.56;
+      const d=Math.hypot(x-cx,y-h*.5);
+      if(d<70) showRuthClickInfo('nucleus');
+      else if(x<w*.45 && Math.abs(y-(h*.5-Math.min(h*.32,impactFm/220*h*.32+7)))<55) showRuthClickInfo('impact');
+      else showRuthClickInfo('trajectory');
+      return;
+    }
+    const sourceX=w*.09,slitX=w*.23,foilX=w*.55;
+    if(Math.hypot(x-sourceX,y-cy)<65) showRuthClickInfo('source');
+    else if(Math.abs(x-slitX)<45 && Math.abs(y-cy)<100) showRuthClickInfo('collimator');
+    else if(Math.abs(x-foilX)<28 && Math.abs(y-cy)<135) showRuthClickInfo('foil');
+    else if(x>w*.72) showRuthClickInfo('detector');
+    else if(x>foilX && Math.abs(y-cy)>35) showRuthClickInfo('deflected');
+    else showRuthClickInfo('straight');
+  }
+
+  function drawClickMarker(ctx,x,y,n,labelText){
+    ctx.save();
+    ctx.shadowColor='#7ee8ff';ctx.shadowBlur=16;
+    ctx.fillStyle='rgba(7,20,34,.92)';ctx.strokeStyle='#8edcff';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.shadowBlur=0;ctx.fillStyle='#eaf7ff';ctx.font='800 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(n),x,y);
+    ctx.font='700 10px system-ui';ctx.textAlign='left';ctx.fillStyle='#bfeaff';ctx.fillText(labelText,x+19,y+1);
+    ctx.restore();
   }
 
   function updateAngle() {
@@ -383,6 +483,10 @@
     label(ctx,'Most pass through almost straight',w*.45,44);
     ctx.fillStyle='#aabbd1';ctx.font='12px system-ui';ctx.textAlign='center';
     ctx.fillText('Some deflect • very few scatter through large angles',w*.55,64);
+    drawClickMarker(ctx,sourceX,cy-68,1,'source');
+    drawClickMarker(ctx,slitX,cy-92,2,'collimator');
+    drawClickMarker(ctx,foilX,cy-128,3,'gold foil');
+    drawClickMarker(ctx,w*.82,cy-112,4,'detector');
   }
 
   function drawCloseup(ctx,w,h) {
@@ -433,6 +537,9 @@
     ctx.fillText(`Calculated scattering angle θ ≈ ${theta.toFixed(1)}°`,20,36);
     ctx.fillStyle='#aabbd1';ctx.font='12px system-ui';
     ctx.fillText('Decrease b or energy → stronger deflection. Increase nuclear charge → stronger deflection.',20,56);
+    drawClickMarker(ctx,cx,cy-42,1,'nucleus');
+    drawClickMarker(ctx,startX+92,startY-30,2,'impact parameter');
+    drawClickMarker(ctx,turnX+95,startY-52,3,'trajectory');
     ctx.restore();
   }
 
