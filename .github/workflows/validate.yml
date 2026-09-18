@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate:
@@ -14,35 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Repair known syntax typos if present
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          p = Path('app.js')
-          s = p.read_text(encoding='utf-8')
-          s2 = s.replace('x.material.dispose?.()}})}}}', 'x.material.dispose?.()}})}}', 1)
-          if s2 != s:
-              p.write_text(s2, encoding='utf-8')
-
-          p = Path('fallback-engine.js')
-          s = p.read_text(encoding='utf-8')
-          s2 = s.replace("km:['s','ū']},charge:{u:", "km:['s','ū']},charge={u:", 1)
-          s2 = s2.replace("'s̄':1/3},strange:{u:", "'s̄':1/3},strange={u:", 1)
-          if s2 != s:
-              p.write_text(s2, encoding='utf-8')
-          PY
-      - name: Commit repair if needed
-        run: |
-          if git diff --quiet; then
-            echo "No repair needed"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "4189822+github-actions[bot]@users.noreply.github.com"
-            git add app.js fallback-engine.js
-            git commit -m "Fix simulation engine syntax validation errors"
-            git push
-          fi
       - name: Check JavaScript syntax
         run: |
           node --check app.js
@@ -56,7 +27,7 @@ jobs:
           node --check advanced-learning.js
           node --check diagnostic-teacher.js
           node --check rutherford-experiment.js
-          node --check compact-simulation-ui.js\n          node --check simulation-audio.js
+          node --check simulation-audio.js
       - name: Check required app files
         run: |
           test -s index.html
@@ -73,5 +44,5 @@ jobs:
           test -s diagnostic-teacher.js
           test -s rutherford-experiment.js
           test -s rutherford-experiment.css
-          test -s compact-simulation-ui.js
-          test -s compact-simulation-ui.css\n          test -s simulation-audio.js\n          test -s simulation-screen.css
+          test -s simulation-audio.js
+          test -s simulation-screen.css
