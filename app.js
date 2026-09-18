@@ -133,7 +133,7 @@ function renderSpec(){const grid=$('#specGrid');if(!grid)return;grid.innerHTML=l
 renderSpec();
 
 const simNav=$('#simNav');simNav.innerHTML=simDefs.map(([id,name,code])=>`<button class="button sim-tab ${id===currentSim?'active':''}" data-sim="${id}"><span class="small subtle">${code}</span> ${name}</button>`).join('');simNav.querySelectorAll('[data-sim]').forEach(b=>b.onclick=()=>activateSim(b.dataset.sim));
-function activateSim(id){currentSim=id;$$('.sim-tab').forEach(b=>b.classList.toggle('active',b.dataset.sim===id));const def=simDefs.find(s=>s[0]===id),t=simText[id];$('#specCode').textContent=`AQA ${def[2]}`;$('#simTitle').textContent=def[1];$('#simSubtitle').textContent=t.sub;$('#simpleExplain').innerHTML=`<p>${t.simple}</p>`;$('#examExplain').innerHTML=`<p>${t.exam}</p>`;$('#mistakeExplain').innerHTML=`<p>${t.mistake}</p>`;renderSimCheck(id);if(threeReady&&builders[id])builders[id]();else{$('#simControls').innerHTML='<div class="field"><span>3D model</span><div class="field-readout">The explanation is ready. The 3D engine is still loading.</div></div>';$('#simReadout').textContent='Loading interactive model…'}}
+function activateSim(id){currentSim=id;processClock=performance.now();selectedHotspot=null;$('.sim-tab').forEach(b=>b.classList.toggle('active',b.dataset.sim===id));const def=simDefs.find(s=>s[0]===id),t=simText[id];$('#specCode').textContent=`AQA ${def[2]}`;$('#simTitle').textContent=def[1];$('#simSubtitle').textContent=t.sub;$('#simpleExplain').innerHTML=`<p>${t.simple}</p>`;$('#examExplain').innerHTML=`<p>${t.exam}</p>`;$('#mistakeExplain').innerHTML=`<p>${t.mistake}</p>`;renderSimCheck(id);if($('#live3DSelected'))$('#live3DSelected').textContent='Click a glowing numbered marker in the 3D model.';if(threeReady&&builders[id]){builders[id]();queueMicrotask(()=>addHotspots(id))}else{$('#simControls').innerHTML='<div class="field"><span>3D model</span><div class="field-readout">The explanation is ready. The 3D engine is still loading.</div></div>';$('#simReadout').textContent='Loading interactive model…'}queueMicrotask(updateLivePanel)}
 function renderSimCheck(id){const q={atom:['Which number identifies the element?',['A','Z','number of neutrons'],1],specific:['Specific charge has units…',['C kg⁻¹','kg C⁻¹','J s'],0],strong:['At about 1 fm the strong force is mainly…',['attractive','zero','always repulsive'],0],decay:['In β⁻ decay Z…',['falls by 1','stays same','rises by 1'],2],antimatter:['Electron + positron can produce…',['two gamma photons','two protons','a neutron only'],0],interactions:['EM exchange particle?',['virtual photon','W⁻ only','pion'],0],classification:['A kaon is a…',['baryon','meson','lepton'],1],quarks:['Proton quarks?',['udd','uud','u d̄'],1],photo:['Below threshold frequency, more intensity gives…',['no emission','higher KE electrons','higher photon energy'],0],collisions:['Excitation means…',['electron removed','higher bound level','nucleus splits'],1],levels:['Downward transition…',['emits photon','absorbs photon','changes Z'],0],diffraction:['Higher momentum gives λ…',['larger','smaller','unchanged'],1],rutherford:['Most α particles passed straight through because…',['atoms are mostly empty space','nuclei are negative','alpha particles are neutral'],0]}[id];const box=$('#simCheck');box.innerHTML=`<div>${q[0]}</div><div class="quick-options">${q[1].map((x,i)=>`<button class="quick-option" data-a="${i}">${x}</button>`).join('')}</div><div id="quickFeedback" class="small subtle"></div>`;box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{box.querySelectorAll('[data-a]').forEach(x=>x.disabled=true);const ok=Number(b.dataset.a)===q[2];b.classList.add(ok?'correct':'wrong');if(!ok)box.querySelector(`[data-a="${q[2]}"]`).classList.add('correct');$('#quickFeedback').textContent=ok?'Correct — keep going.':'Not quite — use the simple explanation above, then try the idea again later.'})}
 activateSim('atom');
 
@@ -163,17 +163,188 @@ const mapNodes=[
 ];const mapEdges=[['atom','strong'],['strong','decay'],['decay','quarks'],['quarks','classification'],['classification','interactions'],['interactions','antimatter'],['antimatter','photo'],['photo','levels'],['collisions','levels'],['levels','diffraction'],['classification','quarks'],['atom','rutherford'],['rutherford','strong']];function renderMap(){const svg=$('#conceptMap'),pos=Object.fromEntries(mapNodes.map(n=>[n[0],[n[2],n[3]]]));svg.innerHTML=mapEdges.map(([a,b])=>`<line class="map-edge" x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}"/>`).join('')+mapNodes.map(([id,label,x,y])=>`<g class="map-node" data-map="${id}" transform="translate(${x-92},${y-30})"><rect width="184" height="60" rx="14"/><text x="92" y="26" text-anchor="middle">${label.includes('&')?label.split(' &')[0]:label}</text><text x="92" y="46" text-anchor="middle" style="font-size:12px;fill:#9fb3ca">${label.includes('&')?'&'+label.split('&')[1]:simDefs.find(s=>s[0]===id)?.[2]||''}</text></g>`).join('');svg.querySelectorAll('[data-map]').forEach(g=>g.onclick=()=>selectMap(g.dataset.map));selectMap('atom')}
 function selectMap(id){$('#conceptMap').querySelectorAll('[data-map]').forEach(g=>g.classList.toggle('active',g.dataset.map===id));const d=simDefs.find(s=>s[0]===id),t=simText[id];$('#mapInfo').innerHTML=`<span class="eyebrow">${d?.[2]||'Extension'}</span><h2>${d?.[1]||id}</h2><p>${t.simple}</p><div class="tip"><strong>Exam link:</strong> ${t.exam}</div><button id="mapOpen" class="button primary">Open simulation</button>`;$('#mapOpen').onclick=()=>{currentSim=id;showView('lab');activateSim(id)}}renderMap();
 
-let THREE=null,renderer=null,scene=null,camera=null,world=null,threeReady=false,paused=false,drag=false,lastX=0,lastY=0,animator=()=>{},clockStart=performance.now();
+let THREE=null,renderer=null,scene=null,camera=null,world=null,raycaster=null,pointer=null,hotspotGroup=null,selectedHotspot=null,threeReady=false,paused=false,drag=false,pointerMoved=false,lastX=0,lastY=0,animator=()=>{},clockStart=performance.now(),processClock=performance.now(),lastLiveUpdate=0;
 const builders={};
+
+const hotspotDefs={
+ atom:[
+  {p:[0,0,1.25],title:'Nucleus',what:'The tiny central region containing protons and neutrons.',science:'Almost all atomic mass is concentrated here. Proton number Z identifies the element.',exam:'State Z as proton number and A as total nucleon number.'},
+  {p:[2.7,1.0,.4],title:'Electron cloud',what:'A probability-style region showing where electrons may be found.',science:'This is not a fixed planetary orbit. Atomic size is dominated by the electron region.',exam:'For a neutral atom, number of electrons = number of protons.'}
+ ],
+ specific:[
+  {p:[0,0,1.2],title:'Mass of the ion/nucleus',what:'Most of the mass comes from protons and neutrons.',science:'Specific charge depends on the total particle mass, not only its charge.',exam:'specific charge = Q/m, unit C kg⁻¹.'},
+  {p:[2.5,1.1,.3],title:'Electrons',what:'Electrons change the net charge while adding very little mass.',science:'Removing electrons can make Q positive; adding electrons can make Q negative.',exam:'Find net charge first, then divide by the whole mass.'}
+ ],
+ strong:[
+  {p:[-1.25,0,.7],title:'Proton / nucleon',what:'One of the two nucleons in the force model.',science:'At nuclear separations nucleons experience the strong interaction.',exam:'The strong nuclear force is short range.'},
+  {p:[0,1.15,.4],title:'Force region',what:'The arrows show the direction of the strong force at the selected separation.',science:'It is repulsive below about 0.5 fm, attractive over normal nuclear separations and negligible beyond about 3 fm.',exam:'Do not describe it as always attractive.'}
+ ],
+ decay:[
+  {p:[0,0,1.2],title:'Parent nucleus',what:'The unstable nucleus before the decay.',science:'The decay changes the nucleus while conserving charge, energy and momentum.',exam:'Track A and Z carefully.'},
+  {p:[2.7,1.25,.3],title:'Emitted charged particle',what:'This becomes the alpha particle, beta electron or positron depending on the selected process.',science:'In beta decay the beta particle is created in the weak interaction.',exam:'β⁻: Z +1; β⁺: Z −1; A unchanged.'},
+  {p:[2.7,-1.0,.5],title:'Neutrino / antineutrino',what:'The neutral lepton emitted in beta processes.',science:'It is required for lepton-number, energy and momentum conservation.',exam:'β⁻ emits an electron antineutrino; β⁺ emits an electron neutrino.'}
+ ],
+ antimatter:[
+  {p:[-2.7,0,.5],title:'Matter particle',what:'The electron or incoming photon side of the process.',science:'Matter–antimatter processes convert between rest energy, kinetic energy and photon energy.',exam:'Use E = mc² and E = hf where appropriate.'},
+  {p:[2.7,0,.5],title:'Antiparticle / products',what:'The positron or produced particle side of the process.',science:'A particle and antiparticle have equal rest mass and opposite relevant quantum numbers.',exam:'e⁻ + e⁺ annihilation commonly produces two gamma photons.'},
+  {p:[0,1.5,.4],title:'Energy conversion',what:'This marker highlights the interaction region where the process changes form.',science:'Energy and momentum must both be conserved.',exam:'Electron–positron pair creation needs at least 1.022 MeV of rest energy.'}
+ ],
+ interactions:[
+  {p:[-3,0,.6],title:'Incoming particle',what:'A particle entering the interaction.',science:'Start a particle-interaction diagram by identifying every incoming particle and its quantum numbers.',exam:'Check charge, baryon number and lepton number.'},
+  {p:[0,.75,.5],title:'Exchange particle',what:'The interaction is represented using an exchange particle.',science:'AQA uses a virtual photon for electromagnetic interactions and W⁺/W⁻ for the weak processes studied here.',exam:'Name the correct exchange particle and then check the vertices.'},
+  {p:[3,0,.6],title:'Outgoing particle',what:'A particle after the interaction.',science:'Outgoing particles must make the full reaction conserve the required quantities.',exam:'Also remember total energy and momentum conservation.'}
+ ],
+ classification:[
+  {p:[-2.5,1.8,.5],title:'Baryons',what:'Protons and neutrons are baryons and therefore hadrons.',science:'Baryons contain three quarks and have baryon number +1.',exam:'Proton and neutron are the key AQA baryon examples.'},
+  {p:[.5,1.4,.5],title:'Mesons',what:'Pions and kaons are mesons and therefore hadrons.',science:'Mesons contain a quark and an antiquark, so total baryon number is zero.',exam:'Kaons are strange mesons.'},
+  {p:[3,1.5,.5],title:'Leptons',what:'Electrons, muons and neutrinos are leptons.',science:'Leptons do not take part in the strong interaction.',exam:'Track electron and muon lepton numbers separately.'}
+ ],
+ quarks:[
+  {p:[0,0,1.25],title:'Quark content',what:'The coloured spheres represent the u, d or s quarks/antiquarks used to build the selected hadron.',science:'Add fractional charge, baryon number and strangeness to get the hadron totals.',exam:'p = uud; n = udd.'},
+  {p:[0,1.45,.25],title:'Hadron binding model',what:'The connecting lines are a teaching visual showing that the quarks belong to one hadron.',science:'They are not literal rods or strings visible inside the particle.',exam:'Meson = quark + antiquark; baryon = three quarks.'}
+ ],
+ photo:[
+  {p:[-2.6,1.3,.4],title:'Photon',what:'One photon approaches the metal surface carrying energy hf.',science:'Photon energy depends on frequency, not intensity.',exam:'E = hf.'},
+  {p:[1.2,0,1.2],title:'Metal surface',what:'Electrons in the metal require at least the work function φ to escape.',science:'Below threshold frequency no photoelectrons are emitted, however intense the light.',exam:'hf = φ + KEmax.'},
+  {p:[3.0,1.0,.4],title:'Photoelectron',what:'An emitted electron carries the photon energy left after overcoming the work function.',science:'Its maximum kinetic energy is hf − φ.',exam:'KEmax = eVs.'}
+ ],
+ collisions:[
+  {p:[-3,0,.4],title:'Incident electron',what:'The incoming electron carries kinetic energy into the collision.',science:'It can transfer only an allowed excitation energy or enough energy for ionisation.',exam:'1 eV = 1.602 × 10⁻¹⁹ J.'},
+  {p:[0,0,1.1],title:'Atom',what:'The atom can be excited or ionised depending on the transferred energy.',science:'Excitation leaves an electron bound; ionisation removes it completely.',exam:'Do not treat excitation energies as continuous.'},
+  {p:[1.7,1.3,.4],title:'After the collision',what:'This region shows the changed atomic state or ejected electron.',science:'Any leftover energy remains as kinetic energy of particles after the collision.',exam:'Apply energy conservation.'}
+ ],
+ levels:[
+  {p:[0,0,1.2],title:'Allowed energy levels',what:'Each disc represents an allowed atomic energy, not a physical orbit in space.',science:'Atomic energies are discrete.',exam:'Line spectra are evidence for discrete energy levels.'},
+  {p:[0,2.0,.5],title:'Electron transition',what:'The electron marker moves from the selected upper level to the lower level.',science:'The energy lost becomes one photon.',exam:'ΔE = hf.'},
+  {p:[2.5,1.1,.4],title:'Photon',what:'The photon carries exactly the energy difference between the two levels.',science:'A larger energy difference gives higher frequency and shorter wavelength.',exam:'ΔE = hf = hc/λ.'}
+ ],
+ diffraction:[
+  {p:[-2.7,0,.4],title:'Electron beam',what:'Electrons are accelerated towards the diffracting structure/screen.',science:'Increasing accelerating voltage increases electron momentum.',exam:'Use λ = h/p.'},
+  {p:[3.1,0,1.1],title:'Diffraction screen',what:'The screen shows the distribution of diffracted electrons.',science:'A ring pattern is evidence of electron wave behaviour.',exam:'Electron diffraction supports wave–particle duality.'},
+  {p:[3.0,1.7,.4],title:'Diffraction rings',what:'The ring spacing changes as the electron wavelength changes.',science:'Higher momentum gives shorter de Broglie wavelength and a tighter pattern.',exam:'Increasing p decreases λ.'}
+ ],
+ rutherford:[
+  {p:[0,0,1.3],title:'Positive nucleus',what:'The gold nucleus contains concentrated positive charge and most of the atomic mass.',science:'An alpha particle passing close to it experiences strong electrostatic repulsion.',exam:'Rare large deflections imply a tiny concentrated positive nucleus.'},
+  {p:[-1.2,.8,.5],title:'Close alpha path',what:'A small impact parameter brings the alpha particle close to the nucleus.',science:'Closer approach gives a larger Coulomb deflection.',exam:'Smaller impact parameter → larger scattering angle.'},
+  {p:[-1.3,1.7,.4],title:'Distant alpha path',what:'Most alpha particles pass far from a nucleus and are barely deflected.',science:'This is consistent with the atom being mostly empty space.',exam:'Most alpha particles passed straight through the foil.'}
+ ]
+};
+
+const processTimelines={
+ decay:{duration:2600,steps:['Unstable nucleus','Weak change inside the nucleus','Emitted particles separate','Daughter nucleus remains']},
+ antimatter:{duration:2400,steps:['Particles/photon approach','Energy is concentrated at the interaction','New photons or pair appear','Energy and momentum are checked']},
+ interactions:{duration:2200,steps:['Incoming particles','Exchange particle carries the interaction','Interaction vertex','Outgoing particles']},
+ photo:{duration:2200,steps:['Photon approaches metal','Photon energy transfers to one electron','Electron overcomes work function','Photoelectron leaves the surface']},
+ collisions:{duration:2600,steps:['Electron approaches','Collision occurs','Excitation or ionisation happens','Particles leave with conserved energy']},
+ levels:{duration:3000,steps:['Electron begins on upper level','Electron changes energy','Photon is emitted','Electron remains on lower level']},
+ diffraction:{duration:2200,steps:['Electron beam travels','Electron reaches diffracting structure','Wave-like diffraction occurs','Ring pattern is observed']},
+ rutherford:{duration:3000,steps:['Alpha particle approaches','Coulomb repulsion increases near nucleus','Trajectory bends','Detector records the scattering angle']}
+};
+
+function makeHotspotLabel(text){
+ const cv=document.createElement('canvas');cv.width=512;cv.height=96;
+ const x=cv.getContext('2d');x.clearRect(0,0,512,96);x.fillStyle='rgba(5,17,30,.88)';x.strokeStyle='rgba(126,216,255,.75)';x.lineWidth=3;
+ x.beginPath();x.roundRect(8,8,496,80,20);x.fill();x.stroke();
+ x.fillStyle='#eaf7ff';x.font='700 28px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,49);
+ const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
+ const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false});
+ const sp=new THREE.Sprite(mat);sp.scale.set(2.4,.45,1);sp.position.y=.52;sp.renderOrder=50;return sp;
+}
+function makeHotspot(def,index){
+ const g=new THREE.Group();g.position.set(def.p[0],def.p[1],def.p[2]||0);g.userData.hotspotInfo=def;g.userData.hotspotIndex=index;
+ const m=new THREE.Mesh(new THREE.SphereGeometry(.14,20,16),new THREE.MeshStandardMaterial({color:0x8edcff,emissive:0x184b66,emissiveIntensity:1.5,roughness:.18,metalness:.15,transparent:true,opacity:.92}));
+ m.userData.hotspotInfo=def;g.add(m);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.25,.022,8,36),new THREE.MeshBasicMaterial({color:0xbbeaff,transparent:true,opacity:.75,depthTest:false}));
+ ring.userData.hotspotInfo=def;g.add(ring);
+ const label=makeHotspotLabel(String(index+1)+' · '+def.title);label.userData.hotspotInfo=def;g.add(label);
+ return g;
+}
+function addHotspots(id){
+ if(!threeReady||!world||!THREE)return;
+ if(hotspotGroup&&hotspotGroup.parent)world.remove(hotspotGroup);
+ hotspotGroup=new THREE.Group();hotspotGroup.name='interactive-hotspots';
+ (hotspotDefs[id]||[]).forEach((d,i)=>hotspotGroup.add(makeHotspot(d,i)));
+ world.add(hotspotGroup);selectedHotspot=null;updateLivePanel();
+}
+function hotspotInfoFromObject(o){
+ let n=o;while(n&&n!==world){if(n.userData&&n.userData.hotspotInfo)return n.userData.hotspotInfo;n=n.parent}return null;
+}
+function hotspotNodeFromObject(o){
+ let n=o;while(n&&n!==world){if(n.userData&&n.userData.hotspotInfo&&n.type==='Group')return n;n=n.parent}return null;
+}
+function ensureInteractionPanel(){
+ const wrap=$('.viewer-wrap');if(!wrap)return;
+ if(!$('#live3DPanel')){
+  const p=document.createElement('div');p.id='live3DPanel';p.className='live-3d-panel';
+  p.innerHTML='<div class="live-3d-head"><span class="eyebrow">Live 3D explanation</span><strong id="live3DStage">Explore the model</strong></div><div id="live3DNow" class="live-3d-now"></div><div id="live3DSelected" class="live-3d-selected">Click a glowing numbered marker in the 3D model.</div><div class="live-3d-grid"><div><span>Science</span><p id="live3DScience"></p></div><div><span>Exam link</span><p id="live3DExam"></p></div></div>';
+  wrap.appendChild(p);
+ }
+ if(!$('#hotspotToggle')){
+  const b=document.createElement('button');b.id='hotspotToggle';b.className='button';b.textContent='◎ 3D labels: On';$('.viewer-buttons')?.appendChild(b);
+  b.onclick=()=>{if(!hotspotGroup)return;hotspotGroup.visible=!hotspotGroup.visible;b.textContent=hotspotGroup.visible?'◎ 3D labels: On':'◎ 3D labels: Off';b.classList.toggle('active',hotspotGroup.visible)};
+ }
+}
+function currentDynamicState(){
+ const id=currentSim;
+ try{
+  if(id==='atom'){const v=$('#iso')?.value||'6,12';const a=v.split(',').map(Number);return 'Selected isotope: Z = '+a[0]+', A = '+a[1]+', neutrons = '+(a[1]-a[0])+'.';}
+  if(id==='specific'){const Z=+($('#scZ')?.value||6),A=Math.max(+($('#scA')?.value||12),Z),ne=+($('#scE')?.value||Z);const q=(Z-ne)*ECHARGE,m=Z*MP+(A-Z)*MN+ne*ME;return 'Net charge = '+(Z-ne)+'e; specific charge ≈ '+(q/m).toExponential(2)+' C kg⁻¹.';}
+  if(id==='strong'){const d=+($('#sep')?.value||120)/100;const st=d<.5?'repulsive':d<=3?'attractive':'negligible';return 'Nucleon separation = '+d.toFixed(2)+' fm, so the strong force is currently '+st+'.';}
+  if(id==='decay'){const m=$('#decayMode')?.value||'bm';return m==='alpha'?'Alpha decay: a helium-4 nucleus is emitted.':m==='bm'?'Beta-minus: neutron character changes to proton character; e⁻ and anti-νₑ are emitted.':'Beta-plus: proton character changes to neutron character; e⁺ and νₑ are emitted.';}
+  if(id==='antimatter'){const m=$('#antiMode')?.value||'ann';return m==='ann'?'An electron and positron approach and convert their energy into photons.':'A high-energy photon near a nucleus can create an electron–positron pair.';}
+  if(id==='interactions'){const m=$('#intMode')?.value||'em';return 'Selected interaction: '+({em:'electromagnetic virtual-photon exchange',bm:'beta-minus weak interaction',bp:'beta-plus weak interaction',capture:'electron capture',ep:'electron–proton collision'}[m]||m)+'.';}
+  if(id==='classification'){return 'Highlighted family: '+($('#fam')?.value||'all particles')+'. Click the numbered markers to compare groups.';}
+  if(id==='quarks'){return 'Selected hadron: '+($('#had')?.selectedOptions?.[0]?.textContent||'proton p = uud')+'. Add the quark quantum numbers to check the totals.';}
+  if(id==='photo'){const f=+($('#pf')?.value||8)*1e14,phi=+($('#pphi')?.value||2.3),eph=H*f/ECHARGE,ke=Math.max(0,eph-phi);return ke>0?'Photon energy '+eph.toFixed(2)+' eV exceeds φ = '+phi.toFixed(2)+' eV; photoemission occurs with KEmax = '+ke.toFixed(2)+' eV.':'Photon energy '+eph.toFixed(2)+' eV is below φ = '+phi.toFixed(2)+' eV; no photoemission occurs.';}
+  if(id==='collisions'){const E=+($('#ce')?.value||11),vals=($('#ct')?.value||'10.2,13.6').split(',').map(Number);return E>=vals[1]?'Incident electron has enough energy for ionisation.':E>=vals[0]?'Incident electron can excite the atom to an allowed higher state.':'Incident electron is below the first model excitation threshold.';}
+  if(id==='levels'){return 'Selected transition: '+($('#tr')?.selectedOptions?.[0]?.textContent||'n=3 → n=2')+'. The emitted photon carries exactly the energy difference.';}
+  if(id==='diffraction'){const V=+($('#dv')?.value||200),p=Math.sqrt(2*ME*ECHARGE*V),lam=H/p;return 'At '+V+' V, electron wavelength ≈ '+(lam*1e10).toFixed(3)+' Å. Higher voltage tightens the diffraction pattern.';}
+  if(id==='rutherford'){const b=+($('#rb')?.value||70)/100,Z=+($('#rz')?.value||79);return 'Impact parameter b = '+b.toFixed(2)+' scaled units and nuclear charge Z = '+Z+'. Smaller b or larger Z gives stronger deflection.';}
+ }catch(e){}
+ return 'Use the controls and click the 3D markers to connect the visual model to the physics.';
+}
+function currentTimelineStage(){
+ const t=processTimelines[currentSim];if(!t)return {label:'Current state',text:currentDynamicState()};
+ const q=((performance.now()-processClock)%t.duration)/t.duration;const i=Math.min(t.steps.length-1,Math.floor(q*t.steps.length));
+ return {label:'Step '+(i+1)+' of '+t.steps.length,text:t.steps[i]};
+}
+function updateLivePanel(){
+ ensureInteractionPanel();
+ const stage=currentTimelineStage();
+ if($('#live3DStage'))$('#live3DStage').textContent=stage.label+' · '+stage.text;
+ if($('#live3DNow'))$('#live3DNow').textContent=currentDynamicState();
+ const base=hotspotDefs[currentSim]?.[0];
+ if(!selectedHotspot&&base){
+  if($('#live3DScience'))$('#live3DScience').textContent=base.science;
+  if($('#live3DExam'))$('#live3DExam').textContent=base.exam;
+ }
+}
+function selectHotspotAt(e){
+ if(!raycaster||!pointer||!camera||!world||!hotspotGroup||hotspotGroup.visible===false)return;
+ const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
+ raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(hotspotGroup.children,true);
+ if(!hits.length)return;
+ const info=hotspotInfoFromObject(hits[0].object),node=hotspotNodeFromObject(hits[0].object);if(!info)return;
+ selectedHotspot=info;
+ hotspotGroup.children.forEach(g=>g.scale.setScalar(g===node?1.32:1));
+ if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+info.title+'</strong> · '+info.what;
+ if($('#live3DScience'))$('#live3DScience').textContent=info.science;
+ if($('#live3DExam'))$('#live3DExam').textContent=info.exam;
+ window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:currentSim,title:info.title}}));
+}
+function animateHotspots(t){
+ if(!hotspotGroup||hotspotGroup.visible===false)return;
+ hotspotGroup.children.forEach((g,i)=>{const s=g.userData.hotspotInfo===selectedHotspot?1.32:1;const pulse=1+.07*Math.sin(t*3+i);g.scale.setScalar(s*pulse);g.children.forEach(o=>{if(o.type==='Sprite')o.quaternion.copy(camera.quaternion)})});
+}
 function threeColor(css){return new THREE.Color(css)}
-function sphere(r,color,opacity=1){return new THREE.Mesh(new THREE.SphereGeometry(r,28,20),new THREE.MeshStandardMaterial({color,roughness:.32,metalness:.06,transparent:opacity<1,opacity}))}
+function sphere(r,color,opacity=1){const m=new THREE.Mesh(new THREE.SphereGeometry(r,32,24),new THREE.MeshStandardMaterial({color,roughness:.24,metalness:.1,transparent:opacity<1,opacity}));m.castShadow=true;m.receiveShadow=true;return m}
 function line3(points,color){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color,transparent:true,opacity:.88}))}
-function clearWorld(){animator=()=>{};if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}}
+function clearWorld(){animator=()=>{};hotspotGroup=null;selectedHotspot=null;if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}queueMicrotask(()=>{if(threeReady&&world)addHotspots(currentSim)})}
 function randomBall(r){let v;do{v=new THREE.Vector3((Math.random()*2-1)*r,(Math.random()*2-1)*r,(Math.random()*2-1)*r)}while(v.length()>r);return v}
 function cluster(Z,A,size=.16){const g=new THREE.Group(),R=.42+.16*Math.cbrt(Math.min(A,210));for(let i=0;i<A;i++){const m=sphere(size,i<Z?'#ff7777':'#72a9ff');m.position.copy(randomBall(R));g.add(m)}return g}
 function setCamera(z=8){camera.position.set(0,1.3,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
 function control(label,inner){return `<label class="field"><span>${label}</span>${inner}</label>`}
-function setReadout(html){$('#simReadout').innerHTML=html}
+function setReadout(html){$('#simReadout').innerHTML=html;queueMicrotask(updateLivePanel)}
 
 builders.atom=()=>{clearWorld();setCamera(8);$('#simControls').innerHTML=control('Choose isotope','<select id="iso"><option value="1,1">Hydrogen-1</option><option value="6,12" selected>Carbon-12</option><option value="6,14">Carbon-14</option><option value="8,16">Oxygen-16</option><option value="79,197">Gold-197</option></select>');const build=()=>{clearWorld();const [Z,A]=$('#iso').value.split(',').map(Number),nuc=cluster(Z,A,A>60?.08:.15);world.add(nuc);const pts=[];for(let i=0;i<Math.min(1600,220+Z*10);i++){let v=randomBall(4);if(v.length()<1.5)v.setLength(1.5+Math.random()*2.3);pts.push(v.x,v.y,v.z)}const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));const cloud=new THREE.Points(geom,new THREE.PointsMaterial({color:'#76d8ff',size:.045,transparent:true,opacity:.34,depthWrite:false}));world.add(cloud);setReadout(`Z = ${Z} · A = ${A} · neutrons = ${A-Z} · neutral atom electrons = ${Z}`);animator=t=>{cloud.rotation.y=t*.08;nuc.rotation.y=-t*.05}};$('#iso').onchange=build;build()};
 
@@ -202,5 +373,5 @@ builders.diffraction=()=>{clearWorld();setCamera(9);$('#simControls').innerHTML=
 function trajectory(b,Z){let p=new THREE.Vector3(-6,b,0),v=new THREE.Vector3(.105,0,0),pts=[];for(let i=0;i<260;i++){pts.push(p.clone());const r=Math.max(.28,p.length()),a=p.clone().normalize().multiplyScalar(.000065*Z/(r*r));v.add(a);p.add(v);if(p.x>6||Math.abs(p.y)>6)break}return pts}
 builders.rutherford=()=>{clearWorld();setCamera(10);$('#simControls').innerHTML=control('Impact parameter','<input id="rb" type="range" min="15" max="190" value="70"><div id="rbR" class="field-readout"></div>')+control('Nuclear charge Z','<input id="rz" type="range" min="10" max="90" value="79"><div id="rzR" class="field-readout"></div>');const nucleus=cluster(79,197,.07);world.add(nucleus);let paths=[];const draw=()=>{paths.forEach(p=>world.remove(p));paths=[];const b=+$('#rb').value/100,Z=+$('#rz').value;$('#rbR').textContent=`b = ${b.toFixed(2)} scaled units`;$('#rzR').textContent=`Z = ${Z}${Z===79?' (gold)':''}`;[-1.5,-1.0,-.65,.65,1.0,1.5].forEach(v=>{const l=line3(trajectory(v,Z),0x57718d);world.add(l);paths.push(l)});const h=line3(trajectory(b,Z),0x67c7ff);world.add(h);paths.push(h);setReadout('Smaller impact parameter and larger nuclear charge give stronger electrostatic deflection.');animator=t=>nucleus.rotation.y=t*.1};['rb','rz'].forEach(id=>$('#'+id).oninput=draw);draw()};
 
-function initThree(T){THREE=T;const canvas=$('#sceneCanvas');renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(42,1,.1,100);world=new THREE.Group();scene.add(world);scene.add(new THREE.HemisphereLight(0xffffff,0x34445c,1.6));const dl=new THREE.DirectionalLight(0xffffff,2.2);dl.position.set(5,8,7);scene.add(dl);const resize=()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(Math.max(10,r.width),Math.max(10,r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()};new ResizeObserver(resize).observe(canvas.parentElement);resize();canvas.onpointerdown=e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!drag)return;world.rotation.y+=(e.clientX-lastX)*.008;world.rotation.x=Math.max(-1.2,Math.min(1.2,world.rotation.x+(e.clientY-lastY)*.006));lastX=e.clientX;lastY=e.clientY};canvas.onpointerup=()=>drag=false;canvas.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=Math.max(4,Math.min(16,camera.position.z+e.deltaY*.01))},{passive:false});$('#rotateLeft').onclick=()=>world.rotation.y-=.3;$('#rotateRight').onclick=()=>world.rotation.y+=.3;$('#resetView').onclick=()=>setCamera(currentSim==='rutherford'?10:8);$('#pauseMotion').onclick=()=>{paused=!paused;$('#pauseMotion').textContent=paused?'Resume motion':'Pause motion'};threeReady=true;$('#renderStatus').textContent='3D model ready';setTimeout(()=>$('#renderStatus').style.opacity=.2,1400);const loop=()=>{requestAnimationFrame(loop);if(!paused)animator((performance.now()-clockStart)/1000);renderer.render(scene,camera)};loop();activateSim(currentSim)}
+function initThree(T){THREE=T;const canvas=$('#sceneCanvas');renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x07111f,.018);camera=new THREE.PerspectiveCamera(42,1,.1,100);world=new THREE.Group();scene.add(world);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();scene.add(new THREE.HemisphereLight(0xeef8ff,0x22344d,1.75));const dl=new THREE.DirectionalLight(0xffffff,2.35);dl.position.set(5,8,7);dl.castShadow=true;scene.add(dl);const rim=new THREE.PointLight(0x67c7ff,18,18,2);rim.position.set(-5,2,4);scene.add(rim);const warm=new THREE.PointLight(0xffc86b,9,14,2);warm.position.set(4,-3,2);scene.add(warm);const resize=()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(Math.max(10,r.width),Math.max(10,r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()};new ResizeObserver(resize).observe(canvas.parentElement);resize();ensureInteractionPanel();canvas.onpointerdown=e=>{drag=true;pointerMoved=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!drag)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)pointerMoved=true;world.rotation.y+=dx*.008;world.rotation.x=Math.max(-1.2,Math.min(1.2,world.rotation.x+dy*.006));lastX=e.clientX;lastY=e.clientY};canvas.onpointerup=e=>{drag=false;if(!pointerMoved)selectHotspotAt(e)};canvas.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=Math.max(4,Math.min(16,camera.position.z+e.deltaY*.01))},{passive:false});$('#rotateLeft').onclick=()=>world.rotation.y-=.3;$('#rotateRight').onclick=()=>world.rotation.y+=.3;$('#resetView').onclick=()=>setCamera(currentSim==='rutherford'?10:8);$('#pauseMotion').onclick=()=>{paused=!paused;$('#pauseMotion').textContent=paused?'Resume motion':'Pause motion'};document.addEventListener('input',e=>{if(e.target.closest?.('#simControls')){processClock=performance.now();setTimeout(updateLivePanel,0)}});document.addEventListener('change',e=>{if(e.target.closest?.('#simControls')){processClock=performance.now();setTimeout(updateLivePanel,0)}});document.addEventListener('click',e=>{if(e.target.closest?.('#simControls button')){processClock=performance.now();setTimeout(updateLivePanel,0)}});threeReady=true;$('#renderStatus').textContent='Interactive 3D model ready · click numbered markers';setTimeout(()=>$('#renderStatus').style.opacity=.35,1900);const loop=()=>{requestAnimationFrame(loop);const now=performance.now(),t=(now-clockStart)/1000;if(!paused)animator(t);animateHotspots(t);if(now-lastLiveUpdate>180){lastLiveUpdate=now;updateLivePanel()}renderer.render(scene,camera)};loop();activateSim(currentSim)}
 import('https://cdn.jsdelivr.net/npm/three@0.181.1/build/three.module.js').then(initThree).catch(()=>{$('#renderStatus').textContent='3D engine unavailable on this network';$('#simReadout').textContent='The teaching notes, formulas, map, atlas and quiz still work. Try another network for the 3D models.'});
