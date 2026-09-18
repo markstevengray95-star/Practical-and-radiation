@@ -204,6 +204,8 @@
     return 260+n*560;
   }
 
+  window.addEventListener('particlelab:hotspot',()=>cue('tick'));
+
   document.addEventListener('click',e=>{
     if(e.target.closest?.('#simSoundToggle,#simMoreToggle')) return;
 
