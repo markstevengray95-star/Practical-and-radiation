@@ -47,3 +47,5 @@ jobs:
           test -s simulation-audio.js
           test -s simulation-screen.css
           test -s interactive-3d.css
+          test -s vendor/three.module.min.js
+          test -s vendor/three.core.min.js
