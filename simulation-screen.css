@@ -342,3 +342,18 @@
   .sim-hud-card:last-child{display:none}
   #view-lab .quick-options{grid-template-columns:1fr}
 }
+
+.sim-3d-badge{
+  display:inline-grid;
+  place-items:center;
+  margin-left:5px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:rgba(99,217,164,.12);
+  border:1px solid rgba(99,217,164,.38);
+  color:#8fe6ba;
+  font-size:.54rem;
+  font-weight:900;
+  letter-spacing:.05em;
+  vertical-align:middle;
+}
