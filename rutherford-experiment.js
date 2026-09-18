@@ -282,6 +282,7 @@
     if($('#ruthClickTitle')) $('#ruthClickTitle').textContent=d.title;
     if($('#ruthClickInfo')) $('#ruthClickInfo').textContent=d.info;
     if($('#ruthClickScience')) $('#ruthClickScience').innerHTML='<strong>Science:</strong> '+d.science;
+    window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:'rutherford-experiment',title:d.title}}));
   }
 
   function handleRuthClick(e){
