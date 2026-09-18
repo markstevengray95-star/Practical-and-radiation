@@ -62,7 +62,7 @@
 
   let currentSim = 'atom';
   let shellBuilt = false;
-  let observer = null;
+  let stepObserver = null;
 
   function activeSim() {
     return $('#simNav .sim-tab.active')?.dataset.sim || currentSim || 'atom';
@@ -258,24 +258,19 @@
     if ($('#compactStepPrev')) $('#compactStepPrev').disabled = $('#stepPrev')?.disabled || false;
   }
 
-  function attachObservers() {
-    if (observer) return;
-    observer = new MutationObserver(() => {
-      if (!shellBuilt) buildShell();
-      organize();
-      updateKeyInfo();
-      syncStep();
-      rebuildSelect();
-    });
-    observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class']});
-
+  function attachEvents() {
     document.addEventListener('click', e => {
       if (e.target.closest?.('#simNav .sim-tab')) {
         setTimeout(() => {
           organize();
           updateKeyInfo();
           syncStep();
-        }, 70);
+          const select = $('#compactSimSelect');
+          if (select) select.value = activeSim();
+        }, 90);
+      }
+      if (e.target.closest?.('#stepPrev,#stepNext,.step-dot')) {
+        setTimeout(syncStep, 20);
       }
     });
     document.addEventListener('input', e => {
@@ -286,13 +281,29 @@
     });
   }
 
+  function watchStepGuide() {
+    const content = $('#stepContent');
+    if (!content || stepObserver) return;
+    stepObserver = new MutationObserver(syncStep);
+    stepObserver.observe(content, {childList:true, subtree:true, characterData:true});
+  }
+
   function init() {
+    attachEvents();
     let tries = 0;
     const timer = setInterval(() => {
       tries++;
-      if (buildShell() || tries > 30) clearInterval(timer);
-    }, 100);
-    attachObservers();
+      if (!shellBuilt) buildShell();
+      if (shellBuilt) {
+        organize();
+        updateKeyInfo();
+        syncStep();
+        watchStepGuide();
+        if (tries >= 20) clearInterval(timer);
+      } else if (tries > 40) {
+        clearInterval(timer);
+      }
+    }, 150);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
