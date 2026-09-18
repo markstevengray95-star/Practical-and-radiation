@@ -127,7 +127,7 @@
 
   async function loadThree(){
     try{
-      const T=await import('https://cdn.jsdelivr.net/npm/three@0.181.1/build/three.module.js');
+      const T=await import('./vendor/three.module.min.js');
       initThree(T);
     }catch(err){
       if($('#ruth3DStatus'))$('#ruth3DStatus').textContent='3D engine could not load on this network.';
