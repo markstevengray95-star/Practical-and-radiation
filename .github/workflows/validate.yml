@@ -55,7 +55,8 @@ jobs:
           node --check spec-mastery.js
           node --check advanced-learning.js
           node --check diagnostic-teacher.js
-          node --check rutherford-experiment.js\n          node --check compact-simulation-ui.js
+          node --check rutherford-experiment.js
+          node --check compact-simulation-ui.js
       - name: Check required app files
         run: |
           test -s index.html
@@ -71,4 +72,6 @@ jobs:
           test -s advanced-learning.js
           test -s diagnostic-teacher.js
           test -s rutherford-experiment.js
-          test -s rutherford-experiment.css\n          test -s compact-simulation-ui.js\n          test -s compact-simulation-ui.css
+          test -s rutherford-experiment.css
+          test -s compact-simulation-ui.js
+          test -s compact-simulation-ui.css
