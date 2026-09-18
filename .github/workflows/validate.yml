@@ -45,4 +45,5 @@ jobs:
           test -s rutherford-experiment.js
           test -s rutherford-experiment.css
           test -s simulation-audio.js
-          test -s simulation-screen.css\n          test -s interactive-3d.css
+          test -s simulation-screen.css
+          test -s interactive-3d.css
