@@ -10,13 +10,14 @@
     {
       n:1,phase:'Foundations',code:'3.2.1.1',title:'Atomic structure, nuclide notation & isotopes',duration:'50–60 min',
       overview:'Build the language students need for the whole topic: proton, neutron, electron, Z, A, nuclide notation, isotopes, relative/SI particle data and simple isotopic information.',
-      objectives:['State the charge and relative role of proton, neutron and electron.','Use Z and A correctly in nuclide notation.','Calculate neutron number and identify isotopes.'],
+      objectives:['State proton, neutron and electron charge and mass data in relative and SI form.','Use Z and A correctly in nuclide notation.','Calculate neutron number, identify isotopes and interpret simple isotopic data.'],
       recall:['What particles are found in an atom?','What does atomic number tell you at GCSE?','What does “neutral atom” mean?'],
       teach:[
         ['1. Build the atom','Nucleus = protons + neutrons; electrons occupy the region around it. Emphasise that the 3D model is not to scale.'],
-        ['2. Introduce Z and A','Z = proton number. A = nucleon number = protons + neutrons. Neutrons = A − Z.'],
-        ['3. Nuclide notation','Practise reading ᴬZX and moving between notation and particle numbers.'],
-        ['4. Isotopes','Same proton number, different neutron number. Link back to “same element” being fixed by Z.']
+        ['2. Particle data','Proton: +e, about 1 u, 1.673 × 10⁻²⁷ kg. Neutron: 0, about 1 u, 1.675 × 10⁻²⁷ kg. Electron: −e, about 1/1836 u, 9.109 × 10⁻³¹ kg. Use e = 1.602 × 10⁻¹⁹ C.'],
+        ['3. Introduce Z and A','Z = proton number. A = nucleon number = protons + neutrons. Neutrons = A − Z.'],
+        ['4. Nuclide notation','Practise reading ᴬZX and moving between notation and particle numbers.'],
+        ['5. Isotopes and isotopic data','Isotopes have the same Z but different neutron number. Read simple isotopic data to identify the isotope and determine proton, neutron and electron counts.']
       ],
       sim:'atom',simTask:'Use the Atom Builder Practice ladder. Start with H-1 and C-12, then C-14, then build neutral sodium-23. Say p, n and e before pressing Check my atom.',
       equations:['N = A − Z'],worked:'For ²³₁₁Na: p = 11, n = 12 and a neutral atom has 11 electrons.',
@@ -135,8 +136,9 @@
         ['1. Hadrons vs leptons','Hadrons experience the strong interaction; leptons do not.'],
         ['2. Baryons','Proton, neutron and antibaryons. Proton is the stable baryon in the AQA classification statement.'],
         ['3. Mesons','Pions and kaons. Pions also appear in the nucleon strong-force exchange model.'],
-        ['4. Strange particles','Produced through strong interaction, typically in pairs so total strangeness is conserved; they decay through the weak interaction.'],
-        ['5. Pions, muons & scientific evidence','Pion is the AQA exchange particle for the strong nuclear force between nucleons. Muons decay to products including an electron. Modern particle physics depends on large collaborations reproducing and validating results.']
+        ['4. Lepton families and lepton number','Electron/electron-neutrino form one lepton family and muon/muon-neutrino another. Particles have family lepton number +1 and antiparticles −1; track electron and muon lepton numbers separately.'],
+        ['5. Strange particles','Produced through strong interaction, typically in pairs so total strangeness is conserved; they decay through the weak interaction.'],
+        ['6. Pions, muons & scientific evidence','Pion is the AQA exchange particle for the strong nuclear force between nucleons. Muons decay to products including an electron. Modern particle physics depends on large collaborations reproducing and validating results.']
       ],
       sim:'classification',simTask:'Sort each displayed particle into the full family: e.g. proton = hadron + baryon.',
       equations:[],worked:'K⁺ is a hadron and meson. It is strange because its quark content includes s̄ and it has non-zero strangeness. In strong production, total strangeness is conserved, so strange particles are created with balancing strangeness.',
@@ -153,7 +155,8 @@
         ['1. Quark properties','u: +2/3e; d and s: −1/3e. All quarks B = +1/3.'],
         ['2. Antiquarks','Reverse additive quantum numbers: charge, B and strangeness.'],
         ['3. Baryons','Proton = uud; neutron = udd. Antibaryons contain three antiquarks.'],
-        ['4. Mesons','One quark + one antiquark; practise pions and kaons.']
+        ['4. Mesons','One quark + one antiquark; practise pions and kaons.'],
+        ['5. Neutron decay at quark level','A neutron udd becomes a proton uud when one down quark changes to an up quark: d → u. The full weak-interaction detail and W⁻ diagram are then connected back to the interactions lesson.']
       ],
       sim:'quarks',simTask:'Build p, n, π⁺, π⁻, K⁺ and K⁻. Predict Q, B and S before reading the totals.',
       equations:['p = uud','n = udd','quark B = +1/3','antiquark B = −1/3'],worked:'π⁺ = u d̄: charge = +2/3e + +1/3e = +e; B = +1/3 − 1/3 = 0.',
