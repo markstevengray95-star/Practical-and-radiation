@@ -155,6 +155,30 @@ try {
   await soundTest.click();
   await page.waitForTimeout(80);
 
+  // Complete-beginner pathway checks.
+  const startNav = page.locator('[data-view="starthere"]');
+  if (!(await startNav.count())) throw new Error('Start Here navigation missing');
+  await startNav.click();
+  await page.waitForSelector('#view-starthere.active-view', { timeout: 5000 });
+  if ((await page.locator('[data-dq]').count()) < 12) throw new Error('Beginner diagnostic is incomplete');
+  if ((await page.locator('[data-bridge]').count()) < 6) throw new Error('Prerequisite bridge is incomplete');
+  if (!(await page.locator('#beginLesson1').count())) throw new Error('Begin Lesson 1 action missing');
+
+  // Revision hub checks.
+  const revisionNav = page.locator('[data-view="revisionhub"]');
+  if (!(await revisionNav.count())) throw new Error('Revision Hub navigation missing');
+  await revisionNav.click();
+  await page.waitForSelector('#view-revisionhub.active-view', { timeout: 5000 });
+  for (const tab of ['today','flash','mixed','formula','definitions','glossary','spec','errors']) {
+    if (!(await page.locator('[data-revision-tab="' + tab + '"]').count())) throw new Error('Missing revision tab: ' + tab);
+  }
+  await page.locator('[data-revision-tab="glossary"]').click();
+  await page.waitForTimeout(60);
+  if ((await page.locator('.glossary-entry').count()) < 30) throw new Error('Glossary is too small');
+  await page.locator('[data-revision-tab="spec"]').click();
+  await page.waitForTimeout(60);
+  if ((await page.locator('[data-spec]').count()) < 30) throw new Error('Specification checklist is incomplete');
+
   // Classroom lesson sequence checks.
   await page.locator('[data-view="course"]').click();
   await page.waitForSelector('#courseList.lesson-sequence-sidebar', { timeout: 5000 });
