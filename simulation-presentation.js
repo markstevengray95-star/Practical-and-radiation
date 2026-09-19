@@ -332,7 +332,9 @@
         addKeyStrip();
         addLegend();
         addObjectGuide();
-        updateObjectGuide();
+        if(!$('#simObjectGuide .sim-guide-button') && window.PARTICLELAB_GUIDES?.[now]?.length){
+          updateObjectGuide();
+        }
         formatReadout();
       }
     },250);
