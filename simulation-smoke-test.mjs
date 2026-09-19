@@ -87,9 +87,21 @@ try {
   await page.locator('#atomE').fill('6');
   await page.locator('#atomE').dispatchEvent('input');
   await page.waitForTimeout(60);
-  await neutronToken.dragTo(nucleusDrop);
-  await page.waitForTimeout(60);
-  await neutronToken.dragTo(nucleusDrop);
+  const dragNeutronToNucleus = async () => {
+    await page.evaluate(() => {
+      const token=document.querySelector('.atom-drag-token[data-particle="neutron"]');
+      const zone=document.querySelector('.atom-drop-zone[data-drop="nucleus"]');
+      if(!token||!zone)throw new Error('Atom drag token or nucleus target missing');
+      const dt=new DataTransfer();
+      token.dispatchEvent(new DragEvent('dragstart',{bubbles:true,cancelable:true,dataTransfer:dt}));
+      zone.dispatchEvent(new DragEvent('dragover',{bubbles:true,cancelable:true,dataTransfer:dt}));
+      zone.dispatchEvent(new DragEvent('drop',{bubbles:true,cancelable:true,dataTransfer:dt}));
+      token.dispatchEvent(new DragEvent('dragend',{bubbles:true,cancelable:true,dataTransfer:dt}));
+    });
+    await page.waitForTimeout(70);
+  };
+  await dragNeutronToNucleus();
+  await dragNeutronToNucleus();
   await page.waitForTimeout(100);
   const draggedCarbon14 = await page.evaluate(() => window.PARTICLELAB_ATOM_STATE);
   if (!draggedCarbon14 || draggedCarbon14.Z !== 6 || draggedCarbon14.neutrons !== 8 || draggedCarbon14.A !== 14) {
