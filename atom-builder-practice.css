@@ -130,3 +130,20 @@
   opacity:.82;
   cursor:not-allowed;
 }
+
+/* The atom builder is itself a compound control, so it must span the parent auto-fit grid. */
+#view-lab #simControls .atom-isotope-intro,
+#view-lab #simControls .atom-builder-grid,
+#view-lab #simControls .atom-isotope-actions,
+#view-lab #simControls .atom-builder-actions,
+#view-lab #simControls .atom-builder-help{grid-column:1 / -1;min-width:0;max-width:100%}
+#view-lab #simControls .atom-builder-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+#view-lab #simControls .atom-builder-grid .field{min-width:0}
+#view-lab #simControls .atom-builder-grid .field>span,
+#view-lab #simControls .atom-builder-grid .field-readout{overflow-wrap:anywhere}
+@media(max-width:760px){
+  #view-lab #simControls .atom-builder-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  #view-lab #simControls .atom-builder-grid{grid-template-columns:1fr}
+}
