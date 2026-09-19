@@ -42,6 +42,8 @@ jobs:
           node --check simulation-essentials.js
           node --check simulation-change-coach.js
           node --check lesson-sequence.js
+          node --check student-mastery-path.js
+          node --check simulation-missions.js
           node --check start-here.js
           node --check revision-hub.js
           node --check exam-skills.js
@@ -85,6 +87,10 @@ jobs:
           test -s simulation-change-coach.css
           test -s lesson-sequence.js
           test -s lesson-sequence.css
+          test -s student-mastery-path.js
+          test -s student-mastery-path.css
+          test -s simulation-missions.js
+          test -s simulation-missions.css
           test -s start-here.js
           test -s start-here.css
           test -s revision-hub.js
