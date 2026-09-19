@@ -59,26 +59,26 @@
       next:'Radioactive decay',homework:'Sketch and annotate force vs separation qualitatively.'
     },
     {
-      n:4,phase:'Foundations',code:'3.2.1.2',title:'Alpha decay, beta decay & the neutrino',duration:'50–60 min',
-      overview:'Learn how unstable nuclei change, and why the neutrino became necessary in beta decay.',
-      objectives:['Balance alpha and beta nuclear equations.','State how A and Z change in α, β⁻ and β⁺ processes.','Explain the role of the neutrino in beta decay.'],
-      recall:['What do A and Z represent?','What is an alpha particle?','Which conservation idea must always hold?'],
+      n:4,phase:'Foundations',code:'3.2.1.2',title:'Alpha decay, beta-minus decay & the neutrino',duration:'50–60 min',
+      overview:'Complete the AQA 3.2.1.2 core by learning how unstable nuclei change in alpha and beta-minus decay, and why the neutrino was proposed.',
+      objectives:['Balance alpha and beta-minus nuclear equations.','State how A and Z change in α and β⁻ decay.','Explain why the neutrino was proposed from beta-decay evidence.'],
+      recall:['What do A and Z represent?','What is an alpha particle?','Which quantities must remain conserved in a decay?'],
       teach:[
-        ['1. Alpha decay','Emit ⁴₂He, so A −4 and Z −2.'],
-        ['2. Beta-minus','A neutron changes to proton character; emit e⁻ and ν̄ₑ. A unchanged, Z +1.'],
-        ['3. Beta-plus','A proton changes to neutron character; emit e⁺ and νₑ. A unchanged, Z −1.'],
-        ['4. Why neutrinos?','Historically required to account for conservation in beta decay; use lepton-number reasoning later.']
+        ['1. Alpha decay','An alpha particle is a helium-4 nucleus, ⁴₂He. Emitting one makes A decrease by 4 and Z decrease by 2.'],
+        ['2. Beta-minus decay','A neutron changes to proton character and an electron plus electron antineutrino are emitted. A is unchanged and Z increases by 1.'],
+        ['3. Why the neutrino?','The neutrino was proposed because beta-decay observations required an unseen particle to account for the missing energy.'],
+        ['4. Keep the specification sequence clear','β⁺, electron capture and electron–proton collisions are taught later under AQA 3.2.1.4 particle interactions, where W⁺ and W⁻ exchange is introduced.']
       ],
-      sim:'decay',simTask:'Run α, β⁻ and β⁺. For each, write the change in A and Z before replaying the animation.',
-      equations:['β⁻: n → p + e⁻ + ν̄ₑ','β⁺: p → n + e⁺ + νₑ'],worked:'β⁻ decay keeps A the same but increases Z by 1 because neutron character changes to proton character.',
-      exam:'The beta electron is created during the decay; it is not an orbital electron leaving the atom.',
-      exit:['What happens to A and Z in alpha decay?','What happens to Z in β⁻?','Which neutrino type appears in β⁻ decay?'],
-      next:'Antiparticles & photons',homework:'Balance a short set of α and β decay equations.'
+      sim:'decay',simTask:'Run α and β⁻ first. Before each animation, predict the change in A and Z and identify every emitted particle. Use β⁺ later when you reach the particle-interactions lesson.',
+      equations:['α: ᴬZX → ᴬ⁻⁴Z⁻²Y + ⁴₂He','β⁻: n → p + e⁻ + ν̄ₑ'],worked:'In β⁻ decay the mass number A stays the same while Z increases by 1 because neutron character changes to proton character.',
+      exam:'For AQA 3.2.1.2, be precise: α changes A and Z; β⁻ leaves A unchanged, increases Z by 1 and emits an electron antineutrino. The beta electron is created in the decay.',
+      exit:['What happens to A and Z in alpha decay?','What happens to A and Z in β⁻ decay?','Why was the neutrino proposed?'],
+      next:'Antiparticles & photons',homework:'Balance alpha and beta-minus decay equations, then explain the neutrino evidence in one sentence.'
     },
     {
       n:5,phase:'Particle physics',code:'3.2.1.3',title:'Photons, rest energy & antiparticles',duration:'50–60 min',
       overview:'Introduce the photon model and the idea that every particle has a corresponding antiparticle.',
-      objectives:['Use E = hf and E = hc/λ.','Compare particle and antiparticle properties.','Use E₀ = mc² to interpret rest energy in MeV.'],
+      objectives:['Use E = hf and E = hc/λ for photons.','Compare particle and antiparticle properties.','Interpret particle rest energies quoted in MeV without treating E = mc² as a required AQA calculation here.'],
       recall:['What is frequency?','What is wavelength?','What does c represent?'],
       teach:[
         ['1. Photon model','EM radiation is exchanged in quanta called photons, with energy hf.'],
@@ -87,8 +87,8 @@
         ['4. Key examples','e⁻/e⁺, p/p̄, n/n̄ and ν/ν̄. Neutral does not mean “same particle”.']
       ],
       sim:'antimatter',simTask:'Use comparison mode to inspect electron/positron, proton/antiproton and neutron/antineutron pairs.',
-      equations:['E = hf','E = hc / λ','E₀ = mc²'],worked:'Electron rest energy = 0.511 MeV, so an electron + positron pair has 1.022 MeV rest energy in total.',
-      exam:'Do not define antiparticle as simply “same mass, opposite charge” because neutral particles can have distinct antiparticles.',
+      equations:['E = hf','E = hc / λ'],worked:'Electron rest energy is 0.511 MeV, so an electron + positron pair has 1.022 MeV of rest energy in total.',
+      exam:'Know that a particle and antiparticle have equal mass and opposite charge when charged, and recognise their rest energies in MeV. Do not reduce the definition to “opposite charge” because neutral particles can have distinct antiparticles.',
       exit:['What stays the same for a particle and antiparticle?','What is a photon’s energy equation?','Why is an antineutron distinct from a neutron?'],
       next:'Annihilation & pair production',homework:'Photon-energy calculations in J and eV.'
     },
