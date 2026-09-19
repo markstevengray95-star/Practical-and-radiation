@@ -49,11 +49,27 @@ try {
   // Atom builder completion check.
   await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
   await page.waitForTimeout(120);
-  for (const id of ['atomZ','atomA','atomE']) {
+  for (const id of ['atomZ','atomN','atomA','atomE','atomNPlus','atomNMinus']) {
     if (!(await page.locator('#' + id).count())) throw new Error('Atom builder control missing: ' + id);
   }
+
+  // Prove a real isotope change: carbon-12 -> carbon-14 by changing neutrons only.
+  await page.locator('#atomZ').fill('6');
+  await page.locator('#atomN').fill('6');
+  await page.locator('#atomE').fill('6');
+  await page.locator('#atomE').dispatchEvent('input');
+  await page.waitForTimeout(80);
+  await page.locator('#atomNPlus').click();
+  await page.locator('#atomNPlus').click();
+  await page.waitForTimeout(80);
+  const carbon14 = await page.evaluate(() => window.PARTICLELAB_ATOM_STATE);
+  if (!carbon14 || carbon14.Z !== 6 || carbon14.A !== 14 || carbon14.neutrons !== 8 || carbon14.electrons !== 6) {
+    throw new Error('Atom builder could not create carbon-14 by changing neutron number');
+  }
+
+  // Prove the sodium-23 lesson target can be built.
   await page.locator('#atomZ').fill('11');
-  await page.locator('#atomA').fill('23');
+  await page.locator('#atomN').fill('12');
   await page.locator('#atomE').fill('11');
   await page.locator('#atomE').dispatchEvent('input');
   await page.waitForTimeout(100);
