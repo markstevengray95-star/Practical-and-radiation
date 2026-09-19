@@ -7,12 +7,16 @@
 
   const coaches={
     atom:()=> {
-      const v=($('#iso')?.value||'6,12').split(',').map(Number),Z=v[0],A=v[1],N=A-Z;
+      const a=window.PARTICLELAB_ATOM_STATE||{};
+      const Z=Number.isFinite(a.Z)?a.Z:+($('#atomZ')?.value||6);
+      const N=Number.isFinite(a.neutrons)?a.neutrons:+($('#atomN')?.value||6);
+      const A=Number.isFinite(a.A)?a.A:Z+N;
+      const ne=Number.isFinite(a.electrons)?a.electrons:+($('#atomE')?.value||Z);
       return {
-        observe:'This isotope has '+Z+' protons and '+N+' neutrons.',
-        why:'The element is fixed by proton number Z. Changing neutron number changes the isotope, not the element.',
-        exam:'State proton number, neutron number and electron number separately. For a neutral atom, electrons = protons.',
-        next:'Try a different isotope of the same element and identify what stays unchanged.'
+        observe:(a.nuclide||('A='+A+', Z='+Z))+' has '+Z+' protons, '+N+' neutrons and '+ne+' electrons.',
+        why:'The element is fixed by proton number Z. An isotope is made by keeping Z fixed and changing the neutron number N, so A = Z + N changes.',
+        exam:'For isotope questions: identify Z first, calculate N = A − Z, then decide electron number from the charge.',
+        next:'Keep Z fixed and press + neutron. Check that the element stays the same while A increases by 1.'
       };
     },
     specific:()=> {
