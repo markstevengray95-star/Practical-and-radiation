@@ -45,6 +45,7 @@ jobs:
           node --check start-here.js
           node --check revision-hub.js
           node --check exam-skills.js
+          node --check atom-builder-practice.js
 
       - name: Check simulation registry and required files
         run: |
@@ -90,6 +91,8 @@ jobs:
           test -s exam-skills.js
           test -s exam-skills.css
           test -s knowledge-organiser.css
+          test -s atom-builder-practice.js
+          test -s atom-builder-practice.css
           python3 - <<'PY'
           from pathlib import Path
           import re
