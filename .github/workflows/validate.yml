@@ -118,4 +118,4 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep 1
           done
-          TEST_URL=http://127.0.0.1:4173/ node simulation-smoke-test.mjs
+          TEST_URL=http://127.0.0.1:4173/ timeout 240s node simulation-smoke-test.mjs
