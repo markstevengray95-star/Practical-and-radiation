@@ -113,8 +113,26 @@ try {
     const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
     if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
 
+    const essentials = page.locator('#simEssentials');
+    if (!(await essentials.count())) throw new Error(id + ': missing exam essentials panel');
+    const essentialText = (await essentials.textContent())?.trim() || '';
+    if (!essentialText.includes('Must know') || !essentialText.includes('Exam technique')) {
+      throw new Error(id + ': essentials tabs are incomplete');
+    }
+    const specPill = (await page.locator('#studySpecPill').textContent())?.trim() || '';
+    if (!specPill) throw new Error(id + ': missing AQA specification tag');
+
     results.push({ id, title, ok: true });
   }
+
+  const focusButton = page.locator('[data-study-mode="focus"]');
+  const fullButton = page.locator('[data-study-mode="full"]');
+  if (!(await focusButton.count()) || !(await fullButton.count())) throw new Error('Student Focus / Full tools controls are missing');
+  await focusButton.click();
+  if (!(await page.locator('body').evaluate(el => el.classList.contains('sim-focus-mode')))) throw new Error('Focus view did not activate');
+  await fullButton.click();
+  if (!(await page.locator('body').evaluate(el => el.classList.contains('sim-full-mode')))) throw new Error('Full tools view did not activate');
+  await focusButton.click();
 
   const soundButton = page.locator('#simSoundToggle');
   const soundTest = page.locator('#simSoundTest');
