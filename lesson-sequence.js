@@ -9,7 +9,7 @@
   const lessons=[
     {
       n:1,phase:'Foundations',code:'3.2.1.1',title:'Atomic structure, nuclide notation & isotopes',duration:'50–60 min',
-      overview:'Build the language students need for the whole topic: proton, neutron, electron, Z, A, nuclide notation and isotopes.',
+      overview:'Build the language students need for the whole topic: proton, neutron, electron, Z, A, nuclide notation, isotopes, relative/SI particle data and simple isotopic information.',
       objectives:['State the charge and relative role of proton, neutron and electron.','Use Z and A correctly in nuclide notation.','Calculate neutron number and identify isotopes.'],
       recall:['What particles are found in an atom?','What does atomic number tell you at GCSE?','What does “neutral atom” mean?'],
       teach:[
@@ -135,12 +135,13 @@
         ['1. Hadrons vs leptons','Hadrons experience the strong interaction; leptons do not.'],
         ['2. Baryons','Proton, neutron and antibaryons. Proton is the stable baryon in the AQA classification statement.'],
         ['3. Mesons','Pions and kaons. Pions also appear in the nucleon strong-force exchange model.'],
-        ['4. Strange particles','Produced through strong interaction, decay through weak interaction. Introduce strangeness qualitatively.']
+        ['4. Strange particles','Produced through strong interaction, typically in pairs so total strangeness is conserved; they decay through the weak interaction.'],
+        ['5. Pions, muons & scientific evidence','Pion is the AQA exchange particle for the strong nuclear force between nucleons. Muons decay to products including an electron. Modern particle physics depends on large collaborations reproducing and validating results.']
       ],
       sim:'classification',simTask:'Sort each displayed particle into the full family: e.g. proton = hadron + baryon.',
-      equations:[],worked:'K⁺ is a hadron and meson. It is strange because its quark content includes s̄ and it has non-zero strangeness.',
+      equations:[],worked:'K⁺ is a hadron and meson. It is strange because its quark content includes s̄ and it has non-zero strangeness. In strong production, total strangeness is conserved, so strange particles are created with balancing strangeness.',
       exam:'Give the full classification when asked, not just one family label.',
-      exit:['Is a pion a baryon or meson?','Why is an electron not a hadron?','How are strange particles produced and how do they decay?'],
+      exit:['Is a pion a baryon or meson, and what role does AQA assign it in the nucleon strong-force model?','What happens when a muon decays?','How are strange particles produced and how do they decay?'],
       next:'Quarks & antiquarks',homework:'Complete a particle-family classification table.'
     },
     {
@@ -242,11 +243,12 @@
         ['2. de Broglie relation','λ = h/p applies wavelength to moving particles.'],
         ['3. Momentum trend','Higher p → shorter λ.'],
         ['4. Diffraction trend','For the same structure, shorter λ generally means less diffraction / tighter pattern.'],
-        ['5. Duality','Quantum objects are not simply classical waves or classical particles.']
+        ['5. Duality','Quantum objects are not simply classical waves or classical particles.'],
+        ['6. How knowledge changes','New models are evaluated through evidence, peer review, replication and validation by the scientific community.']
       ],
       sim:'diffraction',simTask:'Increase accelerating voltage and explain the chain V ↑ → p ↑ → λ ↓ → pattern changes.',
       equations:['λ = h / p','p = mv'],worked:'If momentum doubles, de Broglie wavelength halves.',
-      exam:'Electron diffraction gives wave evidence for matter; photoelectric effect gives particle evidence for EM radiation.',
+      exam:'Electron diffraction gives wave evidence for matter; photoelectric effect gives particle evidence for EM radiation. Details of a particular electron-diffraction method are not required by AQA, but the evidence and momentum trend are.',
       exit:['What does λ = h/p predict?','What happens to λ as p rises?','Give one experiment supporting each side of wave–particle duality.'],
       next:'Synoptic review',homework:'Mixed wave–particle duality questions.'
     },
