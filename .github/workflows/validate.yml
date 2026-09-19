@@ -28,6 +28,7 @@ jobs:
           node --check diagnostic-teacher.js
           node --check rutherford-experiment.js
           node --check simulation-audio.js
+          node --check particle-depth.js
       - name: Check required app files
         run: |
           test -s index.html
@@ -49,3 +50,5 @@ jobs:
           test -s interactive-3d.css
           test -s vendor/three.module.min.js
           test -s vendor/three.core.min.js
+          test -s particle-depth.js
+          test -s particle-depth.css
