@@ -298,7 +298,8 @@
 
     const detectorG=new THREE.Group();
     const tor=new THREE.Mesh(new THREE.TorusGeometry(4.05,.10,14,100,Math.PI*1.72),material(0x66d9a6,{roughness:.24,metalness:.15,emissive:0x1f6d50,emissiveIntensity:.6,opacity:.9}));
-    tor.rotation.y=Math.PI/2;tor.rotation.z=-Math.PI*.86;detectorG.add(tor);addLabel(detectorG,'4 · detector',4.55,'detector');mark(detectorG,'detector');world.add(detectorG);
+    // Detector is laid horizontally around the foil, matching the top-down scattering geometry.
+    tor.rotation.x=Math.PI/2;tor.rotation.z=-Math.PI*.86;detectorG.add(tor);addLabel(detectorG,'4 · detector',1.15,'detector');mark(detectorG,'detector');world.add(detectorG);
 
     world.add(lineFrom([new THREE.Vector3(-4.45,0,0),new THREE.Vector3(-.12,0,0)],0x67c7ff,.45,'straight'));
     addExamplePath(.08,0x78dcff,'straight');
@@ -308,8 +309,9 @@
   }
 
   function addExamplePath(angle,color,key){
-    const start=new THREE.Vector3(-4.45,0,0),hit=new THREE.Vector3(0,0,0),len=4.3;
-    const end=new THREE.Vector3(Math.cos(angle)*len,Math.sin(angle)*len,Math.sin(angle*.55)*1.4);
+    const start=new THREE.Vector3(-4.45,.08,0),hit=new THREE.Vector3(0,.08,0),len=4.3;
+    // Scatter in the horizontal X–Z plane so trajectories meet the horizontal detector arc.
+    const end=new THREE.Vector3(Math.cos(angle)*len,.08,Math.sin(angle)*len);
     world.add(lineFrom([start,hit,end],color,.42,key));
   }
 
@@ -347,9 +349,9 @@
       if(r<.88){angle=(Math.random()-.5)*.055;category='straight';}
       else if(r<.985){angle=(Math.random()<.5?-1:1)*(.12+Math.random()*.35);category='small';}
       else{angle=(Math.random()<.5?-1:1)*(1+Math.random()*1.35);category='large';}
-      const z=(Math.random()-.5)*.35,start=new THREE.Vector3(-4.45,(Math.random()-.5)*.16,z),hit=new THREE.Vector3(0,0,z*.25);
-      const end=new THREE.Vector3(hit.x+Math.cos(angle)*5.2,hit.y+Math.sin(angle)*5.2,z+Math.sin(angle*.65)*1.25);
-      const curve=new THREE.CatmullRomCurve3([start,new THREE.Vector3(-2.2,start.y,start.z),hit,new THREE.Vector3(hit.x+Math.cos(angle)*1.8,hit.y+Math.sin(angle)*1.8,end.z*.35),end]);
+      const z=(Math.random()-.5)*.18,start=new THREE.Vector3(-4.45,.08,z),hit=new THREE.Vector3(0,.08,z*.25);
+      const end=new THREE.Vector3(hit.x+Math.cos(angle)*5.2,.08,hit.z+Math.sin(angle)*5.2);
+      const curve=new THREE.CatmullRomCurve3([start,new THREE.Vector3(-2.2,.08,start.z),hit,new THREE.Vector3(hit.x+Math.cos(angle)*1.8,.08,hit.z+Math.sin(angle)*1.8),end]);
       const key=category==='straight'?'straight':category==='large'?'back':'deflected';
       const color=category==='straight'?0x7ee8ff:category==='small'?0xffd56a:0xff8a95;
       world.add(lineFrom(curve.getPoints(80),color,.2,key));
