@@ -12,6 +12,7 @@ const browser = await chromium.launch({
   args: ['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']
 });
 const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
+page.setDefaultTimeout(8000);
 const pageErrors = [];
 page.on('pageerror', err => pageErrors.push(String(err)));
 page.on('console', msg => {
@@ -19,6 +20,7 @@ page.on('console', msg => {
 });
 
 try {
+  console.log('SMOKE: boot');
   await page.goto(BASE, { waitUntil: 'networkidle', timeout: 30000 });
   await page.locator('[data-view="lab"]').click();
   await page.waitForSelector('#simNav .sim-tab', { timeout: 10000 });
@@ -43,6 +45,7 @@ try {
     throw new Error('Expected real 3D renderer, got: ' + rendererStatus + '\n' + pageErrors.join('\n'));
   }
 
+  console.log('SMOKE: core simulations');
   const results = [];
   for (const id of expected) {
     const tab = page.locator('#simNav .sim-tab[data-sim="' + id + '"]');
@@ -155,6 +158,7 @@ try {
   await soundTest.click();
   await page.waitForTimeout(80);
 
+  console.log('SMOKE: start here');
   // Complete-beginner pathway checks.
   const startNav = page.locator('[data-view="starthere"]');
   if (!(await startNav.count())) throw new Error('Start Here navigation missing');
@@ -164,6 +168,7 @@ try {
   if ((await page.locator('[data-bridge]').count()) < 6) throw new Error('Prerequisite bridge is incomplete');
   if (!(await page.locator('#beginLesson1').count())) throw new Error('Begin Lesson 1 action missing');
 
+  console.log('SMOKE: revision hub');
   // Revision hub checks.
   const revisionNav = page.locator('[data-view="revisionhub"]');
   if (!(await revisionNav.count())) throw new Error('Revision Hub navigation missing');
@@ -185,6 +190,7 @@ try {
   if ((await page.locator('#knowledgeOrganiser .ko-block').count()) < 10) throw new Error('Knowledge organiser is incomplete');
   if (!(await page.locator('#printOrganiser').count())) throw new Error('Knowledge organiser print action is missing');
 
+  console.log('SMOKE: exam skills');
   // AQA Physics exam-skills coach checks.
   const examSkillsNav = page.locator('[data-view="examskills"]');
   if (!(await examSkillsNav.count())) throw new Error('Exam Skills navigation missing');
@@ -194,6 +200,7 @@ try {
   if ((await page.locator('[data-worked]').count()) < 8) throw new Error('Worked-example bank is incomplete');
   if ((await page.locator('.mark-killer').count()) < 8) throw new Error('Common-error coaching is incomplete');
 
+  console.log('SMOKE: lesson sequence');
   // Classroom lesson sequence checks.
   await page.locator('[data-view="course"]').click();
   await page.waitForSelector('#courseList.lesson-sequence-sidebar', { timeout: 5000 });
@@ -229,6 +236,7 @@ try {
   if (!(await page.locator('#view-lab').evaluate(el => el.classList.contains('active-view')))) throw new Error('Lesson activity did not open the simulation lab');
   if (!(await page.locator('.sim-tab[data-sim="photo"]').evaluate(el => el.classList.contains('active')))) throw new Error('Lesson 11 did not launch photoelectric simulation');
 
+  console.log('SMOKE: learning tools');
   // Feature suite checks.
   await page.locator('[data-view="lab"]').click();
   await page.waitForSelector('#learningSuite', { state: 'attached', timeout: 5000 });
@@ -260,6 +268,7 @@ try {
   await page.waitForTimeout(80);
   if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('English mode did not restore');
 
+  console.log('SMOKE: Rutherford experiment');
   await page.locator('[data-view="rutherfordexp"]').click();
   await page.waitForSelector('#rutherfordExperimentCanvas', { state: 'visible', timeout: 10000 });
   await page.waitForFunction(() => {
