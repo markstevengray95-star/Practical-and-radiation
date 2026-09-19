@@ -179,6 +179,12 @@ try {
   await page.waitForTimeout(60);
   if ((await page.locator('[data-spec]').count()) < 30) throw new Error('Specification checklist is incomplete');
 
+  await page.locator('[data-revision-tab="organiser"]').click();
+  await page.waitForTimeout(60);
+  if (!(await page.locator('#knowledgeOrganiser').count())) throw new Error('Knowledge organiser is missing');
+  if ((await page.locator('#knowledgeOrganiser .ko-block').count()) < 10) throw new Error('Knowledge organiser is incomplete');
+  if (!(await page.locator('#printOrganiser').count())) throw new Error('Knowledge organiser print action is missing');
+
   // AQA Physics exam-skills coach checks.
   const examSkillsNav = page.locator('[data-view="examskills"]');
   if (!(await examSkillsNav.count())) throw new Error('Exam Skills navigation missing');
