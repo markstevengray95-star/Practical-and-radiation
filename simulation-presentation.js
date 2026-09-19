@@ -217,10 +217,10 @@
       '<div class="sim-guide-buttons">'+
         guides.map((g,i)=>'<button class="sim-guide-button" data-guide-index="'+i+'"><span>'+String(i+1)+'</span><strong>'+g.title+'</strong></button>').join('')+
       '</div>';
-    $('.sim-guide-button',box).forEach(btn=>btn.addEventListener('click',()=>{
+    $$('.sim-guide-button',box).forEach(btn=>btn.addEventListener('click',()=>{
       const item=guides[Number(btn.dataset.guideIndex)];
       if(!item) return;
-      $('.sim-guide-button',box).forEach(x=>x.classList.toggle('active',x===btn));
+      $$('.sim-guide-button',box).forEach(x=>x.classList.toggle('active',x===btn));
       window.dispatchEvent(new CustomEvent('particlelab:guide-select',{detail:item}));
       window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:currentSim(),title:item.title}}));
     }));
