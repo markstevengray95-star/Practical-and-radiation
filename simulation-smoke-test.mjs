@@ -46,6 +46,27 @@ try {
   }
 
   console.log('SMOKE: core simulations');
+  // Atom builder completion check.
+  await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
+  await page.waitForTimeout(120);
+  for (const id of ['atomZ','atomA','atomE']) {
+    if (!(await page.locator('#' + id).count())) throw new Error('Atom builder control missing: ' + id);
+  }
+  await page.locator('#atomZ').fill('11');
+  await page.locator('#atomA').fill('23');
+  await page.locator('#atomE').fill('11');
+  await page.locator('#atomE').dispatchEvent('input');
+  await page.waitForTimeout(100);
+  const atomState = await page.evaluate(() => window.PARTICLELAB_ATOM_STATE);
+  if (!atomState || atomState.Z !== 11 || atomState.A !== 23 || atomState.electrons !== 11 || atomState.neutrons !== 12) {
+    throw new Error('Atom builder could not construct neutral sodium-23');
+  }
+  if (!(await page.locator('#atomBuilderPractice').count())) throw new Error('Atom Builder Practice panel missing');
+  const atomPracticeText = (await page.locator('#atomBuilderPractice').textContent()) || '';
+  if (!/sodium-23/i.test(atomPracticeText) || !/Build knowledge/i.test(atomPracticeText)) {
+    throw new Error('Atom Builder Practice is incomplete');
+  }
+
   const results = [];
   for (const id of expected) {
     const tab = page.locator('#simNav .sim-tab[data-sim="' + id + '"]');
@@ -220,6 +241,8 @@ try {
   await page.locator('[data-lesson-view="full"]').click();
   await page.waitForTimeout(50);
   if (!(await page.locator('.lesson-full-plan').count())) throw new Error('Full lesson plan view did not open');
+  const taskCount = await page.locator('.lesson-task-card').count();
+  if (taskCount < 6) throw new Error('Lesson 1 independent task bank is incomplete');
   await page.locator('[data-lesson-view="guided"]').click();
   await page.waitForTimeout(50);
 
