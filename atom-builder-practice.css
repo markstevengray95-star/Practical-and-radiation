@@ -93,3 +93,40 @@
   border-color:rgba(99,217,164,.22);
   background:rgba(99,217,164,.07);
 }
+
+
+.atom-isotope-intro{
+  margin-bottom:6px;
+  padding:7px 8px;
+  border:1px solid rgba(103,199,255,.16);
+  border-radius:9px;
+  background:rgba(103,199,255,.055);
+  color:#d6e9f6;
+  font-size:.61rem;
+  line-height:1.4;
+}
+.atom-isotope-actions{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-top:6px;
+  padding:6px 7px;
+  border:1px solid rgba(99,217,164,.13);
+  border-radius:9px;
+  background:rgba(99,217,164,.035);
+}
+.atom-isotope-actions>span:first-child{
+  color:#cce8dc;
+  font-size:.58rem;
+  font-weight:900;
+}
+.atom-isotope-note{
+  color:#8fb2a3;
+  font-size:.55rem;
+  font-weight:800;
+}
+#atomA[readonly]{
+  opacity:.82;
+  cursor:not-allowed;
+}
