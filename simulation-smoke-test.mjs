@@ -128,6 +128,30 @@ try {
   await soundTest.click();
   await page.waitForTimeout(80);
 
+  // Feature suite checks.
+  await page.locator('[data-view="lab"]').click();
+  await page.waitForSelector('#learningSuite', { timeout: 5000 });
+  for (const tool of ['inspector','compare','graphs','measure','practical','exam']) {
+    if (!(await page.locator('#lt-' + tool).count())) throw new Error('Missing learning tool: ' + tool);
+  }
+  if (!(await page.locator('#measureOverlay').count())) throw new Error('Measurement overlay missing');
+
+  const hubNav = page.locator('[data-view="learninghub"]');
+  if (!(await hubNav.count())) throw new Error('Learning Tools navigation missing');
+  await hubNav.click();
+  await page.waitForSelector('#view-learninghub.active-view', { timeout: 5000 });
+  for (const panel of ['mastery','teacher','challenge','feynman','history','access','language']) {
+    if (!(await page.locator('#hub-' + panel).count())) throw new Error('Missing learning hub panel: ' + panel);
+  }
+
+  await page.locator('[data-hub="language"]').click();
+  await page.locator('[data-lang="zh"]').click();
+  await page.waitForTimeout(120);
+  if ((await page.locator('html').getAttribute('lang')) !== 'zh-CN') throw new Error('Mandarin mode did not activate');
+  await page.locator('[data-lang="en"]').click();
+  await page.waitForTimeout(80);
+  if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('English mode did not restore');
+
   await page.locator('[data-view="rutherfordexp"]').click();
   await page.waitForSelector('#rutherfordExperimentCanvas', { state: 'visible', timeout: 10000 });
   await page.waitForFunction(() => {
