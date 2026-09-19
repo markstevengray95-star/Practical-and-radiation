@@ -162,7 +162,7 @@ const mapNodes=[
 ];const mapEdges=[['atom','strong'],['strong','decay'],['decay','quarks'],['quarks','classification'],['classification','interactions'],['interactions','antimatter'],['antimatter','photo'],['photo','levels'],['collisions','levels'],['levels','diffraction'],['classification','quarks'],['atom','rutherford'],['rutherford','strong']];function renderMap(){const svg=$('#conceptMap'),pos=Object.fromEntries(mapNodes.map(n=>[n[0],[n[2],n[3]]]));svg.innerHTML=mapEdges.map(([a,b])=>`<line class="map-edge" x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}"/>`).join('')+mapNodes.map(([id,label,x,y])=>`<g class="map-node" data-map="${id}" transform="translate(${x-92},${y-30})"><rect width="184" height="60" rx="14"/><text x="92" y="26" text-anchor="middle">${label.includes('&')?label.split(' &')[0]:label}</text><text x="92" y="46" text-anchor="middle" style="font-size:12px;fill:#9fb3ca">${label.includes('&')?'&'+label.split('&')[1]:simDefs.find(s=>s[0]===id)?.[2]||''}</text></g>`).join('');svg.querySelectorAll('[data-map]').forEach(g=>g.onclick=()=>selectMap(g.dataset.map));selectMap('atom')}
 function selectMap(id){$('#conceptMap').querySelectorAll('[data-map]').forEach(g=>g.classList.toggle('active',g.dataset.map===id));const d=simDefs.find(s=>s[0]===id),t=simText[id];$('#mapInfo').innerHTML=`<span class="eyebrow">${d?.[2]||'Extension'}</span><h2>${d?.[1]||id}</h2><p>${t.simple}</p><div class="tip"><strong>Exam link:</strong> ${t.exam}</div><button id="mapOpen" class="button primary">Open simulation</button>`;$('#mapOpen').onclick=()=>{currentSim=id;showView('lab');activateSim(id)}}renderMap();
 
-let THREE=null,renderer=null,scene=null,camera=null,world=null,raycaster=null,pointer=null,hotspotGroup=null,selectedHotspot=null,threeReady=false,paused=false,drag=false,pointerMoved=false,lastX=0,lastY=0,animator=()=>{},clockStart=performance.now(),processClock=performance.now(),lastLiveUpdate=0;
+let THREE=null,renderer=null,scene=null,camera=null,world=null,raycaster=null,pointer=null,hotspotGroup=null,selectedHotspot=null,hotspotsVisible=false,threeReady=false,paused=false,drag=false,pointerMoved=false,lastX=0,lastY=0,animator=()=>{},clockStart=performance.now(),processClock=performance.now(),lastLiveUpdate=0;
 const builders={};
 
 const hotspotDefs={
@@ -270,8 +270,18 @@ function makeHotspot(def,index){
 }
 function addHotspots(id){
  if(hotspotGroup&&hotspotGroup.parent)world.remove(hotspotGroup);
- hotspotGroup=null;
+ hotspotGroup=new THREE.Group();
+ hotspotGroup.name='learning-hotspots';
+ (hotspotDefs[id]||[]).forEach((def,i)=>hotspotGroup.add(makeHotspot(def,i)));
+ hotspotGroup.visible=hotspotsVisible;
+ world.add(hotspotGroup);
  selectedHotspot=null;
+ const toggle=$('#toggleHotspots');
+ if(toggle){
+   toggle.textContent=hotspotsVisible?'Hide 3D labels':'Inspect 3D';
+   toggle.classList.toggle('primary',hotspotsVisible);
+   toggle.setAttribute('aria-pressed',String(hotspotsVisible));
+ }
  updateLivePanel();
 }
 function hotspotInfoFromObject(o){
@@ -287,8 +297,10 @@ function ensureInteractionPanel(){
   p.innerHTML='<div class="live-3d-head"><span class="eyebrow">Live 3D explanation</span><strong id="live3DStage">Explore the model</strong></div><div id="live3DNow" class="live-3d-now"></div><div id="live3DSelected" class="live-3d-selected">Use the Model guide beside the simulation to identify each object. The 3D scene now contains only the physics model.</div><div class="live-3d-grid"><div><span>Science</span><p id="live3DScience"></p></div><div><span>Exam link</span><p id="live3DExam"></p></div></div>';
   wrap.appendChild(p);
  }
- if(!$('#modelGuideHint')){
-  const b=document.createElement('span');b.id='modelGuideHint';b.className='button model-guide-hint';b.textContent='Model guide is below the controls';$('.viewer-buttons')?.appendChild(b);
+ if(!$('#toggleHotspots')){
+  const b=document.createElement('button');b.type='button';b.id='toggleHotspots';b.className='button model-guide-hint';b.textContent='Inspect 3D';b.setAttribute('aria-pressed','false');
+  b.onclick=()=>{hotspotsVisible=!hotspotsVisible;if(hotspotGroup)hotspotGroup.visible=hotspotsVisible;b.textContent=hotspotsVisible?'Hide 3D labels':'Inspect 3D';b.classList.toggle('primary',hotspotsVisible);b.setAttribute('aria-pressed',String(hotspotsVisible));if(hotspotsVisible){selectedHotspot=null;updateLivePanel()}};
+  $('.viewer-buttons')?.appendChild(b);
  }
 }
 function currentDynamicState(){
@@ -335,17 +347,18 @@ window.addEventListener('particlelab:guide-select',e=>{
  if($('#live3DExam'))$('#live3DExam').textContent=info.exam;
 });
 function selectHotspotAt(e){
- if(!raycaster||!pointer||!camera||!world||!hotspotGroup||hotspotGroup.visible===false)return;
+ if(!raycaster||!pointer||!camera||!world||!hotspotGroup||hotspotGroup.visible===false)return false;
  const rect=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-rect.left)/rect.width)*2-1;pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
  raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(hotspotGroup.children,true);
- if(!hits.length)return;
- const info=hotspotInfoFromObject(hits[0].object),node=hotspotNodeFromObject(hits[0].object);if(!info)return;
+ if(!hits.length)return false;
+ const info=hotspotInfoFromObject(hits[0].object),node=hotspotNodeFromObject(hits[0].object);if(!info)return false;
  selectedHotspot=info;
  hotspotGroup.children.forEach(g=>g.scale.setScalar(g===node?1.32:1));
  if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+info.title+'</strong> · '+info.what;
  if($('#live3DScience'))$('#live3DScience').textContent=info.science;
  if($('#live3DExam'))$('#live3DExam').textContent=info.exam;
  window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:currentSim,title:info.title}}));
+ return true;
 }
 function animateHotspots(t){
  if(!hotspotGroup||hotspotGroup.visible===false)return;
@@ -522,6 +535,7 @@ builders.rutherford=()=>{clearWorld();setCamera(10);$('#simControls').innerHTML=
 function initThree(T){THREE=T;const canvas=$('#sceneCanvas');renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x07111f,.018);camera=new THREE.PerspectiveCamera(42,1,.1,100);world=new THREE.Group();scene.add(world);raycaster=new THREE.Raycaster();pointer=new THREE.Vector2();scene.add(new THREE.HemisphereLight(0xeef8ff,0x22344d,1.75));const dl=new THREE.DirectionalLight(0xffffff,2.35);dl.position.set(5,8,7);dl.castShadow=true;scene.add(dl);const rim=new THREE.PointLight(0x67c7ff,18,18,2);rim.position.set(-5,2,4);scene.add(rim);const warm=new THREE.PointLight(0xffc86b,9,14,2);warm.position.set(4,-3,2);scene.add(warm);const resize=()=>{const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(Math.max(10,r.width),Math.max(10,r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()};new ResizeObserver(resize).observe(canvas.parentElement);resize();ensureInteractionPanel();canvas.onpointerdown=e=>{drag=true;pointerMoved=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!drag)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)pointerMoved=true;world.rotation.y+=dx*.008;world.rotation.x=Math.max(-1.2,Math.min(1.2,world.rotation.x+dy*.006));lastX=e.clientX;lastY=e.clientY};canvas.onpointerup=e=>{
  drag=false;
  if(pointerMoved||!raycaster||!pointer||!camera||!world)return;
+ if(hotspotsVisible&&selectHotspotAt(e))return;
  const rect=canvas.getBoundingClientRect();
  pointer.x=((e.clientX-rect.left)/rect.width)*2-1;
  pointer.y=-((e.clientY-rect.top)/rect.height)*2+1;
@@ -546,6 +560,8 @@ window.PARTICLELAB_CORE={
  getCurrentSim:()=>currentSim,
  activateSim,
  is3DReady:()=>threeReady,
+ setInspectMode:on=>{hotspotsVisible=!!on;if(hotspotGroup)hotspotGroup.visible=hotspotsVisible;const b=$('#toggleHotspots');if(b){b.textContent=hotspotsVisible?'Hide 3D labels':'Inspect 3D';b.classList.toggle('primary',hotspotsVisible);b.setAttribute('aria-pressed',String(hotspotsVisible))}return hotspotsVisible},
+ getInspectMode:()=>hotspotsVisible,
  getControlState:()=>Object.fromEntries([...document.querySelectorAll('#simControls input,#simControls select')].map(el=>[el.id||el.name||el.type,el.value]))
 };
 activateSim(currentSim);
