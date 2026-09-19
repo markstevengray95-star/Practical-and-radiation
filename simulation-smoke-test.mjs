@@ -88,6 +88,15 @@ try {
     const after = (await page.locator('#simReadout').textContent())?.trim();
     if (!after) throw new Error(id + ': readout disappeared after interaction');
 
+    await page.waitForSelector('#simReadout .sim-readout-flow', { timeout: 3000 });
+    const keyStrip = page.locator('#simKeyStrip');
+    if (!(await keyStrip.count())) throw new Error(id + ': missing key-information strip');
+    const keyText = (await keyStrip.textContent())?.trim();
+    if (!keyText) throw new Error(id + ': key-information strip is empty');
+
+    const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
+    if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
+
     results.push({ id, title, ok: true });
   }
 
