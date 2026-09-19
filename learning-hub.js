@@ -12,7 +12,10 @@
 
   const challengeData={
     atom:[
-      {title:'Build sodium-23',text:'Use the atom controls to create a neutral ²³₁₁Na atom.',check:()=>{const v=$('#iso')?.value||'';return v==='11,23';},hint:'Z = 11, A = 23; neutral means electrons = protons.'}
+      {title:'Build carbon-14',text:'Create a neutral ¹⁴₆C atom.',check:()=>{const a=window.PARTICLELAB_ATOM_STATE||{};return a.Z===6&&a.A===14&&a.electrons===6;},hint:'Carbon has Z = 6. For A = 14, neutrons = 8. Neutral means 6 electrons.'},
+      {title:'Build sodium-23',text:'Create a neutral ²³₁₁Na atom.',check:()=>{const a=window.PARTICLELAB_ATOM_STATE||{};return a.Z===11&&a.A===23&&a.electrons===11;},hint:'Z = 11, A = 23; neutral means electrons = protons.'},
+      {title:'Make sodium +1',text:'Turn your sodium-23 atom into Na⁺ without changing the nucleus.',check:()=>{const a=window.PARTICLELAB_ATOM_STATE||{};return a.Z===11&&a.A===23&&a.electrons===10;},hint:'An ion changes electron number, not proton or neutron number.'},
+      {title:'Build chloride ion',text:'Create ³⁷₁₇Cl⁻.',check:()=>{const a=window.PARTICLELAB_ATOM_STATE||{};return a.Z===17&&a.A===37&&a.electrons===18;},hint:'Cl has 17 protons. A − Z = 20 neutrons. A −1 charge means one extra electron.'}
     ],
     specific:[
       {title:'Make a positive ion',text:'Create a particle with fewer electrons than protons so its specific charge is positive.',check:()=>+($('#scE')?.value||0)<+($('#scZ')?.value||0),hint:'Remove electrons so Ne < Z.'}
