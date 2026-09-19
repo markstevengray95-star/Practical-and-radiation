@@ -94,11 +94,22 @@ try {
     const keyText = (await keyStrip.textContent())?.trim();
     if (!keyText) throw new Error(id + ': key-information strip is empty');
 
+    const legend = page.locator('#simParticleLegend');
+    if (!(await legend.count())) throw new Error(id + ': missing model key');
+    const legendText = (await legend.textContent())?.trim() || '';
+    if (!legendText.includes('Target ring')) throw new Error(id + ': model key does not explain target rings');
+
     const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
     if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
 
     results.push({ id, title, ok: true });
   }
+
+  const soundButton = page.locator('#simSoundToggle');
+  const soundTest = page.locator('#simSoundTest');
+  if (!(await soundButton.count()) || !(await soundTest.count())) throw new Error('Simulation sound controls are missing');
+  await soundTest.click();
+  await page.waitForTimeout(80);
 
   await page.locator('[data-view="rutherfordexp"]').click();
   await page.waitForSelector('#rutherfordExperimentCanvas', { state: 'visible', timeout: 10000 });
