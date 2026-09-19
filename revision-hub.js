@@ -280,7 +280,7 @@
         '<div class="revision-card"><span class="eyebrow">Revision status</span><h3>'+due+' flashcards due</h3><p>'+checked+' / '+totalSpec+' specification points checked · '+(state.errors?.length||0)+' logged errors.</p></div></div>'+
         '<div class="revision-tabs">'+[
           ['today','Today'],['flash','Flashcards'],['mixed','Mixed test'],['formula','Formula sprint'],
-          ['definitions','Definitions'],['glossary','Glossary'],['spec','Spec checklist'],['errors','Error log']
+          ['definitions','Definitions'],['glossary','Glossary'],['spec','Spec checklist'],['organiser','Knowledge organiser'],['errors','Error log']
         ].map(x=>'<button data-revision-tab="'+x[0]+'" class="'+(state.active===x[0]?'active':'')+'">'+x[1]+'</button>').join('')+'</div>'+
         '<div id="revision-today" class="revision-panel '+(state.active==='today'?'active':'')+'">'+renderToday(scores)+'</div>'+
         '<div id="revision-flash" class="revision-panel '+(state.active==='flash'?'active':'')+'">'+renderFlash()+'</div>'+
@@ -288,7 +288,8 @@
         '<div id="revision-formula" class="revision-panel '+(state.active==='formula'?'active':'')+'">'+renderSprint('formula')+'</div>'+
         '<div id="revision-definitions" class="revision-panel '+(state.active==='definitions'?'active':'')+'">'+renderSprint('definition')+'</div>'+
         '<div id="revision-glossary" class="revision-panel '+(state.active==='glossary'?'active':'')+'">'+renderGlossary()+'</div>'+
-        '<div id="revision-spec" class="revision-panel '+(state.active==='spec'?'active':'')+'">'+renderSpec()+'</div>'+
+        '<div id="revision-spec" class="revision-panel '+(state.active==='spec'?'active':'')+'">'+renderSpec()+'</div>'+ 
+        '<div id="revision-organiser" class="revision-panel '+(state.active==='organiser'?'active':'')+'">'+renderOrganiser()+'</div>'+
         '<div id="revision-errors" class="revision-panel '+(state.active==='errors'?'active':'')+'">'+renderErrors()+'</div>'+
       '</div>';
     bind(scores);
@@ -360,6 +361,27 @@
     return '<div class="revision-card"><span class="eyebrow">AQA coverage</span><h3>Full specification checklist</h3><p>Tick a point only when you could explain it without notes and answer a question on it.</p></div><div class="spec-groups" style="margin-top:8px">'+specGroups.map(g=>'<section class="spec-group"><h3>'+g[0]+'</h3>'+g[1].map(x=>{const key='s'+(idx++);return '<label class="spec-row"><input type="checkbox" data-spec="'+key+'" '+(state.spec[key]?'checked':'')+'><div><strong>'+x[0]+'</strong><p>'+topicNames[x[1]]+'</p></div><code>'+x[1]+'</code></label>'}).join('')+'</section>').join('')+'</div>';
   }
 
+
+  function renderOrganiser(){
+    return '<div id="knowledgeOrganiser" class="ko-view">'+
+      '<div class="revision-card"><span class="eyebrow">Whole topic at a glance</span><h3>Particles & Radiation knowledge organiser</h3><p>Use this after learning the topic. It is a summary, not a replacement for the lesson explanations.</p><div class="ko-toolbar"><button class="button primary" id="printOrganiser">Print / save as PDF</button><button class="button" id="openSequenceFromKO">Open lesson sequence</button></div></div>'+
+      '<div class="ko-sheet">'+
+        '<section class="ko-block"><h3>Atoms & nuclei</h3><ul><li>Z = proton number; A = proton + neutron number.</li><li>Neutrons = A − Z.</li><li>Isotopes: same Z, different neutron number.</li><li>Specific charge = Q/m in C kg⁻¹.</li><li>Strong force: repulsive below ~0.5 fm, attractive to ~3 fm, negligible beyond a few fm.</li></ul></section>'+
+        '<section class="ko-block"><h3>Decay</h3><ul><li>α: A −4, Z −2.</li><li>β⁻: neutron character → proton + e⁻ + ν̄ₑ; A same, Z +1.</li><li>β⁺: proton character → neutron + e⁺ + νₑ; A same, Z −1.</li></ul></section>'+
+        '<section class="ko-block"><h3>Photons & antiparticles</h3><span class="ko-equation">E = hf = hc/λ</span><span class="ko-equation">E₀ = mc²</span><ul><li>Particle/antiparticle: same mass/rest energy, opposite relevant additive quantum numbers.</li><li>e⁻/e⁺ pair rest energy = 1.022 MeV.</li><li>Annihilation and pair production must conserve energy and momentum.</li></ul></section>'+
+        '<section class="ko-block"><h3>Interactions</h3><ul><li>Four fundamental interactions: gravity, EM, weak, strong.</li><li>EM exchange particle: virtual photon.</li><li>Weak exchange particles required: W⁺, W⁻.</li><li>AQA does not test gluon, Z⁰ or graviton in this section.</li></ul></section>'+
+        '<section class="ko-block"><h3>Particle families</h3><table class="ko-table"><tr><th>Family</th><th>Key idea</th></tr><tr><td>Hadron</td><td>Feels strong interaction</td></tr><tr><td>Baryon</td><td>3 quarks; B = +1</td></tr><tr><td>Meson</td><td>q + q̄; B = 0</td></tr><tr><td>Lepton</td><td>Does not feel strong interaction</td></tr></table><ul><li>Pion: meson and exchange particle in AQA nucleon strong-force model.</li><li>Muon decays to products including an electron.</li><li>Strange particles: produced strongly, decay weakly.</li></ul></section>'+
+        '<section class="ko-block"><h3>Quarks</h3><table class="ko-table"><tr><th>Quark</th><th>Q</th><th>B</th><th>S</th></tr><tr><td>u</td><td>+2/3 e</td><td>+1/3</td><td>0</td></tr><tr><td>d</td><td>−1/3 e</td><td>+1/3</td><td>0</td></tr><tr><td>s</td><td>−1/3 e</td><td>+1/3</td><td>−1</td></tr></table><p>Antiquarks reverse additive quantum numbers. p = uud; n = udd.</p></section>'+
+        '<section class="ko-block"><h3>Conservation</h3><ul><li>Conserve charge, baryon number, lepton number, energy and momentum.</li><li>Strangeness conserved in strong interactions.</li><li>In weak interactions strangeness may change by 0 or ±1.</li><li>β⁻ quark change: d → u; β⁺: u → d.</li></ul></section>'+
+        '<section class="ko-block"><h3>Photoelectric effect</h3><span class="ko-equation">hf = φ + KEmax</span><span class="ko-equation">KEmax = eVs</span><span class="ko-equation">f₀ = φ/h</span><ul><li>Frequency sets photon energy.</li><li>Intensity mainly sets photon arrival rate.</li><li>Below threshold: no emission regardless of intensity.</li></ul></section>'+
+        '<section class="ko-block"><h3>Collisions & eV</h3><span class="ko-equation">1 eV = 1.602 × 10⁻¹⁹ J</span><ul><li>Excitation: electron remains bound at higher energy.</li><li>Ionisation: electron removed.</li><li>Fluorescent tubes use collisions, excitation/ionisation and photon emission.</li></ul></section>'+
+        '<section class="ko-block"><h3>Energy levels</h3><span class="ko-equation">ΔE = hf = hc/λ</span><ul><li>Energy levels are discrete.</li><li>Downward transition emits a photon.</li><li>Line spectra are evidence for discrete ΔE values.</li></ul></section>'+
+        '<section class="ko-block"><h3>Wave–particle duality</h3><span class="ko-equation">λ = h/p</span><ul><li>Electron diffraction → wave evidence for matter.</li><li>Photoelectric effect → particle evidence for EM radiation.</li><li>Higher momentum → shorter de Broglie wavelength → less diffraction for the same structure.</li><li>Models are tested through peer review and scientific validation.</li></ul></section>'+
+        '<section class="ko-block ko-warning"><h3>Common traps</h3><ul><li>Intensity does not change photon energy at fixed frequency.</li><li>Excitation is not ionisation.</li><li>Meson ≠ three quarks.</li><li>Neutral antiparticles can still be distinct.</li><li>Energy-level lines are not physical orbits.</li><li>Check every conservation rule, not charge alone.</li></ul></section>'+
+        '<section class="ko-block ko-extension"><h3>Rutherford extension · 3.8.1.1</h3><ul><li>Most α straight → atom mostly empty space.</li><li>Some deflect → positive nucleus.</li><li>Rare large/backward scattering → tiny dense nucleus with concentrated charge/mass.</li><li>Smaller impact parameter → larger deflection.</li></ul></section>'+
+      '</div></div>';
+  }
+
   function renderErrors(){
     const errors=state.errors||[];
     return '<div class="revision-card"><span class="eyebrow">Repair mistakes</span><h3>Error log</h3><p>Wrong mixed-test answers stay here until you remove them after successful correction.</p><div class="lt-actions"><button class="button" id="clearErrors">Clear all</button></div></div><div class="error-log" style="margin-top:8px">'+(errors.length?errors.map((e,i)=>'<div class="error-item"><strong>'+topicNames[e.topic]+' · '+e.q+'</strong><p><b>Correct answer:</b> '+e.answer+'</p><p>'+e.why+'</p><button class="button" data-error-fixed="'+i+'">I can explain this now</button></div>').join(''):'<div class="revision-card"><p>No logged errors. Complete the mixed test to create a targeted error list.</p></div>')+'</div>';
@@ -397,7 +419,11 @@
     $('#glossarySearch')?.addEventListener('input',e=>{$('#glossaryGrid').innerHTML=glossaryHTML(e.target.value)});
     $('#glossaryClear')?.addEventListener('click',()=>{const i=$('#glossarySearch');if(i)i.value='';const g=$('#glossaryGrid');if(g)g.innerHTML=glossaryHTML('')});
 
-    $$('[data-spec]').forEach(x=>x.onchange=()=>{state.spec[x.dataset.spec]=x.checked;save()});
+    $('[data-spec]').forEach(x=>x.onchange=()=>{state.spec[x.dataset.spec]=x.checked;save()});
+
+    $('#printOrganiser')?.addEventListener('click',()=>window.print());
+    $('#openSequenceFromKO')?.addEventListener('click',()=>document.querySelector('[data-view="course"]')?.click());
+
     $$('[data-error-fixed]').forEach(b=>b.onclick=()=>{state.errors.splice(+b.dataset.errorFixed,1);save();render()});
     $('#clearErrors')?.addEventListener('click',()=>{state.errors=[];save();render()});
   }
