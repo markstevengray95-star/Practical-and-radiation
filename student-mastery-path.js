@@ -89,10 +89,10 @@
       $('#masteryOpenSim',host)?.addEventListener('click',()=>simOpen(l));
       $('#masteryPrev',host)?.addEventListener('click',()=>{activeChunk--;render()});
       $('#masteryNext',host)?.addEventListener('click',()=>{if(r.chunks[activeChunk]){activeChunk++;render()}});
-      $('[data-reveal-key]',host).forEach(b=>b.onclick=()=>{$('#masteryKey'+b.dataset.revealKey,host).hidden=false});
-      $('[data-retrieval]',host).forEach(t=>t.oninput=()=>{const i=+t.dataset.retrieval;r.retrieval[i]=t.value;save();const b=host.querySelector('[data-secure-chunk="'+i+'"]');if(b&&!r.chunks[i])b.disabled=t.value.trim().length<12;const status=t.closest('.mastery-retrieve')?.querySelector('.mastery-retrieval-status');if(status&&!r.chunks[i])status.textContent=t.value.trim().length>=12?'Ready to compare and mark secure.':'Write a short explanation before this chunk can be secured.'});
-      $('[data-secure-chunk]',host).forEach(b=>b.onclick=()=>{const i=+b.dataset.secureChunk;if(!r.chunks[i]&&(r.retrieval?.[i]||'').trim().length<12)return;r.chunks[i]=!r.chunks[i];save();window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:l.sim||'course',title:r.chunks[i]?'mastery secure':'review'}}));render()});
-      $('[data-exit]',host).forEach(x=>x.onchange=()=>{r.exit[+x.dataset.exit]=x.checked;save();render();ensureSummary()});
+      $$('[data-reveal-key]',host).forEach(b=>b.onclick=()=>{$('#masteryKey'+b.dataset.revealKey,host).hidden=false});
+      $$('[data-retrieval]',host).forEach(t=>t.oninput=()=>{const i=+t.dataset.retrieval;r.retrieval[i]=t.value;save();const b=host.querySelector('[data-secure-chunk="'+i+'"]');if(b&&!r.chunks[i])b.disabled=t.value.trim().length<12;const status=t.closest('.mastery-retrieve')?.querySelector('.mastery-retrieval-status');if(status&&!r.chunks[i])status.textContent=t.value.trim().length>=12?'Ready to compare and mark secure.':'Write a short explanation before this chunk can be secured.'});
+      $$('[data-secure-chunk]',host).forEach(b=>b.onclick=()=>{const i=+b.dataset.secureChunk;if(!r.chunks[i]&&(r.retrieval?.[i]||'').trim().length<12)return;r.chunks[i]=!r.chunks[i];save();window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:l.sim||'course',title:r.chunks[i]?'mastery secure':'review'}}));render()});
+      $$('[data-exit]',host).forEach(x=>x.onchange=()=>{r.exit[+x.dataset.exit]=x.checked;save();render();ensureSummary()});
       const mastered=chunks.every((_,i)=>!!r.chunks[i])&&l.exit.every((_,i)=>!!r.exit[i]);
       const next=$('#sequenceNext',hostPanel);
       if(next&&l.n<15){next.disabled=!mastered;next.title=mastered?'Ready for the next lesson':'Complete every learning chunk and the mastery gate first';}
