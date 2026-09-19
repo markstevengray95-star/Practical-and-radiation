@@ -155,6 +155,26 @@ try {
   await soundTest.click();
   await page.waitForTimeout(80);
 
+  // Classroom lesson sequence checks.
+  await page.locator('[data-view="course"]').click();
+  await page.waitForSelector('#courseList.lesson-sequence-sidebar', { timeout: 5000 });
+  const sequenceButtons = page.locator('[data-seq-lesson]');
+  if ((await sequenceButtons.count()) !== 16) throw new Error('Expected 16 teaching-sequence lessons');
+  const firstLessonText = (await sequenceButtons.first().textContent()) || '';
+  if (!/Atomic structure/i.test(firstLessonText)) throw new Error('Lesson 1 is not atomic structure');
+  const lastLessonText = (await sequenceButtons.last().textContent()) || '';
+  if (!/Rutherford/i.test(lastLessonText)) throw new Error('Lesson 16 is not Rutherford extension');
+  if (!(await page.locator('#lessonSequenceProgress').count())) throw new Error('Lesson sequence progress is missing');
+
+  await sequenceButtons.nth(10).click();
+  await page.waitForTimeout(80);
+  const lesson11Title = (await page.locator('#lessonPanel h2').textContent()) || '';
+  if (!/Photoelectric/i.test(lesson11Title)) throw new Error('Lesson 11 is not photoelectric effect');
+  await page.locator('#sequenceActivity').click();
+  await page.waitForTimeout(120);
+  if (!(await page.locator('#view-lab').evaluate(el => el.classList.contains('active-view')))) throw new Error('Lesson activity did not open the simulation lab');
+  if (!(await page.locator('.sim-tab[data-sim="photo"]').evaluate(el => el.classList.contains('active')))) throw new Error('Lesson 11 did not launch photoelectric simulation');
+
   // Feature suite checks.
   await page.locator('[data-view="lab"]').click();
   await page.waitForSelector('#learningSuite', { state: 'attached', timeout: 5000 });
