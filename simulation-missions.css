@@ -13,3 +13,12 @@
 .mission-check{margin-top:9px;padding:9px;border:1px solid rgba(107,224,167,.2);border-radius:10px;background:#081b22}.mission-check p{margin:.25rem 0 .45rem;font-size:.76rem}.mission-options{display:grid;gap:5px}.mission-feedback{font-size:.7rem;color:#c7d7e3;margin-top:6px;line-height:1.35}
 #toggleHotspots.primary{border-color:#7ed8ff;box-shadow:0 0 0 1px rgba(126,216,255,.14) inset}
 @media(max-width:760px){.mission-head{display:grid;grid-template-columns:1fr auto}.mission-tools{align-items:flex-start;flex-direction:column}.mission-actions{margin-left:0}.mission-observation{margin-left:0}}
+
+/* Keep the guided mission inside the simulation information column at every desktop width. */
+#view-lab #simulationMissionPanel{grid-column:1 / -1;min-width:0;max-width:100%;overflow:hidden}
+#view-lab #simulationMissionPanel *{min-width:0}
+#view-lab #simulationMissionPanel h3,
+#view-lab #simulationMissionPanel p,
+#view-lab #simulationMissionPanel strong,
+#view-lab #simulationMissionPanel span{overflow-wrap:anywhere}
+#view-lab #simulationMissionPanel textarea{display:block;max-width:100%}
