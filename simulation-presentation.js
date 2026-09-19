@@ -5,6 +5,97 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => [...r.querySelectorAll(s)];
 
+
+  const legends = {
+    atom:[
+      ['#ff7777','Proton','+e, inside nucleus'],
+      ['#72a9ff','Neutron','0 charge, inside nucleus'],
+      ['#76d8ff','Electron cloud','probability-style region'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    specific:[
+      ['#ff7777','Proton','adds +e and mass'],
+      ['#72a9ff','Neutron','adds mass only'],
+      ['#7ee8ff','Electron','adds −e, very small mass'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    strong:[
+      ['#ff7777','Proton / nucleon','one interacting nucleon'],
+      ['#72a9ff','Neutron / nucleon','one interacting nucleon'],
+      ['#63d9a4','Green arrow','attractive force'],
+      ['#ff7b87','Red arrow','repulsive force'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    decay:[
+      ['#ff7777','Proton','nuclear proton'],
+      ['#72a9ff','Neutron','nuclear neutron'],
+      ['#7ee8ff','β⁻ electron','emitted in beta-minus decay'],
+      ['#ff9fcb','β⁺ positron','emitted in beta-plus decay'],
+      ['#f3f7ff','ν / ν̄','neutrino or antineutrino'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    antimatter:[
+      ['#7ee8ff','Electron e⁻','matter particle'],
+      ['#ff9fcb','Positron e⁺','electron antiparticle'],
+      ['#ffe88a','Photon γ','electromagnetic radiation'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    interactions:[
+      ['#ff7777','Charged / proton-like particle','depends on selected process'],
+      ['#72a9ff','Neutron-like particle','depends on selected process'],
+      ['#7ee8ff','Electron','charged lepton'],
+      ['#ffe88a','Virtual photon γ','EM exchange'],
+      ['#b895ff','W boson','weak exchange'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    classification:[
+      ['#ff7777','Proton','baryon / hadron'],
+      ['#72a9ff','Neutron','baryon / hadron'],
+      ['#ffc85f','Pion','meson / hadron'],
+      ['#b895ff','Kaon','meson / hadron'],
+      ['#7ee8ff','Electron','lepton'],
+      ['#67d3a1','Muon','lepton'],
+      ['#f3f7ff','Neutrino','lepton']
+    ],
+    quarks:[
+      ['#ffc85f','Up quark u','charge +2/3 e'],
+      ['#67d3a1','Down quark d','charge −1/3 e'],
+      ['#b895ff','Strange quark s','charge −1/3 e, S = −1'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    photo:[
+      ['#ffe88a','Photon γ','energy hf'],
+      ['#7ee8ff','Photoelectron','electron emitted from metal'],
+      ['#8fa3b8','Metal surface','provides work function φ'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    collisions:[
+      ['#7ee8ff','Incident electron','brings kinetic energy'],
+      ['#ff7777','Proton','part of atom'],
+      ['#72a9ff','Neutron','part of atom'],
+      ['#7ee8ff','Atomic electron','can be excited or ionised'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    levels:[
+      ['#7ee8ff','Electron','moves between allowed levels'],
+      ['#ffe88a','Photon','carries ΔE'],
+      ['#b895ff','Energy-level discs','allowed energies, not physical orbits'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    diffraction:[
+      ['#7ee8ff','Electron beam','matter particles with de Broglie wavelength'],
+      ['#b9d8ef','Diffraction pattern','wave behaviour on screen'],
+      ['target','Target ring','clickable label, not a particle']
+    ],
+    rutherford:[
+      ['#7ee8ff','Alpha particle','helium nucleus, charge +2e'],
+      ['#ff7777','Proton in nucleus','positive nuclear charge'],
+      ['#72a9ff','Neutron in nucleus','neutral nucleon'],
+      ['#66d9a6','Detector','records alpha arrival'],
+      ['target','Target ring','clickable label, not a particle']
+    ]
+  };
+
   const profiles = {
     atom:{
       focus:'Nucleus ↔ electron region',
@@ -92,6 +183,31 @@
     else side.prepend(strip);
   }
 
+
+  function addLegend(){
+    const side=$('.lab-side');
+    if(!side || $('#simParticleLegend')) return;
+    const box=document.createElement('div');
+    box.id='simParticleLegend';
+    box.className='sim-particle-legend';
+    const strip=$('#simKeyStrip');
+    if(strip) strip.insertAdjacentElement('afterend',box);
+    else side.prepend(box);
+  }
+
+  function updateLegend(){
+    const box=$('#simParticleLegend');
+    if(!box) return;
+    const rows=legends[currentSim()] || [];
+    box.innerHTML='<div class="sim-legend-title"><strong>Model key</strong><span>What the colours and markers mean</span></div>'+
+      '<div class="sim-legend-items">'+rows.map(([colour,name,note])=>{
+        const mark=colour==='target'
+          ? '<span class="sim-legend-target" aria-hidden="true"></span>'
+          : '<span class="sim-legend-dot" style="--legend-colour:'+colour+'" aria-hidden="true"></span>';
+        return '<div class="sim-legend-item">'+mark+'<div><strong>'+name+'</strong><span>'+note+'</span></div></div>';
+      }).join('')+'</div>';
+  }
+
   function add3DBadge(){
     const wrap=$('.viewer-wrap');
     if(!wrap || $('#sim3DStatusBadge')) return;
@@ -167,8 +283,10 @@
 
   function refresh(){
     addKeyStrip();
+    addLegend();
     add3DBadge();
     updateProfile();
+    updateLegend();
     formatLearningText();
     setTimeout(formatReadout,0);
   }
