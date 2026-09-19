@@ -147,6 +147,12 @@ try {
     const after = (await page.locator('#simReadout').textContent())?.trim();
     if (!after) throw new Error(id + ': readout disappeared after interaction');
 
+    const mission = page.locator('#simulationMissionPanel');
+    if (!(await mission.count())) throw new Error(id + ': missing guided simulation mission');
+    const missionText = (await mission.textContent()) || '';
+    if (!/Learning mission|Optional extension/i.test(missionText)) throw new Error(id + ': simulation mission did not render');
+    if ((await mission.locator('[data-mission-done]').count()) < 3) throw new Error(id + ': simulation mission is incomplete');
+
     await page.waitForSelector('#simReadout .sim-readout-flow', { timeout: 3000 });
     const keyStrip = page.locator('#simKeyStrip');
     if (!(await keyStrip.count())) throw new Error(id + ': missing key-information strip');
@@ -284,6 +290,25 @@ try {
   const lastLessonText = (await sequenceButtons.last().textContent()) || '';
   if (!/Rutherford/i.test(lastLessonText)) throw new Error('Lesson 16 is not Rutherford extension');
   if (!(await page.locator('#lessonSequenceProgress').count())) throw new Error('Lesson sequence progress is missing');
+
+  if (!(await page.locator('#studentMasteryPath').count())) throw new Error('Student mastery pathway is missing');
+  if ((await page.locator('#studentMasteryPath .mastery-chunk-tab').count()) < 4) throw new Error('Lesson mastery chunks are incomplete');
+  const firstMasteryNext = page.locator('#masteryNext');
+  if (!(await firstMasteryNext.isDisabled())) throw new Error('Mastery pathway should gate the next chunk before the current chunk is secure');
+  await page.locator('[data-secure-chunk="0"]').click();
+  await page.waitForTimeout(70);
+  if (await page.locator('#masteryNext').isDisabled()) throw new Error('Mastery pathway did not unlock the next chunk after securing the current chunk');
+
+  await page.locator('[data-view="lab"]').click();
+  await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
+  await page.waitForTimeout(120);
+  if (!(await page.locator('#toggleHotspots').count())) throw new Error('Inspect 3D control is missing');
+  await page.locator('#missionInspect').click();
+  await page.waitForTimeout(80);
+  const inspectOn = await page.evaluate(() => window.PARTICLELAB_CORE?.getInspectMode?.());
+  if (!inspectOn) throw new Error('Inspect 3D mode did not activate');
+  const guideCount = await page.evaluate(() => (window.PARTICLELAB_GUIDES?.atom || []).length);
+  if (guideCount < 2) throw new Error('Atom 3D inspection guide is incomplete');
 
   await sequenceButtons.nth(10).click();
   await page.waitForTimeout(80);
