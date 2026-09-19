@@ -103,12 +103,6 @@ try {
     if (!(await guide.count())) throw new Error(id + ': missing external model guide');
     const guideButtons = guide.locator('.sim-guide-button');
     if ((await guideButtons.count()) < 1) throw new Error(id + ': model guide has no explanatory items');
-    await guideButtons.first().click();
-    await page.waitForTimeout(40);
-    const selectedGuideText = (await page.locator('#live3DSelected').textContent())?.trim() || '';
-    if (!selectedGuideText || /use the model guide/i.test(selectedGuideText)) {
-      throw new Error(id + ': model guide did not update the explanation panel');
-    }
 
     const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
     if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
@@ -132,6 +126,14 @@ try {
   if (!(await page.locator('body').evaluate(el => el.classList.contains('sim-focus-mode')))) throw new Error('Focus view did not activate');
   await fullButton.click();
   if (!(await page.locator('body').evaluate(el => el.classList.contains('sim-full-mode')))) throw new Error('Full tools view did not activate');
+
+  const fullGuide = page.locator('#simObjectGuide .sim-guide-button').first();
+  if (!(await fullGuide.isVisible())) throw new Error('Model guide is not visible in Full tools mode');
+  await fullGuide.click();
+  await page.waitForTimeout(40);
+  const selectedGuideText = (await page.locator('#live3DSelected').textContent())?.trim() || '';
+  if (!selectedGuideText || /use the model guide/i.test(selectedGuideText)) throw new Error('Model guide did not update the explanation panel in Full tools mode');
+
   await focusButton.click();
 
   const soundButton = page.locator('#simSoundToggle');
