@@ -406,7 +406,16 @@ function randomBall(r){let v;do{v=new THREE.Vector3((Math.random()*2-1)*r,(Math.
 function cluster(Z,A,size=.16){const g=new THREE.Group(),R=.42+.16*Math.cbrt(Math.min(A,210));for(let i=0;i<A;i++){const m=sphere(size,i<Z?'#ff7777':'#72a9ff');m.position.copy(randomBall(R));g.add(m)}return g}
 function setCamera(z=8){camera.position.set(0,1.3,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
 function control(label,inner){return `<label class="field"><span>${label}</span>${inner}</label>`}
-function setReadout(html){$('#simReadout').innerHTML=html;queueMicrotask(updateLivePanel)}
+function setReadout(html){
+ const box=$('#simReadout');
+ const parts=String(html)
+   .replace(/<br\s*\/?>/gi,' · ')
+   .split(/\s*·\s*/)
+   .map(x=>x.trim())
+   .filter(Boolean);
+ box.innerHTML='<div class="sim-readout-flow">'+parts.map(x=>'<span class="sim-readout-chip">'+x+'</span>').join('')+'</div>';
+ queueMicrotask(updateLivePanel);
+}
 
 builders.atom=()=>{clearWorld();setCamera(8);$('#simControls').innerHTML=control('Choose isotope','<select id="iso"><option value="1,1">Hydrogen-1</option><option value="6,12" selected>Carbon-12</option><option value="6,14">Carbon-14</option><option value="8,16">Oxygen-16</option><option value="79,197">Gold-197</option></select>');const build=()=>{clearWorld();const [Z,A]=$('#iso').value.split(',').map(Number),nuc=cluster(Z,A,A>60?.08:.15);world.add(nuc);const pts=[];for(let i=0;i<Math.min(1600,220+Z*10);i++){let v=randomBall(4);if(v.length()<1.5)v.setLength(1.5+Math.random()*2.3);pts.push(v.x,v.y,v.z)}const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));const cloud=new THREE.Points(geom,new THREE.PointsMaterial({color:'#76d8ff',size:.045,transparent:true,opacity:.34,depthWrite:false}));world.add(cloud);setReadout(`Z = ${Z} · A = ${A} · neutrons = ${A-Z} · neutral atom electrons = ${Z}`);animator=t=>{cloud.rotation.y=t*.08;nuc.rotation.y=-t*.05}};$('#iso').onchange=build;build()};
 
