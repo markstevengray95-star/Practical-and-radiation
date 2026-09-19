@@ -272,14 +272,25 @@
       return;
     }
 
-    if(e.target.closest?.('#resetView')){
+    if(e.target.closest?.('#rotateLeft,#rotateRight,#resetView,#pauseMotion')){
       cue('soft');
+      return;
+    }
+
+    if(e.target.closest?.('[data-ruth-mode],#ruthReset,#ruthResetCamera,#ruthPause')){
+      cue('scatter');
+      return;
+    }
+
+    if(e.target.closest?.('.sim-guide-button')){
+      cue(hotspotCue(e.target.closest('.sim-guide-button')?.textContent || ''));
+      return;
     }
   },false);
 
   document.addEventListener('input',e=>{
     const el=e.target;
-    if(!el.closest?.('#simControls')) return;
+    if(!el.closest?.('#simControls,#ruthCloseControls')) return;
     const now=performance.now();
     if(now-lastSliderSound<110) return;
     lastSliderSound=now;
@@ -290,8 +301,18 @@
   document.addEventListener('change',e=>{
     if(e.target.closest?.('#simControls select')){
       cue(simCue[selectedSim()] || 'tick');
+      return;
+    }
+    if(e.target.closest?.('#ruthCloseControls input,[data-ruth-mode]')){
+      cue('scatter');
     }
   },false);
+
+  window.PARTICLELAB_SOUND={
+    isEnabled:()=>enabled,
+    test:()=>{ensureAudio();cue(simCue[selectedSim()] || 'soft');},
+    cue
+  };
 
   function init(){
     addHud();
