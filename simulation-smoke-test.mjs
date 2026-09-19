@@ -336,6 +336,8 @@ try {
   const guideCount = await page.evaluate(() => (window.PARTICLELAB_GUIDES?.atom || []).length);
   if (guideCount < 2) throw new Error('Atom 3D inspection guide is incomplete');
 
+  await page.locator('[data-view="course"]').click();
+  await page.waitForTimeout(80);
   await sequenceButtons.nth(10).click();
   await page.waitForTimeout(80);
   const lesson11Title = (await page.locator('#lessonPanel h2').textContent()) || '';
