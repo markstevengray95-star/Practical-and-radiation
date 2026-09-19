@@ -64,3 +64,32 @@
 @media(max-width:480px){
   .atom-knowledge-grid,.atom-live-check,.atom-builder-grid{grid-template-columns:1fr}
 }
+
+
+.atom-task-route{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:thin;
+}
+.atom-task-route span{
+  flex:0 0 auto;
+  padding:4px 6px;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:999px;
+  background:#071522;
+  color:#8fa8ba;
+  font-size:.53rem;
+  white-space:nowrap;
+}
+.atom-task-route span.active{
+  color:#fff;
+  border-color:rgba(103,199,255,.32);
+  background:rgba(103,199,255,.11);
+}
+.atom-task-route span.done{
+  color:#c7f0dc;
+  border-color:rgba(99,217,164,.22);
+  background:rgba(99,217,164,.07);
+}
