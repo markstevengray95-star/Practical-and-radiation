@@ -181,8 +181,18 @@ try {
     const guideButtons = guide.locator('.sim-guide-button');
     if ((await guideButtons.count()) < 1) throw new Error(id + ': model guide has no explanatory items');
 
-    const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
-    if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
+    const sideMetrics = await page.locator('.lab-side').evaluate(el => {
+      const root=el.getBoundingClientRect();
+      const offenders=[...el.querySelectorAll('*')].map(node=>{
+        const r=node.getBoundingClientRect(),cs=getComputedStyle(node);
+        return {tag:node.tagName.toLowerCase(),id:node.id||'',cls:String(node.className||'').slice(0,120),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),clientWidth:node.clientWidth,scrollWidth:node.scrollWidth,overflowX:cs.overflowX,whiteSpace:cs.whiteSpace,position:cs.position};
+      }).filter(x=>x.right>root.right+4 || (x.scrollWidth>x.clientWidth+4 && x.overflowX==='visible')).sort((a,b)=>(b.right-root.right)-(a.right-root.right)).slice(0,12);
+      return {clientWidth:el.clientWidth,scrollWidth:el.scrollWidth,left:Math.round(root.left),right:Math.round(root.right),offenders};
+    });
+    if (sideMetrics.scrollWidth > sideMetrics.clientWidth + 4) {
+      console.error(id+': lab-side overflow diagnostics',JSON.stringify(sideMetrics,null,2));
+      throw new Error(id + ': simulation information column has horizontal overflow');
+    }
 
     const essentials = page.locator('#simEssentials');
     if (!(await essentials.count())) throw new Error(id + ': missing exam essentials panel');
