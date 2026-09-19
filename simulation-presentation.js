@@ -322,6 +322,21 @@
       observer.observe(readout,{childList:true,subtree:true,characterData:true});
     }
 
+    let lastSim=currentSim();
+    setInterval(()=>{
+      const now=currentSim();
+      if(now!==lastSim){
+        lastSim=now;
+        refresh();
+      }else{
+        addKeyStrip();
+        addLegend();
+        addObjectGuide();
+        updateObjectGuide();
+        formatReadout();
+      }
+    },250);
+
     $('#simNav')?.addEventListener('click',e=>{
       if(e.target.closest?.('.sim-tab')) setTimeout(refresh,35);
     });
