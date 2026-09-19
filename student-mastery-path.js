@@ -7,7 +7,7 @@
   const save=()=>localStorage.setItem(STORE,JSON.stringify(state));
   const lessonNo=()=>Number(($('#lessonPanel .lesson-count')?.textContent||'').match(/Lesson\s+(\d+)/i)?.[1]||1);
   const core=l=>l && (String(l.code).startsWith('3.2') || l.code==='3.2 mixed');
-  function rec(n){return state[n]||(state[n]={chunks:[],exit:[],attempts:{}})}
+  function rec(n){const r=state[n]||(state[n]={chunks:[],exit:[],attempts:{},retrieval:{}});r.chunks=r.chunks||[];r.exit=r.exit||[];r.attempts=r.attempts||{};r.retrieval=r.retrieval||{};return r}
   function lesson(){const n=lessonNo();return window.PARTICLELAB_LESSON_SEQUENCE?.lessons?.find(x=>x.n===n)}
   function simOpen(l){
     if(l.sim){document.querySelector('[data-view="lab"]')?.click();setTimeout(()=>window.PARTICLELAB_CORE?.activateSim?.(l.sim),70)}
@@ -35,7 +35,7 @@
   }
   function chunkCheck(l,i){
     const r=rec(l.n),secured=!!r.chunks[i],key=l.teach[i][1];
-    return '<div class="mastery-retrieve"><strong>Retrieve it</strong><p>Close the notes and explain this idea in your own words. Then reveal the key idea and compare.</p><textarea data-retrieval="'+i+'" rows="2" placeholder="Write your explanation here..."></textarea><div class="mastery-inline-actions"><button class="button" data-reveal-key="'+i+'">Reveal key idea</button><button class="button '+(secured?'success':'')+'" data-secure-chunk="'+i+'">'+(secured?'✓ Secure':'Mark secure')+'</button></div><div class="mastery-key" id="masteryKey'+i+'" hidden><strong>Key idea:</strong> '+key+'</div></div>';
+    const written=(r.retrieval?.[i]||'');return '<div class="mastery-retrieve"><strong>Retrieve it</strong><p>Close the notes and explain this idea in your own words. Write enough to show your reasoning, then compare it with the key idea.</p><textarea data-retrieval="'+i+'" rows="2" placeholder="Write your explanation here...">'+written.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</textarea><div class="mastery-inline-actions"><button class="button" data-reveal-key="'+i+'">Reveal key idea</button><button class="button '+(secured?'success':'')+'" data-secure-chunk="'+i+'" '+(!secured&&written.trim().length<12?'disabled':'')+'>'+(secured?'✓ Secure':'Mark secure')+'</button></div><div class="mastery-retrieval-status">'+(secured?'Retrieved and marked secure.':written.trim().length>=12?'Ready to compare and mark secure.':'Write a short explanation before this chunk can be secured.')+'</div><div class="mastery-key" id="masteryKey'+i+'" hidden><strong>Key idea:</strong> '+key+'</div></div>';
   }
   function render(){
     if(rendering)return; rendering=true;
@@ -49,14 +49,20 @@
         '<div class="mastery-chunk-tabs">'+chunks.map((c,i)=>'<button class="mastery-chunk-tab '+(i===activeChunk?'active ':'')+(r.chunks[i]?'secure ':'')+(i>0&&!r.chunks[i-1]&&!r.chunks[i]?'locked':'')+'" data-mastery-chunk="'+i+'" '+(i>0&&!r.chunks[i-1]&&!r.chunks[i]?'disabled':'')+'><span>'+(r.chunks[i]?'✓':i+1)+'</span>'+c[0].replace(/^\d+\.\s*/,'')+'</button>').join('')+'</div>'+
         '<article class="mastery-chunk-card '+(secured?'is-secure':'')+'"><div class="mastery-chunk-label">Chunk '+(activeChunk+1)+' of '+chunks.length+'</div><h3>'+chunks[activeChunk][0]+'</h3><div class="mastery-learn"><strong>Learn</strong><p>'+chunks[activeChunk][1]+'</p>'+(l.equations?.length?'<div class="mastery-equations">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'')+'</div><div class="mastery-do"><strong>Do with the model</strong><p>'+l.simTask+'</p><button class="button" id="masteryOpenSim">Open linked interactive model</button></div>'+chunkCheck(l,activeChunk)+'</article>'+
         '<div class="mastery-path-actions"><button class="button" id="masteryPrev" '+(activeChunk===0?'disabled':'')+'>← Previous chunk</button><button class="button primary" id="masteryNext" '+(!secured||activeChunk===chunks.length-1?'disabled':'')+'>Next chunk →</button></div>'+
-        '<div class="mastery-gate"><span class="eyebrow">End-of-lesson mastery gate</span><h3>Answer without notes</h3><div class="mastery-exit-grid">'+l.exit.map((q,i)=>'<label class="mastery-exit '+(r.exit[i]?'secure':'')+'"><input type="checkbox" data-exit="'+i+'" '+(r.exit[i]?'checked':'')+'><span>'+q+'</span></label>').join('')+'</div><p><strong>Exam language:</strong> '+l.exam+'</p><p><strong>Worked example:</strong> '+l.worked+'</p></div>';
+        '<div class="mastery-gate"><span class="eyebrow">End-of-lesson mastery gate</span><h3>Answer without notes</h3><p class="mastery-gate-instruction">Only tick a question when you can answer it aloud or on paper without the simulation or lesson notes.</p><div class="mastery-exit-grid">'+l.exit.map((q,i)=>'<label class="mastery-exit '+(r.exit[i]?'secure':'')+'"><input type="checkbox" data-exit="'+i+'" '+(r.exit[i]?'checked':'')+'><span>'+q+'</span></label>').join('')+'</div><p><strong>Exam language:</strong> '+l.exam+'</p><p><strong>Worked example:</strong> '+l.worked+'</p><div id="masteryUnlockStatus" class="mastery-unlock-status"></div></div>';
       $$('[data-mastery-chunk]',host).forEach(b=>b.onclick=()=>{activeChunk=+b.dataset.masteryChunk;render()});
       $('#masteryOpenSim',host)?.addEventListener('click',()=>simOpen(l));
       $('#masteryPrev',host)?.addEventListener('click',()=>{activeChunk--;render()});
       $('#masteryNext',host)?.addEventListener('click',()=>{if(r.chunks[activeChunk]){activeChunk++;render()}});
-      $$('[data-reveal-key]',host).forEach(b=>b.onclick=()=>{$('#masteryKey'+b.dataset.revealKey,host).hidden=false});
-      $$('[data-secure-chunk]',host).forEach(b=>b.onclick=()=>{const i=+b.dataset.secureChunk;r.chunks[i]=!r.chunks[i];save();window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:l.sim||'course',title:r.chunks[i]?'mastery secure':'review'}}));render()});
-      $$('[data-exit]',host).forEach(x=>x.onchange=()=>{r.exit[+x.dataset.exit]=x.checked;save();render();ensureSummary()});
+      $('[data-reveal-key]',host).forEach(b=>b.onclick=()=>{$('#masteryKey'+b.dataset.revealKey,host).hidden=false});
+      $('[data-retrieval]',host).forEach(t=>t.oninput=()=>{const i=+t.dataset.retrieval;r.retrieval[i]=t.value;save();const b=host.querySelector('[data-secure-chunk="'+i+'"]');if(b&&!r.chunks[i])b.disabled=t.value.trim().length<12;const status=t.closest('.mastery-retrieve')?.querySelector('.mastery-retrieval-status');if(status&&!r.chunks[i])status.textContent=t.value.trim().length>=12?'Ready to compare and mark secure.':'Write a short explanation before this chunk can be secured.'});
+      $('[data-secure-chunk]',host).forEach(b=>b.onclick=()=>{const i=+b.dataset.secureChunk;if(!r.chunks[i]&&(r.retrieval?.[i]||'').trim().length<12)return;r.chunks[i]=!r.chunks[i];save();window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:l.sim||'course',title:r.chunks[i]?'mastery secure':'review'}}));render()});
+      $('[data-exit]',host).forEach(x=>x.onchange=()=>{r.exit[+x.dataset.exit]=x.checked;save();render();ensureSummary()});
+      const mastered=chunks.every((_,i)=>!!r.chunks[i])&&l.exit.every((_,i)=>!!r.exit[i]);
+      const next=$('#sequenceNext',hostPanel);
+      if(next&&current<14){next.disabled=!mastered;next.title=mastered?'Ready for the next lesson':'Complete every learning chunk and the mastery gate first';}
+      const unlock=$('#masteryUnlockStatus',host);
+      if(unlock)unlock.innerHTML=mastered?'<strong>✓ Lesson secure.</strong> The next lesson is unlocked.':'<strong>Next lesson locked.</strong> Secure every chunk and all three exit questions first.';
       ensureSummary();
     } finally {rendering=false}
   }
