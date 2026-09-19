@@ -30,3 +30,7 @@
 .mastery-gate-instruction{font-size:.76rem;color:#c5d5e3;line-height:1.45}
 .mastery-unlock-status{margin-top:9px;padding:8px 9px;border-radius:9px;border:1px solid rgba(126,216,255,.16);background:#081827;font-size:.74rem}
 .mastery-unlock-status strong{color:#e7f7ff}
+
+.mastery-spec-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.mastery-spec-links span{padding:5px 7px;border-radius:999px;border:1px solid rgba(126,216,255,.18);background:#081a2a;color:#bcd7e9;font-size:.66rem}
+.mastery-stretch{margin-top:10px;padding:10px;border-radius:11px;border:1px solid rgba(196,169,255,.3);background:#17162a}.mastery-stretch>summary{display:flex;gap:8px;align-items:center;cursor:pointer}.mastery-stretch>summary strong{color:#e6ddff}.mastery-stretch p{font-size:.78rem;line-height:1.5}
+.mastery-stretch-answer{margin-top:7px;padding:8px;border-radius:8px;background:#0e1830}.mastery-stretch-answer summary{cursor:pointer;font-weight:800;font-size:.72rem;color:#c6d9ff}
