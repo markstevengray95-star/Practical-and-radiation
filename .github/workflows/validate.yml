@@ -89,6 +89,7 @@ jobs:
           test -s revision-hub.css
           test -s exam-skills.js
           test -s exam-skills.css
+          test -s knowledge-organiser.css
           python3 - <<'PY'
           from pathlib import Path
           import re
