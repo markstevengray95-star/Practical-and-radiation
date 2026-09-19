@@ -174,7 +174,7 @@
           [
             ['1','Check','10–12 minute diagnostic'],
             ['2','Bridge','Fill GCSE/maths gaps'],
-            ['3','Learn','Follow 16-lesson sequence'],
+            ['3','Learn','Follow 15 core lessons + optional extension'],
             ['4','Practise','Use simulations + exam tasks'],
             ['5','Retrieve','Use Revision Hub repeatedly']
           ].map(x=>'<div class="beginner-road-step"><span>'+x[0]+'</span><strong>'+x[1]+'</strong><p>'+x[2]+'</p></div>').join('')+
