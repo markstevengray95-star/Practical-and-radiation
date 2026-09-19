@@ -116,6 +116,13 @@ try {
     const specPill = (await page.locator('#studySpecPill').textContent())?.trim() || '';
     if (!specPill) throw new Error(id + ': missing AQA specification tag');
 
+    const coach = page.locator('#simChangeCoach');
+    if (!(await coach.count())) throw new Error(id + ': missing live change coach');
+    const coachText = (await coach.textContent())?.trim() || '';
+    for (const phrase of ['What you should see','Why it happens','Exam connection','Try next']) {
+      if (!coachText.includes(phrase)) throw new Error(id + ': live coach missing ' + phrase);
+    }
+
     results.push({ id, title, ok: true });
   }
 
