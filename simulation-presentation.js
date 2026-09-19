@@ -55,7 +55,8 @@
       ['#b895ff','Kaon','meson / hadron'],
       ['#7ee8ff','Electron','lepton'],
       ['#67d3a1','Muon','lepton'],
-      ['#f3f7ff','Neutrino','lepton']
+      ['#f3f7ff','Neutrino','lepton'],
+      ['target','Target ring','clickable label, not a particle']
     ],
     quarks:[
       ['#ffc85f','Up quark u','charge +2/3 e'],
