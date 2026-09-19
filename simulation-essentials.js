@@ -21,9 +21,9 @@
         ['specific charge = Q / m','charge per unit mass']
       ],
       values:[
-        ['Proton charge','+1.602 × 10⁻¹⁹ C'],['Proton mass','1.673 × 10⁻²⁷ kg'],
-        ['Neutron charge','0'],['Neutron mass','1.675 × 10⁻²⁷ kg'],
-        ['Electron charge','−1.602 × 10⁻¹⁹ C'],['Electron mass','9.11 × 10⁻³¹ kg']
+        ['Proton','charge +1 relative / +1.602 × 10⁻¹⁹ C; relative mass 1 / 1.673 × 10⁻²⁷ kg'],
+        ['Neutron','charge 0; relative mass 1 / 1.675 × 10⁻²⁷ kg'],
+        ['Electron','charge −1 relative / −1.602 × 10⁻¹⁹ C; relative mass ≈ 1/1836 / 9.11 × 10⁻³¹ kg']
       ],
       exam:'Use nuclide notation correctly: ᴬZX. If Z changes, the element changes. If only neutron number changes, the isotope changes.',
       trap:'Do not say isotopes have different proton numbers. They have the same Z and different neutron numbers.',
@@ -136,13 +136,16 @@
         'Baryons include proton and neutron; mesons include pions and kaons.',
         'Leptons required include electron, muon, electron neutrino and muon neutrino plus antiparticles.',
         'The proton is the only stable baryon into which other baryons eventually decay.',
-        'Strange particles are produced via the strong interaction and decay via the weak interaction.'
+        'The pion is used in the AQA model as the exchange particle of the strong nuclear force between nucleons.',
+        'The muon is a lepton that decays to products including an electron.',
+        'Strange particles are produced via the strong interaction, with total strangeness conserved, and decay via the weak interaction.',
+        'Modern particle physics depends on large collaborations reproducing and validating new knowledge.'
       ],
       equations:[],
       values:[
         ['Baryon number','baryon +1, antibaryon −1, others 0'],
         ['Lepton number','tracked separately for electron and muon families'],
-        ['Strangeness in strong interactions','conserved'],
+        ['Strangeness in strong interactions','conserved; strange particles are produced with balancing strangeness'],
         ['Strangeness in weak interactions','may change by 0 or ±1']
       ],
       exam:'Give the full classification when asked: e.g. proton = hadron + baryon; pion = hadron + meson; electron = lepton.',
@@ -248,7 +251,8 @@
         'The photoelectric effect shows that electromagnetic radiation can display particle behaviour.',
         'A moving particle has a de Broglie wavelength λ = h/p.',
         'Increasing particle momentum decreases its de Broglie wavelength.',
-        'A shorter wavelength generally produces less diffraction for the same structure.'
+        'A shorter wavelength generally produces less diffraction for the same structure.',
+        'Changes to models of matter are evaluated through evidence, peer review, replication and validation by the scientific community.'
       ],
       equations:[
         ['λ = h / p','de Broglie wavelength'],
@@ -256,7 +260,7 @@
         ['p = √(2m eV)','electron momentum after acceleration from rest through V, non-relativistic']
       ],
       values:[],
-      exam:'Link the observed change in diffraction to λ = h/p: greater momentum → shorter wavelength → reduced diffraction.',
+      exam:'Link the observed change in diffraction to λ = h/p: greater momentum → shorter wavelength → reduced diffraction. AQA requires the evidence and trend, not details of a particular diffraction method.',
       trap:'Do not say the electron is literally a classical water wave. It exhibits wave properties.',
       remember:['electron diffraction → wave evidence','photoelectric → photon evidence','λ = h/p']
     },
