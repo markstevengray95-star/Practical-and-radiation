@@ -523,3 +523,56 @@
 @media(max-width:650px){
   .lesson-retrieval-split{grid-template-columns:1fr}
 }
+
+
+.lesson-independent-tasks{
+  display:grid;
+  gap:5px;
+  margin-top:9px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.055);
+}
+.lesson-task-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.lesson-task-heading strong{
+  color:#9fb3c6;
+  font-size:.57rem;
+}
+.lesson-task-card{
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:9px;
+  background:rgba(255,255,255,.02);
+  overflow:hidden;
+}
+.lesson-task-card summary{
+  display:flex;
+  gap:7px;
+  align-items:flex-start;
+  padding:7px 8px;
+  cursor:pointer;
+  color:#dce9f5;
+  font-size:.61rem;
+  line-height:1.35;
+}
+.lesson-task-card summary span{
+  flex:0 0 auto;
+  padding:3px 5px;
+  border-radius:6px;
+  background:#0c2b41;
+  color:#9edfff;
+  font-size:.51rem;
+  font-weight:900;
+}
+.lesson-task-answer{
+  padding:7px 8px;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:rgba(99,217,164,.035);
+  color:#cce6da;
+  font-size:.6rem;
+  line-height:1.4;
+}
+.lesson-task-answer strong{color:#e5f8ee}
