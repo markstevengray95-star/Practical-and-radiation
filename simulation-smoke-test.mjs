@@ -28,10 +28,20 @@ try {
     throw new Error('Simulation registry mismatch: ' + JSON.stringify(ids));
   }
 
-  await page.waitForFunction(() => {
-    const t = document.querySelector('#renderStatus')?.textContent || '';
-    return /3D model ready|fallback model ready/i.test(t);
-  }, null, { timeout: 15000 });
+  try {
+    await page.waitForFunction(() => {
+      const t = document.querySelector('#renderStatus')?.textContent || '';
+      return t && !/loading 3d engine/i.test(t);
+    }, null, { timeout: 15000 });
+  } catch (err) {
+    console.error('Renderer status:', await page.locator('#renderStatus').textContent().catch(() => 'missing'));
+    console.error('Browser errors:', pageErrors);
+    throw err;
+  }
+  const rendererStatus = (await page.locator('#renderStatus').textContent())?.trim() || '';
+  if (!/3D model ready/i.test(rendererStatus)) {
+    throw new Error('Expected real 3D renderer, got: ' + rendererStatus + '\n' + pageErrors.join('\n'));
+  }
 
   const results = [];
   for (const id of expected) {
