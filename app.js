@@ -133,7 +133,7 @@ function renderSpec(){const grid=$('#specGrid');if(!grid)return;grid.innerHTML=l
 renderSpec();
 
 const simNav=$('#simNav');simNav.innerHTML=simDefs.map(([id,name,code])=>`<button class="button sim-tab ${id===currentSim?'active':''}" data-sim="${id}"><span class="small subtle">${code}</span> ${name} <span class="sim-3d-badge">3D</span></button>`).join('');simNav.querySelectorAll('[data-sim]').forEach(b=>b.onclick=()=>activateSim(b.dataset.sim));
-function activateSim(id){currentSim=id;processClock=performance.now();selectedHotspot=null;$$('.sim-tab').forEach(b=>b.classList.toggle('active',b.dataset.sim===id));const def=simDefs.find(s=>s[0]===id),t=simText[id];$('#specCode').textContent=`AQA ${def[2]}`;$('#simTitle').textContent=def[1];$('#simSubtitle').textContent=t.sub;$('#simpleExplain').innerHTML=`<p>${t.simple}</p>`;$('#examExplain').innerHTML=`<p>${t.exam}</p>`;$('#mistakeExplain').innerHTML=`<p>${t.mistake}</p>`;renderSimCheck(id);if($('#live3DSelected'))$('#live3DSelected').textContent='Click a glowing numbered marker in the 3D model.';if(threeReady&&builders[id]){builders[id]();queueMicrotask(()=>addHotspots(id))}else{$('#simControls').innerHTML='<div class="field"><span>3D model</span><div class="field-readout">The explanation is ready. The 3D engine is still loading.</div></div>';$('#simReadout').textContent='Loading interactive model…'}queueMicrotask(updateLivePanel)}
+function activateSim(id){currentSim=id;processClock=performance.now();selectedHotspot=null;$$('.sim-tab').forEach(b=>b.classList.toggle('active',b.dataset.sim===id));const def=simDefs.find(s=>s[0]===id),t=simText[id];$('#specCode').textContent=`AQA ${def[2]}`;$('#simTitle').textContent=def[1];$('#simSubtitle').textContent=t.sub;$('#simpleExplain').innerHTML=`<p>${t.simple}</p>`;$('#examExplain').innerHTML=`<p>${t.exam}</p>`;$('#mistakeExplain').innerHTML=`<p>${t.mistake}</p>`;renderSimCheck(id);if($('#live3DSelected'))$('#live3DSelected').textContent='Click a numbered target ring for an explanation. Target rings are labels, not particles.';if(threeReady&&builders[id]){builders[id]();queueMicrotask(()=>addHotspots(id))}else{$('#simControls').innerHTML='<div class="field"><span>3D model</span><div class="field-readout">The explanation is ready. The 3D engine is still loading.</div></div>';$('#simReadout').textContent='Loading interactive model…'}queueMicrotask(updateLivePanel)}
 function renderSimCheck(id){const q={atom:['Which number identifies the element?',['A','Z','number of neutrons'],1],specific:['Specific charge has units…',['C kg⁻¹','kg C⁻¹','J s'],0],strong:['At about 1 fm the strong force is mainly…',['attractive','zero','always repulsive'],0],decay:['In β⁻ decay Z…',['falls by 1','stays same','rises by 1'],2],antimatter:['Electron + positron can produce…',['two gamma photons','two protons','a neutron only'],0],interactions:['EM exchange particle?',['virtual photon','W⁻ only','pion'],0],classification:['A kaon is a…',['baryon','meson','lepton'],1],quarks:['Proton quarks?',['udd','uud','u d̄'],1],photo:['Below threshold frequency, more intensity gives…',['no emission','higher KE electrons','higher photon energy'],0],collisions:['Excitation means…',['electron removed','higher bound level','nucleus splits'],1],levels:['Downward transition…',['emits photon','absorbs photon','changes Z'],0],diffraction:['Higher momentum gives λ…',['larger','smaller','unchanged'],1],rutherford:['Most α particles passed straight through because…',['atoms are mostly empty space','nuclei are negative','alpha particles are neutral'],0]}[id];const box=$('#simCheck');box.innerHTML=`<div>${q[0]}</div><div class="quick-options">${q[1].map((x,i)=>`<button class="quick-option" data-a="${i}">${x}</button>`).join('')}</div><div id="quickFeedback" class="small subtle"></div>`;box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{box.querySelectorAll('[data-a]').forEach(x=>x.disabled=true);const ok=Number(b.dataset.a)===q[2];b.classList.add(ok?'correct':'wrong');if(!ok)box.querySelector(`[data-a="${q[2]}"]`).classList.add('correct');$('#quickFeedback').textContent=ok?'Correct — keep going.':'Not quite — use the simple explanation above, then try the idea again later.'})}
 
 function renderAtlas(filter='all'){const filters=['all','hadron','lepton','antiparticle','strange'];$('#particleFilters').innerHTML=filters.map(f=>`<button class="button ${f===filter?'active':''}" data-filter="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('');$('#particleFilters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>renderAtlas(b.dataset.filter));const list=particles.filter(p=>filter==='all'||p.family.includes(filter));$('#particleButtons').innerHTML=list.map(p=>`<button class="particle-button" data-particle="${p.id}"><strong>${p.symbol}</strong><span>${p.name}</span><span>${p.family}</span></button>`).join('');$('#particleButtons').querySelectorAll('[data-particle]').forEach(b=>b.onclick=()=>showParticle(b.dataset.particle));showParticle(list[0]?.id||'p')}
@@ -251,10 +251,19 @@ function makeHotspotLabel(text){
 }
 function makeHotspot(def,index){
  const g=new THREE.Group();g.position.set(def.p[0],def.p[1],def.p[2]||0);g.userData.hotspotInfo=def;g.userData.hotspotIndex=index;
- const m=new THREE.Mesh(new THREE.SphereGeometry(.14,20,16),new THREE.MeshStandardMaterial({color:0x8edcff,emissive:0x184b66,emissiveIntensity:1.5,roughness:.18,metalness:.15,transparent:true,opacity:.92}));
- m.userData.hotspotInfo=def;g.add(m);
- const ring=new THREE.Mesh(new THREE.TorusGeometry(.25,.022,8,36),new THREE.MeshBasicMaterial({color:0xbbeaff,transparent:true,opacity:.75,depthTest:false}));
- ring.userData.hotspotInfo=def;g.add(ring);
+ // Large invisible hit target: clickable, but never looks like a physics particle.
+ const hit=new THREE.Mesh(new THREE.SphereGeometry(.28,12,10),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));
+ hit.userData.hotspotInfo=def;g.add(hit);
+ const ringMat=new THREE.MeshBasicMaterial({color:0xbbeaff,transparent:true,opacity:.88,depthTest:false});
+ const ringA=new THREE.Mesh(new THREE.TorusGeometry(.25,.025,8,40),ringMat.clone());
+ const ringB=new THREE.Mesh(new THREE.TorusGeometry(.25,.025,8,40),ringMat.clone());ringB.rotation.x=Math.PI/2;
+ const ringC=new THREE.Mesh(new THREE.TorusGeometry(.25,.025,8,40),ringMat.clone());ringC.rotation.y=Math.PI/2;
+ [ringA,ringB,ringC].forEach(r=>{r.userData.hotspotInfo=def;g.add(r)});
+ const stem=new THREE.Line(
+   new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,.24,0),new THREE.Vector3(0,.48,0)]),
+   new THREE.LineBasicMaterial({color:0xbbeaff,transparent:true,opacity:.75,depthTest:false})
+ );
+ stem.userData.hotspotInfo=def;g.add(stem);
  const label=makeHotspotLabel(String(index+1)+' · '+def.title);label.userData.hotspotInfo=def;g.add(label);
  return g;
 }
@@ -275,7 +284,7 @@ function ensureInteractionPanel(){
  const wrap=$('.viewer-wrap');if(!wrap)return;
  if(!$('#live3DPanel')){
   const p=document.createElement('div');p.id='live3DPanel';p.className='live-3d-panel';
-  p.innerHTML='<div class="live-3d-head"><span class="eyebrow">Live 3D explanation</span><strong id="live3DStage">Explore the model</strong></div><div id="live3DNow" class="live-3d-now"></div><div id="live3DSelected" class="live-3d-selected">Click a glowing numbered marker in the 3D model.</div><div class="live-3d-grid"><div><span>Science</span><p id="live3DScience"></p></div><div><span>Exam link</span><p id="live3DExam"></p></div></div>';
+  p.innerHTML='<div class="live-3d-head"><span class="eyebrow">Live 3D explanation</span><strong id="live3DStage">Explore the model</strong></div><div id="live3DNow" class="live-3d-now"></div><div id="live3DSelected" class="live-3d-selected">Click a numbered target ring for an explanation. Target rings are labels, not particles.</div><div class="live-3d-grid"><div><span>Science</span><p id="live3DScience"></p></div><div><span>Exam link</span><p id="live3DExam"></p></div></div>';
   wrap.appendChild(p);
  }
  if(!$('#hotspotToggle')){
