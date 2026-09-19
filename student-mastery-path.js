@@ -60,7 +60,7 @@
       $('[data-exit]',host).forEach(x=>x.onchange=()=>{r.exit[+x.dataset.exit]=x.checked;save();render();ensureSummary()});
       const mastered=chunks.every((_,i)=>!!r.chunks[i])&&l.exit.every((_,i)=>!!r.exit[i]);
       const next=$('#sequenceNext',hostPanel);
-      if(next&&current<14){next.disabled=!mastered;next.title=mastered?'Ready for the next lesson':'Complete every learning chunk and the mastery gate first';}
+      if(next&&l.n<15){next.disabled=!mastered;next.title=mastered?'Ready for the next lesson':'Complete every learning chunk and the mastery gate first';}
       const unlock=$('#masteryUnlockStatus',host);
       if(unlock)unlock.innerHTML=mastered?'<strong>✓ Lesson secure.</strong> The next lesson is unlocked.':'<strong>Next lesson locked.</strong> Secure every chunk and all three exit questions first.';
       ensureSummary();
