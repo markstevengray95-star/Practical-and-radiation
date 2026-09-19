@@ -37,6 +37,8 @@ jobs:
           node --check particle-depth.js
           node --check simulation-smoke-test.mjs
           node --check simulation-presentation.js
+          node --check learning-tools.js
+          node --check learning-hub.js
 
       - name: Check simulation registry and required files
         run: |
@@ -64,6 +66,10 @@ jobs:
           test -s simulation-smoke-test.mjs
           test -s simulation-presentation.js
           test -s simulation-presentation.css
+          test -s learning-tools.js
+          test -s learning-tools.css
+          test -s learning-hub.js
+          test -s learning-hub.css
           python3 - <<'PY'
           from pathlib import Path
           import re
