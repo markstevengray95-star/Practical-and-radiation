@@ -417,8 +417,66 @@ function setReadout(html){
  queueMicrotask(updateLivePanel);
 }
 
-builders.atom=()=>{clearWorld();setCamera(8);$('#simControls').innerHTML=control('Choose isotope','<select id="iso"><option value="1,1">Hydrogen-1</option><option value="6,12" selected>Carbon-12</option><option value="6,14">Carbon-14</option><option value="8,16">Oxygen-16</option><option value="79,197">Gold-197</option></select>');const build=()=>{clearWorld();const [Z,A]=$('#iso').value.split(',').map(Number),nuc=cluster(Z,A,A>60?.08:.15);world.add(nuc);const pts=[];for(let i=0;i<Math.min(1600,220+Z*10);i++){let v=randomBall(4);if(v.length()<1.5)v.setLength(1.5+Math.random()*2.3);pts.push(v.x,v.y,v.z)}const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));const cloud=new THREE.Points(geom,new THREE.PointsMaterial({color:'#76d8ff',size:.045,transparent:true,opacity:.34,depthWrite:false}));world.add(cloud);setReadout(`Z = ${Z} · A = ${A} · neutrons = ${A-Z} · neutral atom electrons = ${Z}`);animator=t=>{cloud.rotation.y=t*.08;nuc.rotation.y=-t*.05}};$('#iso').onchange=build;build()};
-
+builders.atom=()=>{clearWorld();setCamera(8);
+  const presets=[
+    ['1,1,1','Hydrogen-1 · ¹₁H'],['6,12,6','Carbon-12 · ¹²₆C'],['6,14,6','Carbon-14 · ¹⁴₆C'],
+    ['8,16,8','Oxygen-16 · ¹⁶₈O'],['11,23,11','Sodium-23 · ²³₁₁Na'],['17,35,17','Chlorine-35 · ³⁵₁₇Cl'],
+    ['17,37,17','Chlorine-37 · ³⁷₁₇Cl'],['79,197,79','Gold-197 · ¹⁹⁷₇₉Au'],['custom','Custom atom / ion']
+  ];
+  const symbols={1:'H',2:'He',3:'Li',4:'Be',5:'B',6:'C',7:'N',8:'O',9:'F',10:'Ne',11:'Na',12:'Mg',13:'Al',14:'Si',15:'P',16:'S',17:'Cl',18:'Ar',19:'K',20:'Ca',21:'Sc',22:'Ti',23:'V',24:'Cr',25:'Mn',26:'Fe',27:'Co',28:'Ni',29:'Cu',30:'Zn',79:'Au'};
+  $('#simControls').innerHTML=
+    control('Quick preset','<select id="iso">'+presets.map((p,i)=>'<option value="'+p[0]+'" '+(i===1?'selected':'')+'>'+p[1]+'</option>').join('')+'</select>')+
+    '<div class="atom-builder-grid">'+
+      control('Protons · Z','<input id="atomZ" type="number" min="1" max="100" value="6"><div class="field-readout" id="atomZr">Z = 6</div>')+
+      control('Nucleon number · A','<input id="atomA" type="number" min="1" max="250" value="12"><div class="field-readout" id="atomAr">A = 12</div>')+
+      control('Electrons','<input id="atomE" type="number" min="0" max="100" value="6"><div class="field-readout" id="atomEr">electrons = 6</div>')+
+    '</div>'+
+    '<div class="atom-builder-actions"><button class="button" id="atomNeutral">Make neutral</button><button class="button" id="atomPlus">Make +1 ion</button><button class="button" id="atomMinus">Make −1 ion</button></div>'+
+    '<div class="atom-builder-help"><strong>Build rule:</strong> Z = protons · A = protons + neutrons · neutrons = A − Z · neutral atom: electrons = Z.</div>';
+  const build=()=>{
+    let Z=Math.max(1,Math.min(100,+$('#atomZ').value||1));
+    let A=Math.max(Z,Math.min(250,+$('#atomA').value||Z));
+    let ne=Math.max(0,Math.min(100,+$('#atomE').value||0));
+    $('#atomZ').value=Z;$('#atomA').value=A;$('#atomA').min=Z;$('#atomE').value=ne;
+    $('#atomZr').textContent='Z = '+Z+' protons';
+    $('#atomAr').textContent='A = '+A+' nucleons · neutrons = '+(A-Z);
+    const charge=Z-ne;
+    $('#atomEr').textContent='electrons = '+ne+' · charge = '+(charge===0?'0':(charge>0?'+':'')+charge+'e');
+    clearWorld();
+    const nuc=cluster(Z,A,A>120?.065:A>60?.08:.15);world.add(nuc);
+    const visible=Math.min(ne,30),electronGroup=new THREE.Group();
+    for(let i=0;i<visible;i++){
+      const el=sphere(.085,'#76d8ff');
+      const shell=i<2?1:(i<10?2:(i<18?3:4));
+      const shellStart=shell===1?0:shell===2?2:shell===3?10:18;
+      const shellCount=shell===1?2:shell===2?8:shell===3?8:12;
+      const j=i-shellStart,a=j/Math.max(1,shellCount)*Math.PI*2,r=1.55+(shell-1)*.62;
+      el.position.set(Math.cos(a)*r,Math.sin(a*1.7)*.42,Math.sin(a)*r);
+      electronGroup.add(el);
+    }
+    world.add(electronGroup);
+    const pts=[];for(let i=0;i<Math.min(1000,180+ne*8);i++){let v=randomBall(4);if(v.length()<1.5)v.setLength(1.5+Math.random()*2.3);pts.push(v.x,v.y,v.z)}
+    const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+    const cloud=new THREE.Points(geom,new THREE.PointsMaterial({color:'#76d8ff',size:.035,transparent:true,opacity:.16,depthWrite:false}));world.add(cloud);
+    const symbol=symbols[Z]||('Z='+Z),kind=charge===0?'neutral atom':(charge>0?charge+'+ ion':Math.abs(charge)+'− ion');
+    setReadout('symbol = '+symbol+' · Z = '+Z+' · A = '+A+' · protons = '+Z+' · neutrons = '+(A-Z)+' · electrons = '+ne+' · '+kind);
+    animator=t=>{cloud.rotation.y=t*.08;nuc.rotation.y=-t*.05;electronGroup.rotation.y=t*.12};
+    window.PARTICLELAB_ATOM_STATE={Z,A,electrons:ne,neutrons:A-Z,charge,symbol,kind};
+    window.dispatchEvent(new CustomEvent('particlelab:atom-change',{detail:window.PARTICLELAB_ATOM_STATE}));
+  };
+  const setPreset=()=>{
+    const val=$('#iso').value;
+    if(val==='custom')return;
+    const [Z,A,e]=val.split(',').map(Number);
+    $('#atomZ').value=Z;$('#atomA').value=A;$('#atomE').value=e;build();
+  };
+  $('#iso').onchange=setPreset;
+  ['atomZ','atomA','atomE'].forEach(id=>$('#'+id).oninput=()=>{$('#iso').value='custom';build()});
+  $('#atomNeutral').onclick=()=>{$('#atomE').value=$('#atomZ').value;$('#iso').value='custom';build()};
+  $('#atomPlus').onclick=()=>{$('#atomE').value=Math.max(0,+$('#atomZ').value-1);$('#iso').value='custom';build()};
+  $('#atomMinus').onclick=()=>{$('#atomE').value=Math.min(100,+$('#atomZ').value+1);$('#iso').value='custom';build()};
+  build()
+};
 builders.specific=()=>{clearWorld();setCamera(8);$('#simControls').innerHTML=control('Proton number Z','<input id="scZ" type="range" min="1" max="30" value="6"><div id="scZr" class="field-readout"></div>')+control('Nucleon number A','<input id="scA" type="range" min="1" max="70" value="12"><div id="scAr" class="field-readout"></div>')+control('Electrons present','<input id="scE" type="range" min="0" max="30" value="6"><div id="scEr" class="field-readout"></div>');const draw=()=>{let Z=+$('#scZ').value,A=Math.max(+$('#scA').value,Z),ne=Math.min(+$('#scE').value,Z+5);$('#scA').value=A;$('#scE').value=ne;$('#scA').min=Z;$('#scE').max=Z+5;$('#scZr').textContent=`Z = ${Z}`;$('#scAr').textContent=`A = ${A}`;$('#scEr').textContent=`electrons = ${ne}`;clearWorld();const nuc=cluster(Z,A,A>35?.1:.15);world.add(nuc);for(let i=0;i<Math.min(ne,18);i++){const el=sphere(.09,'#7ee8ff');const a=i/Math.max(1,Math.min(ne,18))*Math.PI*2,r=2.3+(i%3)*.45;el.position.set(Math.cos(a)*r,Math.sin(a*1.7)*.7,Math.sin(a)*r);world.add(el)}const Q=(Z-ne)*ECHARGE,m=Z*MP+(A-Z)*MN+ne*ME,s=m?Q/m:0;setReadout(`net charge = ${(Z-ne)}e = ${Q.toExponential(3)} C<br>mass ≈ ${m.toExponential(3)} kg<br><strong>specific charge ≈ ${s.toExponential(3)} C kg⁻¹</strong>`);animator=t=>world.rotation.y=t*.07};['scZ','scA','scE'].forEach(id=>$('#'+id).oninput=draw);draw()};
 
 builders.strong=()=>{clearWorld();setCamera(7);$('#simControls').innerHTML=control('Nucleon separation','<input id="sep" type="range" min="20" max="420" value="120"><div id="sepR" class="field-readout"></div>');const a=sphere(.52,'#ff7777'),b=sphere(.52,'#72a9ff');world.add(a,b);let arrows=[];const draw=()=>{arrows.forEach(o=>world.remove(o));arrows=[];const d=+$('#sep').value/100;a.position.x=-d*.75;b.position.x=d*.75;const state=d<.5?'repulsive':d<=3?'attractive':'negligible';$('#sepR').textContent=`${d.toFixed(2)} fm · ${state}`;setReadout(`r = ${d.toFixed(2)} fm → strong force is <strong>${state}</strong>`);if(state!=='negligible'){const toward=state==='attractive',col=state==='attractive'?0x63d9a4:0xff7b87;const ar1=new THREE.ArrowHelper(new THREE.Vector3(toward?1:-1,0,0),a.position.clone(),.9,col,.22,.12),ar2=new THREE.ArrowHelper(new THREE.Vector3(toward?-1:1,0,0),b.position.clone(),.9,col,.22,.12);world.add(ar1,ar2);arrows=[ar1,ar2]}};$('#sep').oninput=draw;draw()};
