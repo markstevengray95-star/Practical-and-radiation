@@ -22,7 +22,7 @@
       sim:'atom',simTask:'Use the Atom Builder Practice ladder. Start with H-1 and C-12, then C-14, then build neutral sodium-23. Say p, n and e before pressing Check my atom.',
       equations:['N = A − Z'],worked:'For ²³₁₁Na: p = 11, n = 12 and a neutral atom has 11 electrons.',
       exam:'“Isotopes are atoms of the same element with the same proton number but different neutron numbers.”',
-      exit:['Which number identifies the element?','How many neutrons are in ³⁷₁₇Cl?','Why does changing neutron number not change the element?'],
+      exit:['State the charge and approximate relative mass of proton, neutron and electron.','How many neutrons are in ³⁷₁₇Cl?','Why does changing neutron number not change the element?'],
       next:'Specific charge',homework:'Short isotope / nuclide-notation retrieval practice.'
     },
     {
@@ -161,7 +161,7 @@
       sim:'quarks',simTask:'Build p, n, π⁺, π⁻, K⁺ and K⁻. Predict Q, B and S before reading the totals.',
       equations:['p = uud','n = udd','quark B = +1/3','antiquark B = −1/3'],worked:'π⁺ = u d̄: charge = +2/3e + +1/3e = +e; B = +1/3 − 1/3 = 0.',
       exam:'Write the constituent values first, then add Q, B and S. This reduces sign errors.',
-      exit:['Quark content of proton?','What is B for a meson?','What is S for an anti-strange quark?'],
+      exit:['State proton and neutron quark content, then give the quark change in neutron β⁻ decay.','What is B for a meson?','What is S for an anti-strange quark?'],
       next:'Conservation laws & reactions',homework:'Quark-content and quantum-number calculations.'
     },
     {
@@ -298,6 +298,7 @@
   const lessonTaskBank={
     1:[
       ['Particle ID','State the charge of a proton, neutron and electron.','p = +e, n = 0, e⁻ = −e.'],
+      ['Particle mass scale','Compare the approximate relative masses of proton, neutron and electron.','Proton ≈ 1 u, neutron ≈ 1 u, electron ≈ 1/1836 u. In SI, electron mass is about 9.11 × 10⁻³¹ kg while nucleons are about 1.67 × 10⁻²⁷ kg.'],
       ['Read nuclide notation','For ²³₁₁Na, state Z and A.','Z = 11 and A = 23.'],
       ['Find neutrons','How many neutrons are in ²³₁₁Na?','A − Z = 23 − 11 = 12 neutrons.'],
       ['Neutral atom','How many electrons are in neutral ²³₁₁Na?','11 electrons because a neutral atom has electrons = protons.'],
@@ -337,12 +338,14 @@
     8:[
       ['Full class','Classify a proton fully.','Hadron → baryon.'],
       ['Meson','Classify a pion fully.','Hadron → meson.'],
+      ['Lepton families','State electron and muon lepton numbers for e⁻, νₑ, μ⁻ and νμ, and explain what happens for antiparticles.','Each listed particle has +1 in its own lepton family and 0 in the other; the corresponding antiparticle has −1 in its own family.'],
       ['Strange particles','How are strange particles typically produced and how do they decay?','Produced via strong interaction; decay via weak interaction.']
     ],
     9:[
       ['Proton charge','Show that uud has charge +e.','+2/3 +2/3 −1/3 = +1 e.'],
       ['Meson B','Why does a meson have B = 0?','Quark +1/3 plus antiquark −1/3 = 0.'],
-      ['Strangeness','What is S for s and s̄?','s has S = −1; s̄ has S = +1.']
+      ['Strangeness','What is S for s and s̄?','s has S = −1; s̄ has S = +1.'],
+      ['Neutron decay','Use quark content to explain the neutron-to-proton change in β⁻ decay.','Neutron udd becomes proton uud because one d quark changes to u: d → u.']
     ],
     10:[
       ['Conservation list','Name the key quantities to check in a particle reaction.','Charge, baryon number, lepton number, energy, momentum and strangeness where relevant.'],
