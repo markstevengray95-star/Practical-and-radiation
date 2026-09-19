@@ -110,6 +110,7 @@
           rule('3. Neutral atom','electrons = protons, so total charge is zero.')+
           rule('4. Ion','Only electron number changes when forming a simple ion.')+
         '</div>'+
+        '<div class="atom-task-route">'+tasks.map((x,j)=>'<span class="'+(complete.has(j)?'done ':'')+(j===i?'active':'')+'">'+(j+1)+'. '+x.title+'</span>').join('')+'</div>'+
         '<div class="atom-progress"><div class="atom-progress-track"><div class="atom-progress-fill" style="width:'+progress+'%"></div></div><span>'+complete.size+' / '+tasks.length+' targets complete</span></div>'+
         '<div class="atom-challenge-card">'+
           '<div class="atom-challenge-top"><div><span class="atom-level">'+t.level+'</span><h4>'+t.title+'</h4></div><span class="study-spec-pill">Target '+(i+1)+' / '+tasks.length+'</span></div>'+
