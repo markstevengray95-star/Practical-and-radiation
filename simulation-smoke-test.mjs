@@ -150,11 +150,18 @@ try {
 
   // Feature suite checks.
   await page.locator('[data-view="lab"]').click();
-  await page.waitForSelector('#learningSuite', { timeout: 5000 });
+  await page.waitForSelector('#learningSuite', { state: 'attached', timeout: 5000 });
   for (const tool of ['inspector','compare','graphs','measure','practical','exam']) {
     if (!(await page.locator('#lt-' + tool).count())) throw new Error('Missing learning tool: ' + tool);
   }
   if (!(await page.locator('#measureOverlay').count())) throw new Error('Measurement overlay missing');
+
+  const learningSuite = page.locator('#learningSuite');
+  if (await learningSuite.isVisible()) throw new Error('Learning Tools should be hidden in Focus mode');
+  await page.locator('[data-study-mode="full"]').click();
+  await page.waitForTimeout(80);
+  if (!(await learningSuite.isVisible())) throw new Error('Learning Tools did not become visible in Full tools mode');
+  await page.locator('[data-study-mode="focus"]').click();
 
   const hubNav = page.locator('[data-view="learninghub"]');
   if (!(await hubNav.count())) throw new Error('Learning Tools navigation missing');
