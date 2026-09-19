@@ -97,7 +97,18 @@ try {
     const legend = page.locator('#simParticleLegend');
     if (!(await legend.count())) throw new Error(id + ': missing model key');
     const legendText = (await legend.textContent())?.trim() || '';
-    if (!legendText.includes('Target ring')) throw new Error(id + ': model key does not explain target rings');
+    if (legendText.includes('Target ring')) throw new Error(id + ': obsolete target-ring legend is still visible');
+
+    const guide = page.locator('#simObjectGuide');
+    if (!(await guide.count())) throw new Error(id + ': missing external model guide');
+    const guideButtons = guide.locator('.sim-guide-button');
+    if ((await guideButtons.count()) < 1) throw new Error(id + ': model guide has no explanatory items');
+    await guideButtons.first().click();
+    await page.waitForTimeout(40);
+    const selectedGuideText = (await page.locator('#live3DSelected').textContent())?.trim() || '';
+    if (!selectedGuideText || /use the model guide/i.test(selectedGuideText)) {
+      throw new Error(id + ': model guide did not update the explanation panel');
+    }
 
     const sideOverflow = await page.locator('.lab-side').evaluate(el => el.scrollWidth > el.clientWidth + 4);
     if (sideOverflow) throw new Error(id + ': simulation information column has horizontal overflow');
@@ -108,6 +119,12 @@ try {
   const soundButton = page.locator('#simSoundToggle');
   const soundTest = page.locator('#simSoundTest');
   if (!(await soundButton.count()) || !(await soundTest.count())) throw new Error('Simulation sound controls are missing');
+  const soundApi = await page.evaluate(() => ({
+    exists: !!window.PARTICLELAB_SOUND,
+    hasTest: typeof window.PARTICLELAB_SOUND?.test === 'function',
+    hasCue: typeof window.PARTICLELAB_SOUND?.cue === 'function'
+  }));
+  if (!soundApi.exists || !soundApi.hasTest || !soundApi.hasCue) throw new Error('Simulation sound API is not wired');
   await soundTest.click();
   await page.waitForTimeout(80);
 
