@@ -162,6 +162,21 @@ try {
   if ((await sequenceButtons.count()) !== 16) throw new Error('Expected 16 teaching-sequence lessons');
   const firstLessonText = (await sequenceButtons.first().textContent()) || '';
   if (!/Atomic structure/i.test(firstLessonText)) throw new Error('Lesson 1 is not atomic structure');
+
+  await sequenceButtons.first().click();
+  await page.waitForTimeout(80);
+  if (!(await page.locator('.lesson-current-step').count())) throw new Error('Guided current-step view is missing');
+  const beforeStep = (await page.locator('#lessonStepProgress').textContent()) || '';
+  await page.locator('#lessonStepDone').click();
+  await page.waitForTimeout(80);
+  const afterStep = (await page.locator('#lessonStepProgress').textContent()) || '';
+  if (beforeStep === afterStep) throw new Error('Lesson step progress did not advance');
+  await page.locator('[data-lesson-view="full"]').click();
+  await page.waitForTimeout(50);
+  if (!(await page.locator('.lesson-full-plan').count())) throw new Error('Full lesson plan view did not open');
+  await page.locator('[data-lesson-view="guided"]').click();
+  await page.waitForTimeout(50);
+
   const lastLessonText = (await sequenceButtons.last().textContent()) || '';
   if (!/Rutherford/i.test(lastLessonText)) throw new Error('Lesson 16 is not Rutherford extension');
   if (!(await page.locator('#lessonSequenceProgress').count())) throw new Error('Lesson sequence progress is missing');
