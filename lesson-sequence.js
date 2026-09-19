@@ -18,7 +18,7 @@
         ['3. Nuclide notation','Practise reading ᴬZX and moving between notation and particle numbers.'],
         ['4. Isotopes','Same proton number, different neutron number. Link back to “same element” being fixed by Z.']
       ],
-      sim:'atom',simTask:'Build at least three isotopes. For each one, state p, n and e before changing the model.',
+      sim:'atom',simTask:'Use the Atom Builder Practice ladder. Start with H-1 and C-12, then C-14, then build neutral sodium-23. Say p, n and e before pressing Check my atom.',
       equations:['N = A − Z'],worked:'For ²³₁₁Na: p = 11, n = 12 and a neutral atom has 11 electrons.',
       exam:'“Isotopes are atoms of the same element with the same proton number but different neutron numbers.”',
       exit:['Which number identifies the element?','How many neutrons are in ³⁷₁₇Cl?','Why does changing neutron number not change the element?'],
@@ -291,6 +291,101 @@
   ];
 
   
+
+  const lessonTaskBank={
+    1:[
+      ['Particle ID','State the charge of a proton, neutron and electron.','p = +e, n = 0, e⁻ = −e.'],
+      ['Read nuclide notation','For ²³₁₁Na, state Z and A.','Z = 11 and A = 23.'],
+      ['Find neutrons','How many neutrons are in ²³₁₁Na?','A − Z = 23 − 11 = 12 neutrons.'],
+      ['Neutral atom','How many electrons are in neutral ²³₁₁Na?','11 electrons because a neutral atom has electrons = protons.'],
+      ['Isotope reasoning','What changes between ¹²₆C and ¹⁴₆C?','Neutron number changes from 6 to 8; proton number stays 6.'],
+      ['Ion reasoning','What changes when ²³Na becomes Na⁺?','Only electron number changes: 11 → 10. The nucleus is unchanged.']
+    ],
+    2:[
+      ['Sign first','Predict the sign of Q/m for a +2 ion.','Positive, because Q is positive.'],
+      ['Whole particle','Why must total ion mass be used in Q/m?','Specific charge is charge per unit mass of the whole particle.'],
+      ['Compare','Why is |Q/m| far greater for an electron than a proton?','Same |Q| but electron mass is much smaller.']
+    ],
+    3:[
+      ['Three regions','Describe the strong force at 0.3 fm, 1 fm and 4 fm.','Repulsive; attractive; negligible.'],
+      ['Nuclear stability','Why does the nucleus not simply fly apart from proton repulsion?','At nuclear distances the attractive strong force can overcome electrostatic repulsion.'],
+      ['Explain range','Why does the strong force not bind separate atoms?','It is very short range and negligible beyond a few fm.']
+    ],
+    4:[
+      ['Balance α','A parent has A = 226 and Z = 88. Find daughter A and Z after α decay.','A = 222, Z = 86.'],
+      ['Balance β⁻','What happens to A and Z in β⁻ decay?','A unchanged, Z +1.'],
+      ['Neutrino','Why is a neutrino/antineutrino included in beta decay?','To satisfy conservation laws including energy, momentum and lepton number.']
+    ],
+    5:[
+      ['Same / opposite','Give two properties shared by particle and antiparticle.','Same mass and same rest energy.'],
+      ['Photon maths','What happens to photon energy if frequency doubles?','Photon energy doubles because E = hf.'],
+      ['Neutral antiparticle','Why can a neutral particle still have a distinct antiparticle?','Antiparticle identity also depends on additive quantum numbers, not charge alone.']
+    ],
+    6:[
+      ['Threshold','Minimum rest energy for e⁻e⁺ pair creation?','1.022 MeV.'],
+      ['Extra energy','A photon has energy above threshold. Where can the extra energy go?','Into kinetic energy and recoil while conserving momentum.'],
+      ['Two photons','Why are two photons commonly shown in slow e⁻e⁺ annihilation?','Opposite photon momenta can conserve total momentum.']
+    ],
+    7:[
+      ['EM exchange','Name the AQA exchange particle for EM interactions.','Virtual photon.'],
+      ['Weak exchange','Which W boson appears in β⁻ decay?','W⁻.'],
+      ['Read a diagram','What three things should you identify first?','Incoming particles, exchange particle and outgoing particles.']
+    ],
+    8:[
+      ['Full class','Classify a proton fully.','Hadron → baryon.'],
+      ['Meson','Classify a pion fully.','Hadron → meson.'],
+      ['Strange particles','How are strange particles typically produced and how do they decay?','Produced via strong interaction; decay via weak interaction.']
+    ],
+    9:[
+      ['Proton charge','Show that uud has charge +e.','+2/3 +2/3 −1/3 = +1 e.'],
+      ['Meson B','Why does a meson have B = 0?','Quark +1/3 plus antiquark −1/3 = 0.'],
+      ['Strangeness','What is S for s and s̄?','s has S = −1; s̄ has S = +1.']
+    ],
+    10:[
+      ['Conservation list','Name the key quantities to check in a particle reaction.','Charge, baryon number, lepton number, energy, momentum and strangeness where relevant.'],
+      ['β⁻ quark change','What quark changes in β⁻ decay?','d → u.'],
+      ['Strong strangeness','What happens to total strangeness in a strong interaction?','It is conserved.']
+    ],
+    11:[
+      ['Threshold','Why can intense low-frequency light still fail to emit electrons?','Each photon has hf < φ, so no photon has enough energy.'],
+      ['Frequency','What happens to KEmax as frequency rises above threshold?','KEmax increases because hf = φ + KEmax.'],
+      ['Intensity','What mainly changes when intensity rises at fixed frequency?','Photon arrival rate and therefore photoelectron emission rate.']
+    ],
+    12:[
+      ['Excitation','Define excitation.','A bound electron moves to a higher allowed energy level.'],
+      ['Ionisation','Define ionisation.','An electron is removed from the atom.'],
+      ['Convert','Convert 10 eV to joules.','1.602 × 10⁻¹⁸ J.']
+    ],
+    13:[
+      ['Photon from level','What happens in a downward energy transition?','A photon is emitted with energy equal to ΔE.'],
+      ['Spectrum','Why are line spectra discrete?','Only certain allowed energy differences exist.'],
+      ['Trend','Which gives shorter wavelength: large or small ΔE?','Large ΔE gives higher f and shorter λ.']
+    ],
+    14:[
+      ['Equation','State the de Broglie relation.','λ = h/p.'],
+      ['Momentum trend','What happens to λ if p doubles?','λ halves.'],
+      ['Evidence pair','Give one particle-like and one wave-like piece of evidence.','Photoelectric effect for photons; electron diffraction for matter waves.']
+    ],
+    15:[
+      ['Equation dump','Write five core equations without notes.','Examples: Q/m, E = hf, hf = φ + KEmax, ΔE = hf, λ = h/p.'],
+      ['Link topics','How do electron collisions connect to line spectra?','Collisions excite atoms; de-excitation emits photons at discrete ΔE values.'],
+      ['Self diagnosis','Choose one weak area and explain exactly what you still confuse.','Use the Mastery Map/Error Log to target the gap.']
+    ],
+    16:[
+      ['Observation → inference','Most α particles pass straight through. What does this imply?','Most of the atom is empty space.'],
+      ['Rare event','Why are large-angle deflections rare?','Only a small fraction pass very close to the tiny nucleus.'],
+      ['Impact parameter','What happens as impact parameter decreases?','Closer approach gives stronger electrostatic repulsion and larger scattering angle.']
+    ]
+  };
+
+  function taskBankHTML(n){
+    const tasks=lessonTaskBank[n]||[];
+    if(!tasks.length)return '';
+    return '<div class="lesson-independent-tasks"><div class="lesson-task-heading"><span class="eyebrow">Independent practice</span><strong>'+tasks.length+' extra tasks</strong></div>'+
+      tasks.map((t,i)=>'<details class="lesson-task-card"><summary><span>Task '+(i+1)+'</span>'+t[0]+' — '+t[1]+'</summary><div class="lesson-task-answer"><strong>Check:</strong> '+t[2]+'</div></details>').join('')+
+      '</div>';
+  }
+
   const CURRENT_STORE='particleLessonCurrentV2';
   const STAGE_STORE='particleLessonStagesV2';
   const VIEW_STORE='particleLessonViewV2';
@@ -404,10 +499,13 @@
     if(stageId==='objectives')return '<ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
     if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map(x=>'<div class="lesson-check"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')+'</div>'+
       (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
-    if(stageId==='simulate')return '<p>'+l.simTask+'</p><div class="lesson-actions-sequence lesson-inline-actions">'+
+    if(stageId==='simulate')return '<p>'+l.simTask+'</p>'+
+      (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
+      '<div class="lesson-actions-sequence lesson-inline-actions">'+
       (l.sim?'<button class="button primary" id="sequenceActivity">Open '+l.title+' simulation</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||'Open activity')+'</button>')+
+      (l.n===1?'<button class="button" id="sequenceAtomPractice">Open atom-builder practice</button>':'')+
       '<button class="button" id="sequenceFullTools">Open full learning tools</button></div>';
-    if(stageId==='practice')return '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>Exam wording:</strong> '+l.exam+'</p><div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open exam questions</button></div>';
+    if(stageId==='practice')return '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>Exam wording:</strong> '+l.exam+'</p>'+taskBankHTML(l.n)+'<div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open exam questions</button></div>';
     if(stageId==='exit')return '<ol>'+l.exit.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="lesson-ready"><strong>Ready to move on?</strong> Students should answer all three without the simulation or notes.</div>';
     return '<p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next lesson:</strong> '+l.next+'</p>'+
       (current<lessons.length-1?'<div class="lesson-next-preview"><span>Up next</span><strong>'+lessons[current+1].title+'</strong><p>'+lessons[current+1].overview+'</p></div>':'<div class="lesson-ready"><strong>Sequence complete.</strong> Use the Mastery Map and mixed quiz for targeted revision.</div>');
@@ -464,6 +562,7 @@
 
     const bindActivity=()=>{
       $('#sequenceActivity')?.addEventListener('click',()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz'));
+      $('#sequenceAtomPractice')?.addEventListener('click',()=>{openView('lab','atom');setTimeout(()=>window.PARTICLELAB_ATOM_PRACTICE?.open?.(0),120)});
       $('#sequenceExamPractice')?.addEventListener('click',()=>{openView('lab',l.sim||'atom');setTimeout(()=>document.querySelector('[data-lt="exam"]')?.click(),120)});
       $('#sequenceFullTools')?.addEventListener('click',()=>{if(l.sim){openView('lab',l.sim);setTimeout(()=>document.querySelector('[data-study-mode="full"]')?.click(),120)}else openView('learninghub')});
     };
