@@ -354,3 +354,19 @@
   .sim-guide-title span{display:block;margin-top:2px}
   .sim-guide-buttons{grid-template-columns:1fr 1fr}
 }
+
+/* Defensive sizing: every lab-side card must shrink inside the two-column teaching layout. */
+#view-lab .lab-side > *{min-width:0;max-width:100%}
+#view-lab .lab-side input,
+#view-lab .lab-side select,
+#view-lab .lab-side textarea,
+#view-lab .lab-side button{max-width:100%}
+#view-lab .atom-practice,
+#view-lab .atom-practice-body,
+#view-lab .atom-progress,
+#view-lab .atom-progress-track,
+#view-lab .atom-task-route,
+#view-lab .atom-isotope-actions{min-width:0;max-width:100%}
+#view-lab .sim-readout-flow,
+#view-lab .sim-readout-chip{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#view-lab .sim-readout-chip .physics-unit{white-space:normal;overflow-wrap:anywhere}
