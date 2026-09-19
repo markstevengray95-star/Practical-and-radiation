@@ -39,6 +39,7 @@ jobs:
           node --check simulation-presentation.js
           node --check learning-tools.js
           node --check learning-hub.js
+          node --check simulation-essentials.js
 
       - name: Check simulation registry and required files
         run: |
@@ -70,6 +71,9 @@ jobs:
           test -s learning-tools.css
           test -s learning-hub.js
           test -s learning-hub.css
+          test -s simulation-essentials.js
+          test -s simulation-essentials.css
+          test -s student-ui-polish.css
           python3 - <<'PY'
           from pathlib import Path
           import re
