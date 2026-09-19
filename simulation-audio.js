@@ -43,7 +43,7 @@
       if(!AC) return false;
       audioCtx = new AC();
       master = audioCtx.createGain();
-      master.gain.value = 0.12;
+      master.gain.value = 0.16;
       master.connect(audioCtx.destination);
     }
     if(audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
@@ -168,6 +168,25 @@
       });
     }
 
+
+    if(!$('#simSoundTest')){
+      const t=document.createElement('button');
+      t.id='simSoundTest';
+      t.className='button';
+      t.textContent='♪ Test sound';
+      buttons.appendChild(t);
+      t.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(!enabled){
+          enabled=true;
+          localStorage.setItem('particleLabSound','on');
+          renderSoundButton();
+        }
+        ensureAudio();
+        cue(simCue[selectedSim()] || 'correct');
+      });
+    }
+
     if(!$('#simMoreToggle')){
       const b=document.createElement('button');
       b.id='simMoreToggle';
@@ -189,7 +208,7 @@
   function renderSoundButton(){
     const b=$('#simSoundToggle');
     if(!b) return;
-    b.textContent=enabled?'🔊 Sound cues: On':'🔇 Sound cues: Off';
+    b.textContent=enabled?'🔊 Simulation sound: ON':'🔇 Simulation sound: OFF';
     b.classList.toggle('sound-on',enabled);
     b.classList.toggle('sound-off',!enabled);
     b.setAttribute('aria-pressed',enabled?'true':'false');
@@ -204,7 +223,17 @@
     return 260+n*560;
   }
 
-  window.addEventListener('particlelab:hotspot',()=>cue('tick'));
+  function hotspotCue(title=''){
+    const t=String(title).toLowerCase();
+    if(t.includes('photon')) return 'photon';
+    if(t.includes('quark')||t.includes('hadron')) return 'snap';
+    if(t.includes('nucleus')||t.includes('nucleon')||t.includes('force')) return 'low';
+    if(t.includes('detector')||t.includes('scatter')||t.includes('trajectory')) return 'scatter';
+    if(t.includes('electron')||t.includes('positron')||t.includes('neutrino')) return 'tick';
+    return 'soft';
+  }
+
+  window.addEventListener('particlelab:hotspot',e=>cue(hotspotCue(e.detail?.title)));
 
   document.addEventListener('click',e=>{
     if(e.target.closest?.('#simSoundToggle,#simMoreToggle')) return;
