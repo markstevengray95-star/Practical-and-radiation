@@ -179,6 +179,15 @@ try {
   await page.waitForTimeout(60);
   if ((await page.locator('[data-spec]').count()) < 30) throw new Error('Specification checklist is incomplete');
 
+  // AQA Physics exam-skills coach checks.
+  const examSkillsNav = page.locator('[data-view="examskills"]');
+  if (!(await examSkillsNav.count())) throw new Error('Exam Skills navigation missing');
+  await examSkillsNav.click();
+  await page.waitForSelector('#view-examskills.active-view', { timeout: 5000 });
+  if ((await page.locator('.command-card').count()) < 8) throw new Error('Command-word coach is incomplete');
+  if ((await page.locator('[data-worked]').count()) < 8) throw new Error('Worked-example bank is incomplete');
+  if ((await page.locator('.mark-killer').count()) < 8) throw new Error('Common-error coaching is incomplete');
+
   // Classroom lesson sequence checks.
   await page.locator('[data-view="course"]').click();
   await page.waitForSelector('#courseList.lesson-sequence-sidebar', { timeout: 5000 });
