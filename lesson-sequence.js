@@ -288,12 +288,55 @@
     }
   ];
 
-  let completed=new Set(),current=0;
-  try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
+  
+  const CURRENT_STORE='particleLessonCurrentV2';
+  const STAGE_STORE='particleLessonStagesV2';
+  const VIEW_STORE='particleLessonViewV2';
+  const stages=[
+    {id:'recall',label:'Do Now',short:'Recall',time:'5 min'},
+    {id:'objectives',label:'Objectives',short:'Goals',time:'2 min'},
+    {id:'teach',label:'Teach',short:'Teach',time:'15–20 min'},
+    {id:'simulate',label:'Simulation / activity',short:'Simulate',time:'15 min'},
+    {id:'practice',label:'Worked example & exam practice',short:'Practice',time:'10–15 min'},
+    {id:'exit',label:'Exit ticket',short:'Exit',time:'5 min'},
+    {id:'next',label:'Homework & next lesson',short:'Next',time:'2 min'}
+  ];
 
-  function save(){
+  let completed=new Set(),stageDone={},current=0,activeStage=0,lessonView='guided';
+  try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
+  try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
+  try{
+    const saved=JSON.parse(localStorage.getItem(CURRENT_STORE)||'{}');
+    if(Number.isInteger(saved.lesson))current=Math.max(0,Math.min(lessons.length-1,saved.lesson));
+    if(Number.isInteger(saved.stage))activeStage=Math.max(0,Math.min(stages.length-1,saved.stage));
+  }catch{}
+  try{lessonView=localStorage.getItem(VIEW_STORE)||'guided'}catch{}
+
+  function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
+    localStorage.setItem(STAGE_STORE,JSON.stringify(stageDone));
+    localStorage.setItem(CURRENT_STORE,JSON.stringify({lesson:current,stage:activeStage}));
+    localStorage.setItem(VIEW_STORE,lessonView);
     updateProgress();
+  }
+
+  function doneStagesFor(n){
+    return new Set(stageDone[n]||[]);
+  }
+
+  function markStage(stageId,on=true){
+    const l=lessons[current],set=doneStagesFor(l.n);
+    if(on)set.add(stageId);else set.delete(stageId);
+    stageDone[l.n]=[...set];
+    if(set.size===stages.length)completed.add(l.n);
+    else completed.delete(l.n);
+    saveAll();
+  }
+
+  function setStage(i){
+    activeStage=Math.max(0,Math.min(stages.length-1,i));
+    saveAll();
+    renderLesson();
   }
 
   function updateProgress(){
@@ -302,6 +345,9 @@
     if($('#overallProgressBar'))$('#overallProgressBar').style.width=(done/total*100)+'%';
     if($('#lessonSequenceProgress'))$('#lessonSequenceProgress').textContent=done+' / '+total;
     if($('#lessonSequenceFill'))$('#lessonSequenceFill').style.width=(done/total*100)+'%';
+    const currentDone=doneStagesFor(lessons[current]?.n).size;
+    if($('#lessonStepProgress'))$('#lessonStepProgress').textContent=currentDone+' / '+stages.length+' steps';
+    if($('#lessonStepFill'))$('#lessonStepFill').style.width=(currentDone/stages.length*100)+'%';
   }
 
   function openView(view,sim){
@@ -330,19 +376,61 @@
     list.innerHTML=phaseGroups().map(g=>
       '<div class="lesson-phase-heading">'+g.phase+'</div>'+
       g.items.map(l=>{
-        const i=lessons.indexOf(l),done=completed.has(l.n);
+        const i=lessons.indexOf(l),done=completed.has(l.n),stepCount=doneStagesFor(l.n).size;
         return '<button class="lesson-route-button '+(i===current?'active ':'')+(done?'complete':'')+'" data-seq-lesson="'+i+'">'+
           '<span class="lesson-route-number">'+(done?'✓':l.n)+'</span>'+
-          '<span class="lesson-route-title"><strong>'+l.title+'</strong><span>'+l.code+'</span></span>'+
-          '<span class="lesson-route-status">'+(done?'done':'')+'</span></button>';
+          '<span class="lesson-route-title"><strong>'+l.title+'</strong><span>'+l.code+' · '+stepCount+'/'+stages.length+' steps</span></span>'+
+          '<span class="lesson-route-status">'+(done?'done':(i===current?'now':''))+'</span></button>';
       }).join('')
     ).join('');
-    $$('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{current=+b.dataset.seqLesson;renderList();renderLesson();});
+    $$('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{
+      current=+b.dataset.seqLesson;
+      const nextUndone=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
+      activeStage=nextUndone<0?0:nextUndone;
+      saveAll();renderList();renderLesson();
+    });
+  }
+
+  function stageBody(l,stageId){
+    if(stageId==='recall')return '<ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
+    if(stageId==='objectives')return '<ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+    if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map(x=>'<div class="lesson-check"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')+'</div>'+
+      (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
+    if(stageId==='simulate')return '<p>'+l.simTask+'</p><div class="lesson-actions-sequence lesson-inline-actions">'+
+      (l.sim?'<button class="button primary" id="sequenceActivity">Open '+l.title+' simulation</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||'Open activity')+'</button>')+
+      '<button class="button" id="sequenceFullTools">Open full learning tools</button></div>';
+    if(stageId==='practice')return '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>Exam wording:</strong> '+l.exam+'</p><div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open exam questions</button></div>';
+    if(stageId==='exit')return '<ol>'+l.exit.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="lesson-ready"><strong>Ready to move on?</strong> Students should answer all three without the simulation or notes.</div>';
+    return '<p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next lesson:</strong> '+l.next+'</p>'+
+      (current<lessons.length-1?'<div class="lesson-next-preview"><span>Up next</span><strong>'+lessons[current+1].title+'</strong><p>'+lessons[current+1].overview+'</p></div>':'<div class="lesson-ready"><strong>Sequence complete.</strong> Use the Mastery Map and mixed quiz for targeted revision.</div>');
+  }
+
+  function sectionClass(id){
+    return id==='recall'?'recall':id==='objectives'?'objective':id==='teach'?'teach':id==='simulate'?'sim':id==='practice'?'practice':id==='exit'?'exit':'next';
+  }
+
+  function renderGuidedContent(l){
+    const step=stages[activeStage],done=doneStagesFor(l.n),isDone=done.has(step.id);
+    return '<div class="lesson-current-step">'+
+      '<div class="lesson-now-banner"><div><span class="eyebrow">Do this now · Step '+(activeStage+1)+' of '+stages.length+'</span><h3>'+step.label+'</h3><p>'+step.time+'</p></div>'+
+      '<div class="lesson-step-progress"><span id="lessonStepProgress">'+done.size+' / '+stages.length+' steps</span><div class="lesson-route-track compact"><div id="lessonStepFill" class="lesson-route-fill" style="width:'+(done.size/stages.length*100)+'%"></div></div></div></div>'+
+      '<section class="lesson-section '+sectionClass(step.id)+' lesson-active-section"><span class="lesson-mini-time">'+step.time+'</span><h3>'+step.label+'</h3>'+stageBody(l,step.id)+'</section>'+
+      '<div class="lesson-step-actions">'+
+        '<button class="button" id="lessonStepBack" '+(activeStage===0?'disabled':'')+'>← Previous step</button>'+
+        '<button class="button primary" id="lessonStepDone">'+(isDone?'✓ Done — next step':'Mark step done →')+'</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function renderFullPlan(l){
+    return '<div class="lesson-content lesson-full-plan">'+stages.map((s,i)=>
+      '<section class="lesson-section '+sectionClass(s.id)+'" data-full-stage="'+i+'"><span class="lesson-mini-time">'+s.time+'</span><h3>'+s.label+'</h3>'+stageBody(l,s.id)+'</section>'
+    ).join('')+'</div>';
   }
 
   function renderLesson(){
     const panel=$('#lessonPanel');if(!panel)return;
-    const l=lessons[current],done=completed.has(l.n);
+    const l=lessons[current],done=completed.has(l.n),doneSet=doneStagesFor(l.n);
     panel.className='panel lesson-route-panel';
     panel.innerHTML=
       '<div class="lesson-hero">'+
@@ -351,37 +439,59 @@
         '<h2>'+l.title+'</h2><p>'+l.overview+'</p>'+
         '<div class="lesson-meta"><span>'+l.duration+'</span><span>'+l.objectives.length+' objectives</span><span>'+(l.sim?'3D simulation':'guided activity')+'</span></div>'+
       '</div>'+
+      '<div class="lesson-view-toolbar"><div><span class="study-label">Lesson view</span><button class="study-mode-button '+(lessonView==='guided'?'active':'')+'" data-lesson-view="guided">Guided steps</button><button class="study-mode-button '+(lessonView==='full'?'active':'')+'" data-lesson-view="full">Full lesson plan</button></div><button class="text-button" id="resumeThisLesson">Jump to first unfinished step</button></div>'+
       '<div class="lesson-stage-strip">'+
-        [['1','Do Now'],['2','Objectives'],['3','Teach'],['4','Simulate'],['5','Practice'],['6','Exit'],['7','Next']].map(x=>'<div class="lesson-stage"><span>'+x[0]+'</span>'+x[1]+'</div>').join('')+
+        stages.map((s,i)=>'<button class="lesson-stage '+(i===activeStage?'active ':'')+(doneSet.has(s.id)?'done':'')+'" data-seq-stage="'+i+'"><span>'+(doneSet.has(s.id)?'✓':i+1)+'</span>'+s.short+'</button>').join('')+
       '</div>'+
-      '<div class="lesson-content">'+
-        '<div class="lesson-objectives">'+
-          '<section class="lesson-section recall"><span class="lesson-mini-time">5 min</span><h3>Do Now / prior recall</h3><ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol></section>'+
-          '<section class="lesson-section objective"><span class="lesson-mini-time">2 min</span><h3>Learning objectives</h3><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></section>'+
-        '</div>'+
-        '<section class="lesson-section teach"><span class="lesson-mini-time">15–20 min</span><h3>Teach in this order</h3><div class="lesson-check-list">'+l.teach.map(x=>'<div class="lesson-check"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')+'</div>'+
-          (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'')+
-        '</section>'+
-        '<div class="lesson-flow">'+
-          '<section class="lesson-section sim"><span class="lesson-mini-time">15 min</span><h3>Interactive task</h3><p>'+l.simTask+'</p><div class="lesson-actions-sequence">'+
-            (l.sim?'<button class="button primary" id="sequenceActivity">Open '+l.title+' simulation</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||'Open activity')+'</button>')+
-          '</div></section>'+
-          '<section class="lesson-section practice"><span class="lesson-mini-time">10–15 min</span><h3>Worked example → exam practice</h3><p><strong>Worked:</strong> '+l.worked+'</p><p><strong>Exam wording:</strong> '+l.exam+'</p><button class="button" id="sequenceExamPractice">Open exam questions</button></section>'+
-        '</div>'+
-        '<div class="lesson-flow">'+
-          '<section class="lesson-section exit"><span class="lesson-mini-time">5 min</span><h3>Exit ticket</h3><ol>'+l.exit.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="lesson-ready"><strong>Ready to move on?</strong> Students should answer all three without the simulation or notes.</div></section>'+
-          '<section class="lesson-section next"><h3>After the lesson</h3><p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next:</strong> '+l.next+'</p></section>'+
-        '</div>'+
-      '</div>'+
-      '<div class="lesson-actions-sequence"><button class="button primary" id="sequenceComplete">'+(done?'✓ Lesson complete':'Mark lesson complete')+'</button><button class="button" id="sequenceFullTools">Open full learning tools</button></div>'+
+      (lessonView==='guided'?renderGuidedContent(l):renderFullPlan(l))+
+      '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?'✓ Lesson complete':'Complete remaining steps to finish lesson')+'</button></div>'+
       '<div class="lesson-nav-row"><button class="button" id="sequencePrev" '+(current===0?'disabled':'')+'>← Previous lesson</button><button class="button" id="sequenceNext" '+(current===lessons.length-1?'disabled':'')+'>Next lesson →</button></div>';
 
-    $('#sequenceActivity').onclick=()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz');
-    $('#sequenceExamPractice').onclick=()=>{openView('lab',l.sim||'atom');setTimeout(()=>document.querySelector('[data-lt="exam"]')?.click(),120)};
-    $('#sequenceComplete').onclick=()=>{completed.has(l.n)?completed.delete(l.n):completed.add(l.n);save();renderList();renderLesson();};
-    $('#sequenceFullTools').onclick=()=>{if(l.sim){openView('lab',l.sim);setTimeout(()=>document.querySelector('[data-study-mode="full"]')?.click(),120)}else openView('learninghub')};
-    $('#sequencePrev').onclick=()=>{if(current>0){current--;renderList();renderLesson();scrollCourseTop()}};
-    $('#sequenceNext').onclick=()=>{if(current<lessons.length-1){current++;renderList();renderLesson();scrollCourseTop()}};
+    $$('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage));
+    $$('[data-lesson-view]',panel).forEach(b=>b.onclick=()=>{lessonView=b.dataset.lessonView;saveAll();renderLesson();});
+    $('#resumeThisLesson').onclick=()=>{
+      const i=stages.findIndex(s=>!doneStagesFor(l.n).has(s.id));
+      setStage(i<0?0:i);
+    };
+
+    const bindActivity=()=>{
+      $('#sequenceActivity')?.addEventListener('click',()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz'));
+      $('#sequenceExamPractice')?.addEventListener('click',()=>{openView('lab',l.sim||'atom');setTimeout(()=>document.querySelector('[data-lt="exam"]')?.click(),120)});
+      $('#sequenceFullTools')?.addEventListener('click',()=>{if(l.sim){openView('lab',l.sim);setTimeout(()=>document.querySelector('[data-study-mode="full"]')?.click(),120)}else openView('learninghub')});
+    };
+    bindActivity();
+
+    $('#lessonStepBack')?.addEventListener('click',()=>{if(activeStage>0)setStage(activeStage-1)});
+    $('#lessonStepDone')?.addEventListener('click',()=>{
+      markStage(stages[activeStage].id,true);
+      if(activeStage<stages.length-1){
+        activeStage++;
+        saveAll();renderList();renderLesson();
+      }else{
+        completed.add(l.n);saveAll();renderList();renderLesson();
+      }
+    });
+
+    $('#sequenceComplete').onclick=()=>{
+      if(done){
+        completed.delete(l.n);stageDone[l.n]=[];saveAll();activeStage=0;renderList();renderLesson();
+      }else{
+        const first=stages.findIndex(s=>!doneStagesFor(l.n).has(s.id));
+        if(first>=0)setStage(first);
+      }
+    };
+    $('#sequencePrev').onclick=()=>changeLesson(-1);
+    $('#sequenceNext').onclick=()=>changeLesson(1);
+    updateProgress();
+  }
+
+  function changeLesson(delta){
+    const next=current+delta;
+    if(next<0||next>=lessons.length)return;
+    current=next;
+    const first=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
+    activeStage=first<0?0:first;
+    saveAll();renderList();renderLesson();scrollCourseTop();
   }
 
   function scrollCourseTop(){
@@ -392,7 +502,7 @@
     const section=$('#view-course');if(!section)return;
     const head=$('.section-head',section);
     if(head){
-      head.innerHTML='<div><span class="eyebrow">Classroom teaching route</span><h2>Particles & Radiation lesson sequence</h2></div><p class="subtle">Teach the topic lesson by lesson: retrieval → explanation → simulation → exam practice → exit ticket.</p>';
+      head.innerHTML='<div><span class="eyebrow">Classroom teaching route</span><h2>Particles & Radiation lesson sequence</h2></div><p class="subtle">Open one lesson, follow the highlighted step, then press “Mark step done” to move through it.</p>';
     }
     let summary=$('#lessonRouteSummary');
     if(!summary){
@@ -400,16 +510,19 @@
       summary.id='lessonRouteSummary';summary.className='lesson-route-summary';
       head?.insertAdjacentElement('afterend',summary);
     }
-    summary.innerHTML='<div class="lesson-route-overview"><span class="eyebrow">Recommended order</span><h3>15 core lessons + 1 optional extension</h3><p>The sequence follows AQA 3.2 but splits larger ideas into teachable classroom chunks.</p><div class="lesson-route-phases">'+
+    const l=lessons[current],step=stages[activeStage];
+    summary.innerHTML='<div class="lesson-route-overview"><span class="eyebrow">Continue where you left off</span><h3>Lesson '+l.n+' · '+l.title+'</h3><p>Current step: <strong>'+step.label+'</strong>. The app remembers this lesson and step on this device.</p><div class="lesson-route-phases">'+
       phaseGroups().map(g=>'<span class="lesson-phase-chip">'+g.phase+' · '+g.items.length+' lessons</span>').join('')+
-      '</div></div><div class="lesson-route-progress"><div class="lesson-progress-line"><div><span class="eyebrow">Sequence progress</span><h3 id="lessonSequenceProgress"></h3></div><strong>'+lessons.length+'</strong></div><div class="lesson-route-track"><div id="lessonSequenceFill" class="lesson-route-fill"></div></div><p style="margin-top:6px">Mark a lesson complete after its exit ticket.</p></div>';
+      '</div><button class="button primary" id="resumeLessonSequence" style="margin-top:8px">Continue lesson '+l.n+'</button></div>'+
+      '<div class="lesson-route-progress"><div class="lesson-progress-line"><div><span class="eyebrow">Sequence progress</span><h3 id="lessonSequenceProgress"></h3></div><strong>'+lessons.length+'</strong></div><div class="lesson-route-track"><div id="lessonSequenceFill" class="lesson-route-fill"></div></div><p style="margin-top:6px">A lesson completes after all seven steps are ticked.</p></div>';
+    $('#resumeLessonSequence').onclick=()=>{$('#lessonPanel')?.scrollIntoView({behavior:'smooth',block:'start'})};
     const layout=$('.course-layout',section);
     layout?.classList.add('lesson-sequence-layout');
   }
 
   function relabelNavigation(){
     const nav=$('.nav-button[data-view="course"]');if(nav)nav.textContent='Lesson sequence';
-    const jump=$('[data-jump="course"]');if(jump)jump.textContent='Start lesson sequence';
+    const jump=$('[data-jump="course"]');if(jump)jump.textContent='Continue lesson sequence';
   }
 
   function init(){
@@ -421,25 +534,33 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();save();current=0;renderList();renderLesson();
+        completed.clear();stageDone={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
-    // Re-assert sequence rendering if the legacy course renderer is triggered elsewhere.
-    let lastCourse='';
     setInterval(()=>{
       if(!$('#view-course'))return;
       const now=$('#courseList')?.className||'';
       if(!now.includes('lesson-sequence-sidebar')){
         renderSummary();renderList();renderLesson();updateProgress();
       }
-      lastCourse=now;
     },800);
   }
 
   window.PARTICLELAB_LESSON_SEQUENCE={
     lessons,
-    openLesson:n=>{const i=lessons.findIndex(l=>l.n===n);if(i>=0){current=i;document.querySelector('[data-view="course"]')?.click();renderList();renderLesson();}}
+    stages,
+    openLesson:n=>{
+      const i=lessons.findIndex(l=>l.n===n);
+      if(i>=0){
+        current=i;
+        const first=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
+        activeStage=first<0?0:first;
+        saveAll();
+        document.querySelector('[data-view="course"]')?.click();
+        renderSummary();renderList();renderLesson();
+      }
+    }
   };
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,380),{once:true});
