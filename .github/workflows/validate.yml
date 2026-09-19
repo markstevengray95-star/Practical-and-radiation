@@ -42,6 +42,8 @@ jobs:
           node --check simulation-essentials.js
           node --check simulation-change-coach.js
           node --check lesson-sequence.js
+          node --check start-here.js
+          node --check revision-hub.js
 
       - name: Check simulation registry and required files
         run: |
@@ -80,6 +82,10 @@ jobs:
           test -s simulation-change-coach.css
           test -s lesson-sequence.js
           test -s lesson-sequence.css
+          test -s start-here.js
+          test -s start-here.css
+          test -s revision-hub.js
+          test -s revision-hub.css
           python3 - <<'PY'
           from pathlib import Path
           import re
