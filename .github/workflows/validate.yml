@@ -44,6 +44,7 @@ jobs:
           node --check lesson-sequence.js
           node --check start-here.js
           node --check revision-hub.js
+          node --check exam-skills.js
 
       - name: Check simulation registry and required files
         run: |
@@ -86,6 +87,8 @@ jobs:
           test -s start-here.css
           test -s revision-hub.js
           test -s revision-hub.css
+          test -s exam-skills.js
+          test -s exam-skills.css
           python3 - <<'PY'
           from pathlib import Path
           import re
