@@ -394,7 +394,13 @@
   }
 
   function stageBody(l,stageId){
-    if(stageId==='recall')return '<ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
+    if(stageId==='recall'){
+      const older=[];
+      if(current>0) older.push(lessons[current-1].exit[0]);
+      if(current>1) older.push(lessons[current-2].exit[1]||lessons[current-2].exit[0]);
+      return '<div class="lesson-retrieval-split"><div><strong>Prerequisite recall</strong><ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+        (older.length?'<div><strong>Cumulative retrieval</strong><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">These questions deliberately revisit earlier lessons.</p></div>':'')+'</div>';
+    }
     if(stageId==='objectives')return '<ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
     if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map(x=>'<div class="lesson-check"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')+'</div>'+
       (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
