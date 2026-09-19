@@ -338,7 +338,54 @@ function animateHotspots(t){
 function threeColor(css){return new THREE.Color(css)}
 function sphere(r,color,opacity=1){const m=new THREE.Mesh(new THREE.SphereGeometry(r,32,24),new THREE.MeshStandardMaterial({color,roughness:.24,metalness:.1,transparent:opacity<1,opacity}));m.castShadow=true;m.receiveShadow=true;return m}
 function line3(points,color){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color,transparent:true,opacity:.88}))}
-function clearWorld(){animator=()=>{};hotspotGroup=null;selectedHotspot=null;if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}queueMicrotask(()=>{if(threeReady&&world)addHotspots(currentSim)})}
+function addSceneStage(id){
+  if(!THREE||!world)return;
+  const accents={
+    atom:0x67c7ff,specific:0x7ee8ff,strong:0xff8a95,decay:0xffd56a,
+    antimatter:0xc9b7ff,interactions:0x8edcff,classification:0x63d9a4,
+    quarks:0xffc85f,photo:0xffe88a,collisions:0xffa65e,levels:0xb895ff,
+    diffraction:0x7ee8ff,rutherford:0x66d9a6
+  };
+  const accent=accents[id]||0x67c7ff;
+  const stage=new THREE.Group();
+  stage.name='simulation-stage';
+
+  const shadow=new THREE.Mesh(
+    new THREE.PlaneGeometry(13.5,9),
+    new THREE.ShadowMaterial({color:0x000000,opacity:.16})
+  );
+  shadow.rotation.x=-Math.PI/2;
+  shadow.position.y=-2.24;
+  shadow.receiveShadow=true;
+  stage.add(shadow);
+
+  const grid=new THREE.GridHelper(12,24,0x31536c,0x173044);
+  grid.position.y=-2.22;
+  grid.material.transparent=true;
+  grid.material.opacity=.22;
+  grid.material.depthWrite=false;
+  stage.add(grid);
+
+  const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(2.45,.015,6,96),
+    new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.28,depthWrite:false})
+  );
+  ring.rotation.x=Math.PI/2;
+  ring.position.y=-2.20;
+  stage.add(ring);
+
+  const inner=new THREE.Mesh(
+    new THREE.RingGeometry(.9,1.0,64),
+    new THREE.MeshBasicMaterial({color:accent,transparent:true,opacity:.08,side:THREE.DoubleSide,depthWrite:false})
+  );
+  inner.rotation.x=-Math.PI/2;
+  inner.position.y=-2.19;
+  stage.add(inner);
+
+  world.add(stage);
+}
+
+function clearWorld(){animator=()=>{};hotspotGroup=null;selectedHotspot=null;if(!world)return;while(world.children.length){const o=world.children.pop();o.traverse?.(x=>{x.geometry?.dispose?.();if(x.material){if(Array.isArray(x.material))x.material.forEach(m=>m.dispose?.());else x.material.dispose?.()}})}queueMicrotask(()=>{if(threeReady&&world){addSceneStage(currentSim);addHotspots(currentSim)}})}
 function randomBall(r){let v;do{v=new THREE.Vector3((Math.random()*2-1)*r,(Math.random()*2-1)*r,(Math.random()*2-1)*r)}while(v.length()>r);return v}
 function cluster(Z,A,size=.16){const g=new THREE.Group(),R=.42+.16*Math.cbrt(Math.min(A,210));for(let i=0;i<A;i++){const m=sphere(size,i<Z?'#ff7777':'#72a9ff');m.position.copy(randomBall(R));g.add(m)}return g}
 function setCamera(z=8){camera.position.set(0,1.3,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
