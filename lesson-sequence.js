@@ -436,10 +436,14 @@
     saveAll();
   }
 
-  function setStage(i){
+  function setStage(i,scroll=false){
     activeStage=Math.max(0,Math.min(stages.length-1,i));
+    lessonView='guided';
     saveAll();
     renderLesson();
+    if(scroll){
+      requestAnimationFrame(()=>$('#lessonPanel .lesson-active-section')?.scrollIntoView({behavior:'smooth',block:'nearest'}));
+    }
   }
 
   function updateProgress(){
@@ -486,8 +490,9 @@
           '<span class="lesson-route-status">'+(done?'done':(i===current?'now':''))+'</span></button>';
       }).join('')
     ).join('');
-    $$('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{
+    $('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{
       current=+b.dataset.seqLesson;
+      lessonView='guided';
       const nextUndone=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
       activeStage=nextUndone<0?0:nextUndone;
       saveAll();renderList();renderLesson();
@@ -559,11 +564,11 @@
       '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?'✓ Lesson complete':'Complete remaining steps to finish lesson')+'</button></div>'+
       '<div class="lesson-nav-row"><button class="button" id="sequencePrev" '+(current===0?'disabled':'')+'>← Previous lesson</button><button class="button" id="sequenceNext" '+(current===lessons.length-1?'disabled':'')+'>Next lesson →</button></div>';
 
-    $$('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage));
+    $('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage,true));
     $$('[data-lesson-view]',panel).forEach(b=>b.onclick=()=>{lessonView=b.dataset.lessonView;saveAll();renderLesson();});
     $('#resumeThisLesson').onclick=()=>{
       const i=stages.findIndex(s=>!doneStagesFor(l.n).has(s.id));
-      setStage(i<0?0:i);
+      setStage(i<0?0:i,true);
     };
 
     const bindActivity=()=>{
@@ -664,6 +669,7 @@
     lessons,
     stages,
     taskBank:lessonTaskBank,
+    openStage:i=>setStage(i,true),
     openLesson:n=>{
       const i=lessons.findIndex(l=>l.n===n);
       if(i>=0){
