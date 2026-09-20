@@ -546,6 +546,7 @@
   const CURRENT_STORE='particleLessonCurrentV2';
   const STAGE_STORE='particleLessonStagesV2';
   const VIEW_STORE='particleLessonViewV2';
+  const CHUNK_POS_STORE='particleLessonChunkPositionV3';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -556,7 +557,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -565,12 +566,14 @@
     if(Number.isInteger(saved.stage))activeStage=Math.max(0,Math.min(stages.length-1,saved.stage));
   }catch{}
   try{lessonView=localStorage.getItem(VIEW_STORE)||'guided'}catch{}
+  try{chunkPosition=JSON.parse(localStorage.getItem(CHUNK_POS_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
     localStorage.setItem(STAGE_STORE,JSON.stringify(stageDone));
     localStorage.setItem(CURRENT_STORE,JSON.stringify({lesson:current,stage:activeStage}));
     localStorage.setItem(VIEW_STORE,lessonView);
+    localStorage.setItem(CHUNK_POS_STORE,JSON.stringify(chunkPosition));
     updateProgress();
   }
 
@@ -595,6 +598,49 @@
     if(scroll){
       requestAnimationFrame(()=>$('#lessonPanel .lesson-active-section')?.scrollIntoView({behavior:'smooth',block:'nearest'}));
     }
+  }
+
+
+  function activeChunkFor(l){
+    const max=Math.max(0,(l?.teach?.length||1)-1);
+    const raw=Number(chunkPosition[l?.n]);
+    return Number.isInteger(raw)?Math.max(0,Math.min(max,raw)):0;
+  }
+
+  function setActiveChunk(l,index,scroll=false){
+    if(!l?.teach?.length)return;
+    chunkPosition[l.n]=Math.max(0,Math.min(l.teach.length-1,Number(index)||0));
+    saveAll();
+    renderLesson();
+    if(scroll){
+      requestAnimationFrame(()=>$('#lessonPanel .lesson-chunk-rich:not([hidden])')?.scrollIntoView({behavior:'smooth',block:'start'}));
+    }
+  }
+
+  function teachingStageHTML(l){
+    const active=activeChunkFor(l);
+    const guided=lessonView==='guided';
+    const selector=guided?
+      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">Teaching sequence</span><strong>Chunk '+(active+1)+' of '+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
+        l.teach.map((x,i)=>'<button type="button" role="tab" data-core-chunk="'+i+'" class="'+(i===active?'active':'')+'" aria-selected="'+(i===active?'true':'false')+'"><span>'+(i+1)+'</span><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></button>').join('')+
+      '</div></div>':'';
+
+    const cards='<div class="lesson-check-list">'+l.teach.map((x,i)=>{
+      const cs=chunkSupport(l,i);
+      const hidden=guided&&i!==active?' hidden':'';
+      return '<article class="lesson-check lesson-chunk-rich '+(guided&&i===active?'active-chunk':'')+'" data-lesson-chunk="'+i+'"'+hidden+'>'+
+        '<div class="lesson-chunk-main"><span class="eyebrow">Teaching chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div>'+
+        '<div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div>'+
+        '<div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div>'+
+        '<div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div>'+
+      '</article>';
+    }).join('')+'</div>';
+
+    const controls=guided?
+      '<div class="chunk-switch-actions"><button type="button" class="button" id="coreChunkPrev" '+(active===0?'disabled':'')+'>← Previous chunk</button><button type="button" class="button primary" id="coreChunkNext" '+(active===l.teach.length-1?'disabled':'')+'>Next chunk →</button></div>':'';
+
+    return selector+cards+controls+
+      (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">Equations from this lesson</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
   }
 
   function updateProgress(){
@@ -662,9 +708,7 @@
     if(stageId==='objectives')return keywordHTML(l)+
       '<div class="lesson-objective-block"><span class="eyebrow">By the end of this lesson you should be able to</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
       '<div class="lesson-stage-guidance"><strong>How to use this lesson</strong><p>Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.</p></div>';
-    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Only one chunk is shown at a time. Read all of the key information, complete the activity without revealing the answer, check it, then use <em>Next chunk</em>.</p></div>'+
-      '<div class="lesson-check-list">'+l.teach.map((x,i)=>{const cs=chunkSupport(l,i);return '<article class="lesson-check lesson-chunk-rich" data-lesson-chunk="'+i+'"><div class="lesson-chunk-main"><span class="eyebrow">Teaching chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div><div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div><div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div><div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div></article>'}).join('')+'</div>'+
-      (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">Equations from this lesson</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
+    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use <em>Next chunk</em>.</p></div>'+teachingStageHTML(l);
     if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>Apply the knowledge</strong><p>Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.</p></div><p>'+l.simTask+'</p>'+
       (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
       '<div class="lesson-actions-sequence lesson-inline-actions">'+
@@ -748,6 +792,11 @@
       }
     });
 
+
+    $$('[data-core-chunk]',panel).forEach(b=>b.addEventListener('click',()=>setActiveChunk(l,+b.dataset.coreChunk,true)));
+    $('#coreChunkPrev')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)-1,true));
+    $('#coreChunkNext')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)+1,true));
+
     $('#sequenceComplete').onclick=()=>{
       if(done){
         completed.delete(l.n);stageDone[l.n]=[];saveAll();activeStage=0;renderList();renderLesson();
@@ -810,7 +859,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
@@ -829,6 +878,7 @@
     taskBank:lessonTaskBank,
     chunkDetail:lessonChunkDetail,
     getChunkSupport:(lessonNumber,chunkIndex)=>{const l=lessons.find(x=>x.n===lessonNumber);return l?chunkSupport(l,chunkIndex):null},
+    getActiveChunk:()=>activeChunkFor(lessons[current]),
     openStage:i=>setStage(i,true),
     openLesson:n=>{
       const i=lessons.findIndex(l=>l.n===n);
