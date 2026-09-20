@@ -46,6 +46,27 @@ try {
   }
 
   console.log('SMOKE: core simulations');
+  // Drag-and-drop atom builder overlay check.
+  await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
+  await page.waitForTimeout(120);
+  if (!(await page.locator('#atomDragBuilder').count())) throw new Error('Drag-and-drop atom builder overlay missing');
+  if ((await page.locator('.atom-drag-token').count()) !== 3) throw new Error('Drag-and-drop particle palette is incomplete');
+
+  // Start from carbon-12, then drag a neutron into the nucleus and verify carbon-13.
+  await page.locator('#atomZ').fill('6');
+  await page.locator('#atomN').fill('6');
+  await page.locator('#atomE').fill('6');
+  await page.locator('#atomE').dispatchEvent('input');
+  await page.waitForTimeout(80);
+  const neutronToken = page.locator('.atom-drag-token[data-particle="neutron"]');
+  const nucleusZone = page.locator('.atom-nucleus-zone');
+  await neutronToken.dragTo(nucleusZone);
+  await page.waitForTimeout(100);
+  const draggedState = await page.evaluate(() => window.PARTICLELAB_ATOM_STATE);
+  if (!draggedState || draggedState.Z !== 6 || draggedState.neutrons !== 7 || draggedState.A !== 13) {
+    throw new Error('Dragging neutron onto nucleus did not create carbon-13');
+  }
+
   // Atom builder completion check.
   await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
   await page.waitForTimeout(120);
