@@ -509,17 +509,51 @@
       '</div>';
   }
 
+  const keywordBank={
+    1:[['nucleon','A proton or neutron in the nucleus.'],['proton number, Z','The number of protons; it identifies the element.'],['nucleon number, A','The total number of protons and neutrons.'],['isotope','Atoms of the same element with the same Z but different neutron numbers.'],['ion','An atom or group with unequal numbers of protons and electrons.']],
+    2:[['specific charge','Charge per unit mass, Q/m, measured in C kg⁻¹.'],['net charge','The total charge after positive and negative charges are combined.'],['cation','A positively charged ion.'],['anion','A negatively charged ion.'],['charge-to-mass ratio','Another description of specific charge.']],
+    3:[['strong nuclear force','The short-range interaction between nucleons.'],['electrostatic repulsion','Repulsion between positively charged protons.'],['femtometre','10⁻¹⁵ m, a useful nuclear distance scale.'],['attractive','A force tending to pull particles together.'],['repulsive','A force tending to push particles apart.']],
+    4:[['alpha particle','A helium-4 nucleus containing two protons and two neutrons.'],['beta-minus particle','An electron created and emitted in β⁻ decay.'],['antineutrino','A neutral antilepton emitted in β⁻ decay.'],['daughter nucleus','The nucleus remaining after a radioactive decay.'],['conservation law','A quantity that must have the same total before and after an interaction.']],
+    5:[['photon','A quantum of electromagnetic radiation.'],['antiparticle','A particle with the same mass as its partner but opposite relevant additive quantum numbers.'],['rest energy','Energy associated with rest mass.'],['electronvolt','The energy transferred to one electron through a potential difference of one volt.'],['frequency','Number of wave cycles per second.']],
+    6:[['annihilation','A particle and antiparticle interact and their energy appears in other particles.'],['pair production','Photon energy creates a particle–antiparticle pair.'],['threshold energy','The minimum energy required for a process.'],['rest energy','Energy associated with particle mass.'],['momentum conservation','Total momentum is unchanged through an isolated interaction.']],
+    7:[['fundamental interaction','One of the basic interactions of nature.'],['exchange particle','A particle used to represent how an interaction is mediated.'],['virtual photon','The exchange particle used for electromagnetic interactions in the AQA model.'],['W boson','W⁺ or W⁻ exchange particle involved in weak interactions studied here.'],['interaction vertex','A point on a particle diagram where particles interact.']],
+    8:[['hadron','A particle that experiences the strong interaction.'],['baryon','A hadron made from three quarks.'],['meson','A hadron made from a quark and an antiquark.'],['lepton','A fundamental particle that does not experience the strong interaction.'],['strangeness','An additive quantum number associated with strange quarks.'],['lepton number','A conserved additive quantum number tracked separately for lepton families.']],
+    9:[['quark','A fundamental constituent of hadrons.'],['antiquark','The antiparticle of a quark.'],['up quark','u quark with charge +2/3 e.'],['down quark','d quark with charge −1/3 e.'],['strange quark','s quark with charge −1/3 e and strangeness −1.'],['baryon number','An additive quantum number: +1/3 for a quark and −1/3 for an antiquark.']],
+    10:[['charge conservation','Total electric charge is the same before and after an interaction.'],['baryon number conservation','Total baryon number is conserved.'],['lepton number conservation','Each relevant lepton-family number is conserved.'],['strangeness','Conserved in strong interactions but may change in weak interactions.'],['allowed reaction','A reaction consistent with the required conservation laws.']],
+    11:[['photoelectric effect','Emission of electrons from a surface due to incident electromagnetic radiation.'],['work function, φ','Minimum energy needed to remove an electron from a surface.'],['threshold frequency','Minimum light frequency needed for photoemission.'],['stopping potential','Potential difference that stops the fastest emitted photoelectrons.'],['maximum kinetic energy','Greatest kinetic energy of emitted photoelectrons.']],
+    12:[['excitation','A bound electron moves to a higher allowed energy level.'],['ionisation','An electron is removed completely from an atom.'],['ground state','The lowest allowed atomic energy state.'],['energy level','An allowed discrete energy of an atomic electron.'],['electronvolt','A convenient microscopic energy unit equal to 1.602 × 10⁻¹⁹ J.']],
+    13:[['energy level','A discrete allowed energy state in an atom.'],['transition','A change between allowed energy levels.'],['line spectrum','A spectrum containing discrete wavelengths.'],['emission','Release of a photon when an electron moves to a lower energy level.'],['absorption','Gain of photon energy that raises an electron to a higher allowed level.']],
+    14:[['de Broglie wavelength','Matter-wave wavelength λ = h/p.'],['wave–particle duality','The idea that quantum objects show both wave-like and particle-like behaviour.'],['diffraction','Wave spreading/interference produced by an obstacle or periodic structure.'],['momentum','For de Broglie waves, greater momentum means shorter wavelength.'],['electron diffraction','Evidence for the wave behaviour of electrons.']],
+    15:[['retrieval','Recalling knowledge without notes.'],['synoptic','Linking knowledge from several parts of the topic.'],['equation selection','Choosing the correct relationship before substituting values.'],['exam command word','A word such as state, explain or calculate that tells you what the question requires.'],['error log','A record of mistakes used to target revision.']],
+    16:[['alpha scattering','Deflection of alpha particles by atomic nuclei.'],['impact parameter','Perpendicular offset of an incoming particle from the nucleus centre if undeflected.'],['nuclear model','Model in which positive charge and most mass are concentrated in a tiny nucleus.'],['Coulomb repulsion','Electrostatic repulsion between positive charges.'],['scattering angle','Change in direction of an alpha particle after passing the nucleus.']]
+  };
+
+  function keywordHTML(l){
+    const words=keywordBank[l.n]||[];
+    if(!words.length)return '';
+    return '<div class="lesson-keywords"><span class="eyebrow">Key words</span><div class="lesson-keyword-grid">'+words.map(w=>'<div class="lesson-keyword"><strong>'+w[0]+'</strong><span>'+w[1]+'</span></div>').join('')+'</div></div>';
+  }
+
+  function shortTestHTML(l){
+    const bank=lessonTaskBank[l.n]||[];
+    const count=Math.min(5,Math.max(3,bank.length));
+    const chosen=bank.slice(0,count);
+    return '<div class="lesson-short-test"><div class="short-test-intro"><strong>Short end-of-lesson test</strong><p>Complete this without notes first. Then open each mark point and self-check your answer.</p></div>'+
+      chosen.map((q,i)=>'<article class="short-test-question"><span>Q'+(i+1)+'</span><div><strong>'+q[0]+'</strong><p>'+q[1]+'</p><textarea rows="2" placeholder="Write your answer before checking..."></textarea><details><summary>Reveal mark point</summary><p>'+q[2]+'</p></details></div></article>').join('')+
+      '<div class="lesson-ready"><strong>Mastery check:</strong> Aim to answer every question accurately without notes. Revisit the relevant teaching chunk if a mark point is missing.</div></div>';
+  }
+
   const CURRENT_STORE='particleLessonCurrentV2';
   const STAGE_STORE='particleLessonStagesV2';
   const VIEW_STORE='particleLessonViewV2';
   const stages=[
-    {id:'recall',label:'Do Now',short:'Recall',time:'5 min'},
-    {id:'objectives',label:'Objectives',short:'Goals',time:'2 min'},
-    {id:'teach',label:'Teach',short:'Teach',time:'15–20 min'},
-    {id:'simulate',label:'Simulation / activity',short:'Simulate',time:'15 min'},
-    {id:'practice',label:'Worked example & exam practice',short:'Practice',time:'10–15 min'},
-    {id:'exit',label:'Exit ticket',short:'Exit',time:'5 min'},
-    {id:'next',label:'Homework & next lesson',short:'Next',time:'2 min'}
+    {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
+    {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
+    {id:'teach',label:'Learn in chunks',short:'Learn',time:'20–25 min'},
+    {id:'simulate',label:'Apply / investigate',short:'Apply',time:'10 min'},
+    {id:'practice',label:'Exam practice',short:'Practice',time:'8–10 min'},
+    {id:'exit',label:'Short test',short:'Test',time:'5–8 min'},
+    {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
   let completed=new Set(),stageDone={},current=0,activeStage=0,lessonView='guided';
@@ -621,21 +655,28 @@
       const older=[];
       if(current>0) older.push(lessons[current-1].exit[0]);
       if(current>1) older.push(lessons[current-2].exit[1]||lessons[current-2].exit[0]);
-      return '<div class="lesson-retrieval-split"><div><strong>Prerequisite recall</strong><ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
-        (older.length?'<div><strong>Cumulative retrieval</strong><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">These questions deliberately revisit earlier lessons.</p></div>':'')+'</div>';
+      return '<div class="lesson-stage-guidance"><strong>Starter instructions</strong><p>Answer from memory. Do not use notes until you have attempted every question.</p></div>'+
+        '<div class="lesson-retrieval-split"><div><strong>Prerequisite retrieval</strong><ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+        (older.length?'<div><strong>Cumulative retrieval</strong><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">These deliberately revisit earlier learning so knowledge is retained.</p></div>':'')+'</div>';
     }
-    if(stageId==='objectives')return '<ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
-    if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map((x,i)=>{const s=chunkSupport(l,i);return '<article class="lesson-check lesson-chunk-rich" data-lesson-chunk="'+i+'"><div class="lesson-chunk-main"><span class="eyebrow">Chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div><div class="lesson-chunk-detail"><strong>More detail</strong><p>'+s.detail+'</p></div><div class="lesson-chunk-task"><strong>Student task · '+s.taskTitle+'</strong><p>'+s.task+'</p><details><summary>Check the answer</summary><p>'+s.answer+'</p></details></div><div class="lesson-chunk-exam"><strong>Exam connection</strong><p>'+s.exam+'</p></div></article>'}).join('')+'</div>'+
-      (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
-    if(stageId==='simulate')return '<p>'+l.simTask+'</p>'+
+    if(stageId==='objectives')return keywordHTML(l)+
+      '<div class="lesson-objective-block"><span class="eyebrow">By the end of this lesson you should be able to</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+      '<div class="lesson-stage-guidance"><strong>How to use this lesson</strong><p>Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.</p></div>';
+    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Only one chunk is shown at a time. Read all of the key information, complete the activity without revealing the answer, check it, then use <em>Next chunk</em>.</p></div>'+
+      '<div class="lesson-check-list">'+l.teach.map((x,i)=>{const cs=chunkSupport(l,i);return '<article class="lesson-check lesson-chunk-rich" data-lesson-chunk="'+i+'"><div class="lesson-chunk-main"><span class="eyebrow">Teaching chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div><div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div><div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div><div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div></article>'}).join('')+'</div>'+
+      (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">Equations from this lesson</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
+    if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>Apply the knowledge</strong><p>Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.</p></div><p>'+l.simTask+'</p>'+
       (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
       '<div class="lesson-actions-sequence lesson-inline-actions">'+
       (l.sim?'<button class="button primary" id="sequenceActivity">Open '+l.title+' simulation</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||'Open activity')+'</button>')+
       (l.n===1?'<button class="button" id="sequenceAtomPractice">Open atom-builder practice</button>':'')+
       '<button class="button" id="sequenceFullTools">Open full learning tools</button></div>';
-    if(stageId==='practice')return '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>Exam wording:</strong> '+l.exam+'</p>'+taskBankHTML(l.n)+'<div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open exam questions</button></div>';
-    if(stageId==='exit')return '<ol>'+l.exit.map(x=>'<li>'+x+'</li>').join('')+'</ol><div class="lesson-ready"><strong>Ready to move on?</strong> Students should answer all three without the simulation or notes.</div>';
-    return '<p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next lesson:</strong> '+l.next+'</p>'+
+    if(stageId==='practice')return '<div class="lesson-stage-guidance"><strong>Exam practice</strong><p>Use the worked example to model the method, then complete the independent questions without copying it.</p></div>'+
+      '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>High-value exam wording:</strong> '+l.exam+'</p>'+taskBankHTML(l.n)+
+      '<div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open additional exam questions</button></div>';
+    if(stageId==='exit')return shortTestHTML(l);
+    return '<div class="lesson-stage-guidance"><strong>Review the lesson</strong><p>Return to any chunk you could not explain confidently. Then complete the homework or move to the next lesson.</p></div>'+
+      '<p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next lesson:</strong> '+l.next+'</p>'+
       (current<lessons.length-1?'<div class="lesson-next-preview"><span>Up next</span><strong>'+lessons[current+1].title+'</strong><p>'+lessons[current+1].overview+'</p></div>':'<div class="lesson-ready"><strong>Sequence complete.</strong> Use the Mastery Map and mixed quiz for targeted revision.</div>');
   }
 
