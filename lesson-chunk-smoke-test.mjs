@@ -17,8 +17,22 @@ try{
     await page.locator('[data-seq-lesson]').nth(li).evaluate(el=>el.click());
     await page.waitForTimeout(15);
     const lessonNo=li+1;
+    await page.locator('#lessonPanel [data-seq-stage="0"]').evaluate(el=>el.click());
+    await page.waitForTimeout(10);
+    const starterInputs=page.locator('.lesson-active-section [data-starter-input]');
+    if(await starterInputs.count()!==3) throw new Error('Lesson '+lessonNo+' starter answer boxes missing');
+    await starterInputs.first().fill('Saved starter test response');
+    await page.waitForTimeout(5);
+    const storedStarter=await page.evaluate(lessonNo=>{
+      try{return JSON.parse(localStorage.getItem('particleLessonStarterAnswersV1')||'{}')?.[lessonNo]?.[0]||''}catch{return ''}
+    },lessonNo);
+    if(storedStarter!=='Saved starter test response') throw new Error('Lesson '+lessonNo+' starter answer did not save');
+
     await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
     await page.waitForTimeout(15);
+    const coverage=page.locator('.lesson-active-section .aqa-core-knowledge');
+    if(!(await coverage.count())) throw new Error('Lesson '+lessonNo+' AQA core knowledge panel missing');
+    if((await coverage.locator('li').count())<4) throw new Error('Lesson '+lessonNo+' AQA core knowledge is too thin');
 
     const lesson=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.lessons?.find(x=>x.n===Number((document.querySelector('#lessonPanel .lesson-count')?.textContent||'').match(/Lesson\s+(\d+)/i)?.[1]||1)));
     if(!lesson) throw new Error('Lesson '+lessonNo+' data missing');
