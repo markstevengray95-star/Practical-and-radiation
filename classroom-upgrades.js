@@ -223,13 +223,17 @@
 
   function confidence(){
     const panel=$('#lessonPanel'); if(!panel) return;
-    let card=$('#confidenceCard'); if(card) card.remove();
-    card=document.createElement('div');card.id='confidenceCard';card.className='confidence-card';
+    let card=$('#confidenceCard');
+    if(!card){
+      card=document.createElement('div');
+      card.id='confidenceCard';
+      card.className='confidence-card';
+      panel.appendChild(card);
+    }
     const code=panel.querySelector('.eyebrow')?.textContent?.replace('AQA ','')||'3.2';
     let data={};try{data=JSON.parse(localStorage.getItem('particleConfidenceV2')||'{}')}catch{}
     const current=data[code]||'';
     card.innerHTML=`<div class="tool-label">How confident are you with ${code}?</div><div class="confidence-row"><button class="button confidence-btn ${current==='red'?'active':''}" data-conf="red">Need help</button><button class="button confidence-btn ${current==='amber'?'active':''}" data-conf="amber">Nearly there</button><button class="button confidence-btn ${current==='green'?'active':''}" data-conf="green">Confident</button></div><div class="small subtle">Saved only on this device. Use this to decide what to revisit.</div>`;
-    panel.appendChild(card);
     card.querySelectorAll('[data-conf]').forEach(b=>b.onclick=()=>{data[code]=b.dataset.conf;localStorage.setItem('particleConfidenceV2',JSON.stringify(data));card.querySelectorAll('[data-conf]').forEach(x=>x.classList.toggle('active',x===b))});
   }
 
