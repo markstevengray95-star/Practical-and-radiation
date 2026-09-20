@@ -36,6 +36,7 @@ jobs:
           node --check simulation-audio.js
           node --check particle-depth.js
           node --check simulation-smoke-test.mjs
+          node --check all-steps-verification.mjs
           node --check simulation-presentation.js
           node --check learning-tools.js
           node --check learning-hub.js
@@ -74,6 +75,7 @@ jobs:
           test -s particle-depth.js
           test -s particle-depth.css
           test -s simulation-smoke-test.mjs
+          test -s all-steps-verification.mjs
           test -s simulation-presentation.js
           test -s simulation-presentation.css
           test -s learning-tools.js
@@ -131,3 +133,15 @@ jobs:
             sleep 1
           done
           TEST_URL=http://127.0.0.1:4173/ timeout 240s node simulation-smoke-test.mjs
+
+
+      - name: Exhaustive guided-step verification
+        run: |
+          python3 -m http.server 4174 --bind 127.0.0.1 >/tmp/particle-step-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4174/ >/dev/null; then break; fi
+            sleep 1
+          done
+          TEST_URL=http://127.0.0.1:4174/ timeout 240s node all-steps-verification.mjs
