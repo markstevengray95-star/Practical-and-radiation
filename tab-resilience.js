@@ -132,6 +132,7 @@
   }
 
   function ensureCourse() {
+    if(window.PARTICLELAB_LESSON_SEQUENCE) return;
     const list=$('#courseList'), panel=$('#lessonPanel');
     if(!list||!panel) return;
     if(list.children.length && panel.textContent.trim()) return;
