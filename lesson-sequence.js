@@ -19,7 +19,7 @@
         ['4. Nuclide notation','Practise reading ᴬZX and moving between notation and particle numbers.'],
         ['5. Isotopes and isotopic data','Isotopes have the same Z but different neutron number. Read simple isotopic data to identify the isotope and determine proton, neutron and electron counts.']
       ],
-      sim:'atom',simTask:'Use the Atom Builder Practice ladder. Start with H-1 and C-12, then C-14, then build neutral sodium-23. Say p, n and e before pressing Check my atom.',
+      sim:'atom',simTask:'Use the particle palette on the 3D screen: drag p⁺ and n⁰ into the nucleus and e⁻ into the electron region. Build H-1, C-12, then make C-14 by adding two neutrons without changing Z, before building neutral sodium-23. Say p, n and e before pressing Check my atom.',
       equations:['N = A − Z'],worked:'For ²³₁₁Na: p = 11, n = 12 and a neutral atom has 11 electrons.',
       exam:'“Isotopes are atoms of the same element with the same proton number but different neutron numbers.”',
       exit:['State the charge and approximate relative mass of proton, neutron and electron.','How many neutrons are in ³⁷₁₇Cl?','Why does changing neutron number not change the element?'],
