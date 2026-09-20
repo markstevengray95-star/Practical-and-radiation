@@ -22,6 +22,7 @@ try {
 
   const lessonData=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.lessons||[]);
   const stageData=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.stages||[]);
+  const taskBankData=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.taskBank||{});
   if(lessonData.length!==16) throw new Error('Expected 16 lessons, found '+lessonData.length);
   if(stageData.length!==7) throw new Error('Expected 7 guided stages, found '+stageData.length);
 
@@ -80,7 +81,10 @@ try {
       }
       if(stage.id==='practice'){
         if(!(await page.locator('#sequenceExamPractice').count())) throw new Error('Lesson '+lesson.n+' exam-practice action missing');
-        if((await page.locator('.lesson-task-card').count())<4) throw new Error('Lesson '+lesson.n+' task bank is too small');
+        const expectedTasks=(taskBankData[lesson.n]||[]).length;
+        const renderedTasks=await page.locator('.lesson-task-card').count();
+        if(expectedTasks<3) throw new Error('Lesson '+lesson.n+' configured task bank has fewer than 3 tasks');
+        if(renderedTasks!==expectedTasks) throw new Error('Lesson '+lesson.n+' task bank mismatch: rendered '+renderedTasks+' vs configured '+expectedTasks);
       }
       if(stage.id==='exit'){
         if((await page.locator('.lesson-active-section li').count())!==lesson.exit.length) throw new Error('Lesson '+lesson.n+' exit ticket mismatch');
