@@ -613,7 +613,10 @@
     saveAll();
     renderLesson();
     if(scroll){
-      requestAnimationFrame(()=>$('#lessonPanel .lesson-chunk-rich:not([hidden])')?.scrollIntoView({behavior:'smooth',block:'start'}));
+      requestAnimationFrame(()=>{
+        const target=$('#lessonPanel .lesson-chunk-rich[data-lesson-chunk="'+activeChunkFor(l)+'"]');
+        if(target){target.open=true;target.scrollIntoView({behavior:'smooth',block:'start'});}
+      });
     }
   }
 
@@ -625,15 +628,18 @@
         l.teach.map((x,i)=>'<button type="button" role="tab" data-core-chunk="'+i+'" class="'+(i===active?'active':'')+'" aria-selected="'+(i===active?'true':'false')+'"><span>'+(i+1)+'</span><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></button>').join('')+
       '</div></div>':'';
 
-    const cards='<div class="lesson-check-list">'+l.teach.map((x,i)=>{
+    const cards='<div class="lesson-check-list native-chunk-list">'+l.teach.map((x,i)=>{
       const cs=chunkSupport(l,i);
-      const hidden=guided&&i!==active?' hidden':'';
-      return '<article class="lesson-check lesson-chunk-rich '+(guided&&i===active?'active-chunk':'')+'" data-lesson-chunk="'+i+'"'+hidden+'>'+
-        '<div class="lesson-chunk-main"><span class="eyebrow">Teaching chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div>'+
-        '<div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div>'+
-        '<div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div>'+
-        '<div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div>'+
-      '</article>';
+      const open=(!guided||i===active)?' open':'';
+      return '<details class="lesson-check lesson-chunk-rich '+(guided&&i===active?'active-chunk':'')+'" data-lesson-chunk="'+i+'"'+open+'>'+
+        '<summary class="native-chunk-summary"><span class="native-chunk-number">'+(i+1)+'</span><span><small>Teaching chunk '+(i+1)+' of '+l.teach.length+'</small><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></span></summary>'+
+        '<div class="native-chunk-content">'+
+          '<div class="lesson-chunk-main"><span class="eyebrow">Core idea</span><p>'+x[1]+'</p></div>'+
+          '<div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div>'+
+          '<div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details class="chunk-answer"><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div>'+
+          '<div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div>'+
+        '</div>'+
+      '</details>';
     }).join('')+'</div>';
 
     const controls=guided?
@@ -793,9 +799,24 @@
     });
 
 
-    $$('[data-core-chunk]',panel).forEach(b=>b.addEventListener('click',()=>setActiveChunk(l,+b.dataset.coreChunk,true)));
+    $('[data-core-chunk]',panel).forEach(b=>b.addEventListener('click',()=>setActiveChunk(l,+b.dataset.coreChunk,true)));
     $('#coreChunkPrev')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)-1,true));
     $('#coreChunkNext')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)+1,true));
+    $('.native-chunk-list > details[data-lesson-chunk]',panel).forEach(d=>d.addEventListener('toggle',()=>{
+      if(!d.open)return;
+      const i=Number(d.dataset.lessonChunk);
+      if(Number.isInteger(i)&&chunkPosition[l.n]!==i){
+        chunkPosition[l.n]=i;
+        saveAll();
+        $('[data-core-chunk]',panel).forEach(b=>{
+          const active=Number(b.dataset.coreChunk)===i;
+          b.classList.toggle('active',active);
+          b.setAttribute('aria-selected',String(active));
+        });
+        const status=$('.core-chunk-status strong',panel);
+        if(status)status.textContent='Chunk '+(i+1)+' of '+l.teach.length;
+      }
+    }));
 
     $('#sequenceComplete').onclick=()=>{
       if(done){
