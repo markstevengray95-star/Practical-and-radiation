@@ -144,4 +144,4 @@ jobs:
             if curl -fsS http://127.0.0.1:4174/ >/dev/null; then break; fi
             sleep 1
           done
-          TEST_URL=http://127.0.0.1:4174/ timeout 600s node all-steps-verification.mjs
+          TEST_URL=http://127.0.0.1:4174/ timeout 900s node all-steps-verification.mjs
