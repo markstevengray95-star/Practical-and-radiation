@@ -34,3 +34,16 @@
 .mastery-spec-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.mastery-spec-links span{padding:5px 7px;border-radius:999px;border:1px solid rgba(126,216,255,.18);background:#081a2a;color:#bcd7e9;font-size:.66rem}
 .mastery-stretch{margin-top:10px;padding:10px;border-radius:11px;border:1px solid rgba(196,169,255,.3);background:#17162a}.mastery-stretch>summary{display:flex;gap:8px;align-items:center;cursor:pointer}.mastery-stretch>summary strong{color:#e6ddff}.mastery-stretch p{font-size:.78rem;line-height:1.5}
 .mastery-stretch-answer{margin-top:7px;padding:8px;border-radius:8px;background:#0e1830}.mastery-stretch-answer summary{cursor:pointer;font-weight:800;font-size:.72rem;color:#c6d9ff}
+
+
+/* Deeper mastery chunk learning + application */
+.mastery-deeper{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.3)}
+.mastery-deeper p{margin:.45rem 0 0}
+.mastery-apply{margin-top:14px;padding:14px;border-radius:14px;border:1px solid rgba(96,165,250,.3);background:rgba(30,41,59,.42)}
+.mastery-apply>p{margin:.45rem 0 .7rem}
+.mastery-task-check{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(15,23,42,.4);cursor:pointer}
+.mastery-task-check input{margin-top:3px}
+.mastery-apply details{margin-top:10px}
+.mastery-apply summary{cursor:pointer;font-weight:700}
+.mastery-exam-link{margin-top:12px;padding-top:10px;border-top:1px solid rgba(148,163,184,.2)}
+.mastery-exam-link p{margin:.35rem 0 0}
