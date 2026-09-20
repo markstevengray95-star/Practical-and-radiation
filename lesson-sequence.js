@@ -674,6 +674,7 @@
       const i=lessons.findIndex(l=>l.n===n);
       if(i>=0){
         current=i;
+        lessonView='guided';
         const first=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
         activeStage=first<0?0:first;
         saveAll();
