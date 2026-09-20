@@ -419,7 +419,7 @@
     $('#glossarySearch')?.addEventListener('input',e=>{$('#glossaryGrid').innerHTML=glossaryHTML(e.target.value)});
     $('#glossaryClear')?.addEventListener('click',()=>{const i=$('#glossarySearch');if(i)i.value='';const g=$('#glossaryGrid');if(g)g.innerHTML=glossaryHTML('')});
 
-    $('[data-spec]').forEach(x=>x.onchange=()=>{state.spec[x.dataset.spec]=x.checked;save()});
+    $$('[data-spec]').forEach(x=>x.onchange=()=>{state.spec[x.dataset.spec]=x.checked;save()});
 
     $('#printOrganiser')?.addEventListener('click',()=>window.print());
     $('#openSequenceFromKO')?.addEventListener('click',()=>document.querySelector('[data-view="course"]')?.click());
