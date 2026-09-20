@@ -1,0 +1,41 @@
+.chunk-mastery-summary{
+  margin:12px 0 16px;
+  padding:14px;
+  border:1px solid rgba(126,216,255,.24);
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(22,47,70,.72),rgba(8,24,39,.72));
+  display:grid;
+  gap:10px;
+}
+.chunk-mastery-summary>div:first-child{display:flex;justify-content:space-between;gap:12px;align-items:end}
+.chunk-mastery-summary strong{font-size:.98rem}
+.chunk-summary-track,.chunk-card-track{height:7px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+.chunk-summary-fill,.chunk-card-meter{height:100%;width:0;background:linear-gradient(90deg,#67d7ff,#7ef0b2);transition:width .2s ease}
+.chunk-quick-nav{display:flex;gap:7px;flex-wrap:wrap}
+.chunk-quick-nav button{
+  min-width:34px;height:32px;border-radius:10px;border:1px solid rgba(126,216,255,.3);
+  background:rgba(7,22,36,.72);color:#dff7ff;font-weight:800;cursor:pointer
+}
+.chunk-quick-nav button:hover,.chunk-quick-nav button:focus-visible{border-color:#7ed8ff;transform:translateY(-1px)}
+.lesson-chunk-rich{scroll-margin-top:96px;transition:border-color .2s ease,box-shadow .2s ease}
+.lesson-chunk-rich.chunk-secure{border-color:rgba(126,240,178,.55);box-shadow:0 0 0 1px rgba(126,240,178,.1) inset}
+.chunk-mastery-check{
+  margin-top:14px;padding:14px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(3,13,23,.34)
+}
+.chunk-check-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:9px}
+.chunk-check-head>div{display:grid;gap:2px}.chunk-card-count{font-size:.82rem;color:#9fb8cb;white-space:nowrap}
+.chunk-proof-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.chunk-proof-grid>div{padding:11px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)}
+.chunk-proof-grid strong{font-size:.87rem}.chunk-proof-grid p{margin:5px 0 0;color:#c9d7e4;font-size:.88rem;line-height:1.45}
+.chunk-proof-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chunk-proof-actions button{
+  border:1px solid rgba(126,216,255,.28);background:rgba(10,31,49,.85);color:#dceefa;
+  border-radius:999px;padding:8px 11px;font-weight:750;cursor:pointer
+}
+.chunk-proof-actions button.active{background:rgba(42,126,90,.3);border-color:rgba(126,240,178,.65);color:#dfffee}
+.chunk-next{margin-top:10px}
+@media(max-width:760px){
+  .chunk-proof-grid{grid-template-columns:1fr}
+  .chunk-mastery-summary>div:first-child,.chunk-check-head{align-items:flex-start;flex-direction:column}
+}
