@@ -18,7 +18,7 @@
     el.innerHTML=
       '<div class="atom-drag-palette">'+
         '<h4>Drag particles into the atom</h4>'+
-        '<p>p⁺ and n⁰ → nucleus · e⁻ → electron region</p>'+
+        '<p>Drag onto the model. On touch/keyboard, tap or press Enter to add.</p>'+
         '<div class="atom-token-row">'+
           token('proton','p⁺','proton')+
           token('neutron','n⁰','neutron')+
@@ -53,6 +53,13 @@
       });
       t.addEventListener('dragend',endDrag);
       t.addEventListener('pointerdown',pointerStart);
+      t.addEventListener('click',()=>{ if(!dragType) addParticle(t.dataset.particle); });
+      t.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){
+          e.preventDefault();
+          addParticle(t.dataset.particle);
+        }
+      });
     });
 
     $$('.atom-drop-zone',el).forEach(z=>{
