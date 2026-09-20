@@ -99,6 +99,24 @@ try {
     await pause(20);
     const firstActive=await page.locator('#lessonPanel [data-seq-stage="0"]').evaluate(el=>el.classList.contains('active'));
     if(!firstActive) throw new Error('Lesson '+lesson.n+' previous-step navigation failed');
+
+    // Complete all seven guided steps using the real progression button.
+    for(let si=0; si<stageData.length; si++){
+      const activeBefore=await page.locator('#lessonPanel [data-seq-stage="'+si+'"]').evaluate(el=>el.classList.contains('active'));
+      if(!activeBefore) throw new Error('Lesson '+lesson.n+' completion flow was not on step '+si);
+      const doneButton=page.locator('#lessonStepDone');
+      if(!(await doneButton.count())) throw new Error('Lesson '+lesson.n+' step '+si+' completion button missing');
+      await doneButton.click();
+      await pause(30);
+      const finished=await page.locator('#lessonPanel [data-seq-stage="'+si+'"]').evaluate(el=>el.classList.contains('done'));
+      if(!finished) throw new Error('Lesson '+lesson.n+' step '+si+' did not record as done');
+      if(si<stageData.length-1){
+        const advanced=await page.locator('#lessonPanel [data-seq-stage="'+(si+1)+'"]').evaluate(el=>el.classList.contains('active'));
+        if(!advanced) throw new Error('Lesson '+lesson.n+' did not advance from step '+si+' to '+(si+1));
+      }
+    }
+    const completeText=(await page.locator('#sequenceComplete').textContent())||'';
+    if(!/Lesson complete/i.test(completeText)) throw new Error('Lesson '+lesson.n+' did not complete after all seven steps');
   }
 
   console.log('STEPS: every core mastery chunk and gate');
