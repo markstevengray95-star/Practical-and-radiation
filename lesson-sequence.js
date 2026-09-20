@@ -509,6 +509,234 @@
       '</div>';
   }
 
+  const aqaCoreKnowledge={
+    1:{section:'3.2.1.1',title:'Constituents of the atom',points:[
+      'Use a simple atomic model containing protons, neutrons and electrons; almost all atomic mass is concentrated in the nucleus.',
+      'Know proton, neutron and electron charge in relative and SI form: +e, 0, −e with e = 1.602 × 10⁻¹⁹ C.',
+      'Know approximate relative masses and SI masses: proton ≈ 1 u and 1.673 × 10⁻²⁷ kg; neutron ≈ 1 u and 1.675 × 10⁻²⁷ kg; electron ≈ 1/1836 u and 9.109 × 10⁻³¹ kg.',
+      'Use proton number Z and nucleon number A correctly, including neutron number N = A − Z and standard nuclide notation.',
+      'Define isotopes as atoms with the same proton number but different neutron numbers, and interpret simple isotopic data.',
+      'Changing electron number makes an ion; changing proton number changes the element.'
+    ]},
+    2:{section:'3.2.1.1',title:'Specific charge',points:[
+      'Define specific charge as charge per unit mass, Q/m, with unit C kg⁻¹.',
+      'Calculate the specific charge of a proton and an electron from their SI charge and mass.',
+      'For a nucleus, total charge is Q = Ze; for an ion, find net charge from proton number minus electron number.',
+      'Use the mass of the whole particle or ion in Q/m; for nuclei and ordinary ions, nucleon mass dominates because electron mass is very small.',
+      'Keep the sign of the charge: cations have positive specific charge and anions negative specific charge.'
+    ]},
+    3:{section:'3.2.1.2',title:'Stable and unstable nuclei',points:[
+      'The strong nuclear force acts between nucleons and is required to overcome proton–proton electrostatic repulsion inside stable nuclei.',
+      'At ordinary nuclear separations the strong force is attractive and acts over a short range up to roughly 3 fm.',
+      'At extremely small separation, below roughly 0.5 fm, the strong force becomes strongly repulsive.',
+      'Beyond a few femtometres the strong interaction becomes negligible, so it does not bind separate atoms together.',
+      'Use femtometres correctly: 1 fm = 1 × 10⁻¹⁵ m.'
+    ]},
+    4:{section:'3.2.1.2',title:'Alpha and beta decay',points:[
+      'An alpha particle is a helium-4 nucleus, so alpha emission changes A by −4 and Z by −2.',
+      'In beta-minus decay neutron character changes to proton character; A is unchanged and Z increases by 1.',
+      'A beta-minus decay emits an electron and an electron antineutrino; the beta electron is created during the decay.',
+      'Balance nuclear equations using both nucleon number and proton number.',
+      'The neutrino was proposed to account for the apparently missing energy in beta decay measurements.'
+    ]},
+    5:{section:'3.2.1.3',title:'Particles, antiparticles and photons',points:[
+      'Every particle type has a corresponding antiparticle.',
+      'Particle and antiparticle have the same mass and rest energy; charged pairs have opposite charge and additive quantum numbers are reversed.',
+      'Know the named pairs required here: electron/positron, proton/antiproton, neutron/antineutron and neutrino/antineutrino.',
+      'Treat electromagnetic radiation as photons with energy E = hf, where h is the Planck constant.',
+      'Particle rest energies are commonly expressed in MeV; neutral particles can still have distinct antiparticles.'
+    ]},
+    6:{section:'3.2.1.3',title:'Annihilation and pair production',points:[
+      'In annihilation, particle–antiparticle energy is converted into other particles; slow electron–positron annihilation is commonly represented by two photons.',
+      'The combined electron–positron rest energy is 1.022 MeV, so this is the minimum rest-energy requirement for producing the pair.',
+      'Pair production converts photon energy into a particle and its antiparticle; energy above the threshold becomes kinetic/recoil energy.',
+      'A nearby nucleus or body can recoil so total momentum can be conserved.',
+      'Energy and momentum must both be conserved in annihilation and pair-production processes.'
+    ]},
+    7:{section:'3.2.1.4',title:'Particle interactions',points:[
+      'Know the four fundamental interactions: gravitational, electromagnetic, weak and strong.',
+      'Use the exchange-particle model to represent interactions between particles.',
+      'Electromagnetic interactions use virtual photons as exchange particles in this specification.',
+      'Weak interactions studied here include beta-minus, beta-plus, electron capture and electron–proton collisions, using W⁺ or W⁻ exchange.',
+      'Read simple interaction diagrams by identifying incoming particles, the exchanged particle and outgoing particles.',
+      'Knowledge of gluons, Z⁰ and gravitons is not tested in this AQA subsection.'
+    ]},
+    8:{section:'3.2.1.5',title:'Classification of particles',points:[
+      'Hadrons experience the strong interaction; leptons do not.',
+      'Baryons include proton and neutron; antibaryons include antiproton and antineutron. Baryon number is conserved and the proton is the only stable baryon in this classification.',
+      'Mesons include pions and kaons. Pions model the exchange responsible for the strong nuclear force between nucleons; kaons can decay into pions.',
+      'Required leptons are electron, muon, electron neutrino and muon neutrino, plus their antiparticles. Track electron and muon lepton numbers separately.',
+      'A muon can decay into an electron plus neutrino products.',
+      'Strange particles such as kaons are produced through the strong interaction and decay through the weak interaction; total strangeness is conserved in strong production and may change by 0 or ±1 in weak interactions.',
+      'Modern particle physics depends on large scientific collaborations checking and validating evidence.'
+    ]},
+    9:{section:'3.2.1.6',title:'Quarks and antiquarks',points:[
+      'Only up, down and strange quarks and their antiquarks are required here.',
+      'u has charge +2/3e; d and s have charge −1/3e. Each quark has baryon number +1/3; antiquarks have the opposite additive quantum numbers.',
+      'The strange quark has strangeness −1 and the anti-strange quark has strangeness +1.',
+      'Required baryons: proton uud and neutron udd; corresponding antibaryons contain three antiquarks.',
+      'Required mesons are pions and kaons, each formed from one quark and one antiquark.',
+      'Know neutron beta decay and the quark change d → u.'
+    ]},
+    10:{section:'3.2.1.7',title:'Applications of conservation laws',points:[
+      'Apply conservation of electric charge, baryon number, electron lepton number, muon lepton number and strangeness to particle reactions.',
+      'For particles outside the required set, use quantum-number data supplied in the question.',
+      'Strangeness is conserved in strong interactions; in weak interactions it may change by 0 or ±1.',
+      'Know the quark-character changes d → u in beta-minus decay and u → d in beta-plus decay.',
+      'Energy and momentum are also conserved in particle interactions.',
+      'Test one conserved quantity at a time rather than deciding from charge alone.'
+    ]},
+    11:{section:'3.2.2.1',title:'The photoelectric effect',points:[
+      'Photoelectrons are emitted only when incident radiation exceeds a threshold frequency for that surface.',
+      'Explain threshold frequency using the photon model: one electron absorbs one photon of energy hf.',
+      'The work function φ is the minimum energy needed to remove an electron from the surface.',
+      'Use the photoelectric equation hf = φ + KEmax.',
+      'Use stopping potential through KEmax = eVs.',
+      'At fixed frequency above threshold, increasing intensity increases the photon arrival rate and therefore mainly changes emission rate, not photon energy.'
+    ]},
+    12:{section:'3.2.2.2',title:'Collisions of electrons with atoms',points:[
+      'Excitation transfers an atomic electron to a higher allowed bound state; ionisation removes an electron completely.',
+      'Atomic excitation is quantised because only discrete energy differences are allowed.',
+      'Understand how electron collisions cause excitation and ionisation in a fluorescent tube.',
+      'Know the electron volt and convert both ways using 1 eV = 1.602 × 10⁻¹⁹ J.',
+      'If a collision transfers more energy than required, remaining energy can stay as kinetic energy of the particles.'
+    ]},
+    13:{section:'3.2.2.3',title:'Energy levels and photon emission',points:[
+      'Atomic electrons occupy discrete allowed energy levels rather than a continuous range of bound energies.',
+      'A downward transition emits one photon with energy ΔE = hf; an upward transition requires the matching energy input.',
+      'Line spectra are evidence for discrete energy differences because only particular photon frequencies and wavelengths are emitted.',
+      'Energy levels in exam questions may be given in joules or electronvolts, so convert units before using equations when necessary.',
+      'Use ΔE = hf and ΔE = hc/λ to connect energy-level differences to frequency and wavelength.'
+    ]},
+    14:{section:'3.2.2.4',title:'Wave–particle duality',points:[
+      'Electron diffraction is evidence that particles can show wave properties.',
+      'The photoelectric effect is evidence that electromagnetic radiation has a particulate nature.',
+      'Use the de Broglie relation λ = h/p.',
+      'Increasing particle momentum decreases de Broglie wavelength and therefore changes the amount/angle of diffraction for the same structure.',
+      'Details of a particular particle-diffraction method are not required; the evidence and momentum relationship are.',
+      'Scientific models change when new evidence is evaluated, peer reviewed, replicated and validated by the scientific community.'
+    ]},
+    15:{section:'3.2 synoptic review',title:'Particles and radiation consolidation',points:[
+      'Retrieve all content from 3.2.1.1 to 3.2.1.7 and 3.2.2.1 to 3.2.2.4.',
+      'Be fluent with specific charge, photon energy, photoelectric equations, eV/J conversion, energy-level differences and de Broglie wavelength.',
+      'Classify particles before applying quantum numbers and conservation laws.',
+      'Use precise definitions and link experimental observations to the physical model that explains them.'
+    ]},
+    16:{section:'3.8.1.1',title:'Rutherford scattering extension',points:[
+      'Know the qualitative Rutherford alpha-scattering observations.',
+      'Most alpha particles passing through with little deflection implies atoms are mostly empty space.',
+      'Rare large-angle/backward scattering implies positive charge and most atomic mass are concentrated in a very small nucleus.',
+      'Smaller impact parameter produces closer approach, stronger electrostatic repulsion and a larger scattering angle.',
+      'Use Rutherford scattering as an example of experimental evidence replacing or refining a scientific model.'
+    ]}
+  };
+
+  const starterAnswerBank={
+    1:[
+      'Protons and neutrons are in the nucleus; electrons occupy the surrounding region.',
+      'Atomic number is the number of protons in the nucleus.',
+      'A neutral atom has equal numbers of protons and electrons, so its net charge is zero.'
+    ],
+    2:[
+      'Proton charge is +1.602 × 10⁻¹⁹ C and electron charge is −1.602 × 10⁻¹⁹ C.',
+      'The electron has much less mass than the proton.',
+      'Removing an electron makes the atom or ion more positive by one elementary charge.'
+    ],
+    3:[
+      'Like charges repel, so two positive charges experience electrostatic repulsion.',
+      '1 fm = 1 × 10⁻¹⁵ m.',
+      'Nucleons are protons and neutrons.'
+    ],
+    4:[
+      'A is nucleon number (protons + neutrons); Z is proton number.',
+      'An alpha particle is a helium-4 nucleus containing two protons and two neutrons.',
+      'Conservation laws require appropriate totals such as charge, energy and momentum to balance through an isolated decay or interaction.'
+    ],
+    5:[
+      'Frequency is the number of complete oscillations or wave cycles per second, measured in hertz.',
+      'Wavelength is the distance between equivalent points on successive waves.',
+      'c is the speed of light in vacuum, approximately 3.00 × 10⁸ m s⁻¹.'
+    ],
+    6:[
+      'The electron rest energy is about 0.511 MeV.',
+      'Photon energy is E = hf.',
+      'Energy, momentum and the relevant quantum numbers must be conserved.'
+    ],
+    7:[
+      'Examples from earlier study include gravitational and electromagnetic interactions; particle physics also requires weak and strong interactions.',
+      'Momentum can be transferred in a collision or interaction.',
+      'In beta-minus decay neutron character changes to proton character; in beta-plus decay proton character changes to neutron character.'
+    ],
+    8:[
+      'Yes. Protons are hadrons and experience the strong interaction.',
+      'An electron or electron neutrino is an electron-family lepton.',
+      'An antiparticle has the same mass as its partner but opposite relevant additive quantum numbers; charged pairs have opposite charge.'
+    ],
+    9:[
+      'A baryon is a hadron made from three quarks.',
+      'A meson is a hadron made from one quark and one antiquark.',
+      'Strangeness is a quantum number associated with strange quarks; s has S = −1 and anti-s has S = +1.'
+    ],
+    10:[
+      'A quark has baryon number +1/3; an antiquark has −1/3.',
+      'Electron lepton number is +1 for e⁻ and νe, −1 for their antiparticles, and 0 for non-electron-family particles.',
+      'Strangeness is conserved in strong interactions; in weak interactions it may change by 0 or ±1.'
+    ],
+    11:[
+      'Photon energy is E = hf.',
+      'A photon is a quantum of electromagnetic radiation.',
+      'Kinetic energy is energy associated with motion.'
+    ],
+    12:[
+      'An energy level is an allowed discrete energy state for an atomic electron.',
+      'Ionisation means removing an electron completely from an atom.',
+      'The elementary charge magnitude is e = 1.602 × 10⁻¹⁹ C.'
+    ],
+    13:[
+      'Excitation moves a bound electron to a higher allowed energy level without removing it from the atom.',
+      'Photon energy is E = hf.',
+      'When an electron moves to a lower energy level it loses energy, normally by emitting a photon.'
+    ],
+    14:[
+      'The photoelectric effect shows that electromagnetic radiation transfers energy in discrete photon packets.',
+      'Diffraction is a characteristic wave effect.',
+      'For non-relativistic motion momentum is p = mv.'
+    ],
+    15:[
+      'The AQA 3.2 sequence runs from constituents of the atom through conservation laws, then photoelectric effect, electron collisions, energy levels and wave–particle duality.',
+      'Core equations include Q/m, E = hf, hf = φ + KEmax, KEmax = eVs, ΔE = hf, λ = h/p and 1 eV = 1.602 × 10⁻¹⁹ J.',
+      'Examples include: isotope versus ion, intensity versus photon energy, excitation versus ionisation, and charge conservation alone being insufficient for particle reactions.'
+    ],
+    16:[
+      'An alpha particle is a helium-4 nucleus with charge +2e.',
+      'The alpha particle and nucleus are both positively charged, so they repel electrostatically.',
+      'Mostly empty space means the nucleus occupies only a tiny fraction of the atom’s volume.'
+    ]
+  };
+
+  function esc(value){
+    return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function aqaCoverageHTML(l){
+    const item=aqaCoreKnowledge[l.n];
+    if(!item)return '';
+    return '<section class="aqa-core-knowledge"><div class="aqa-core-head"><div><span class="eyebrow">AQA 7408 specification coverage</span><strong>'+item.section+' · '+item.title+'</strong></div><span>'+item.points.length+' must-know points</span></div>'+
+      '<p class="aqa-core-intro">Use this as the knowledge checklist for the lesson. The teaching chunks below explain and apply each point.</p>'+
+      '<ul>'+item.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></section>';
+  }
+
+  function starterHTML(l){
+    const models=starterAnswerBank[l.n]||[];
+    const saved=starterAnswers[l.n]||[];
+    return '<div class="starter-answer-grid">'+l.recall.map((q,i)=>
+      '<article class="starter-question-card"><div class="starter-question-head"><span>'+(i+1)+'</span><strong>'+q+'</strong></div>'+
+      '<textarea rows="3" data-starter-input="'+i+'" placeholder="Type your answer here...">'+esc(saved[i]||'')+'</textarea>'+
+      '<div class="starter-save-state" data-starter-status="'+i+'">'+((saved[i]||'').trim()?'Saved on this device':'Not answered yet')+'</div>'+
+      (models[i]?'<details class="starter-model-answer"><summary>Check model answer after attempting</summary><p>'+models[i]+'</p></details>':'')+
+      '</article>').join('')+'</div>';
+  }
+
   const keywordBank={
     1:[['nucleon','A proton or neutron in the nucleus.'],['proton number, Z','The number of protons; it identifies the element.'],['nucleon number, A','The total number of protons and neutrons.'],['isotope','Atoms of the same element with the same Z but different neutron numbers.'],['ion','An atom or group with unequal numbers of protons and electrons.']],
     2:[['specific charge','Charge per unit mass, Q/m, measured in C kg⁻¹.'],['net charge','The total charge after positive and negative charges are combined.'],['cation','A positively charged ion.'],['anion','A negatively charged ion.'],['charge-to-mass ratio','Another description of specific charge.']],
@@ -547,6 +775,7 @@
   const STAGE_STORE='particleLessonStagesV2';
   const VIEW_STORE='particleLessonViewV2';
   const CHUNK_POS_STORE='particleLessonChunkPositionV3';
+  const STARTER_STORE='particleLessonStarterAnswersV1';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -557,7 +786,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},chunkPosition={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -567,6 +796,7 @@
   }catch{}
   try{lessonView=localStorage.getItem(VIEW_STORE)||'guided'}catch{}
   try{chunkPosition=JSON.parse(localStorage.getItem(CHUNK_POS_STORE)||'{}')||{}}catch{}
+  try{starterAnswers=JSON.parse(localStorage.getItem(STARTER_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
@@ -574,6 +804,7 @@
     localStorage.setItem(CURRENT_STORE,JSON.stringify({lesson:current,stage:activeStage}));
     localStorage.setItem(VIEW_STORE,lessonView);
     localStorage.setItem(CHUNK_POS_STORE,JSON.stringify(chunkPosition));
+    localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));
     updateProgress();
   }
 
@@ -707,14 +938,14 @@
       const older=[];
       if(current>0) older.push(lessons[current-1].exit[0]);
       if(current>1) older.push(lessons[current-2].exit[1]||lessons[current-2].exit[0]);
-      return '<div class="lesson-stage-guidance"><strong>Starter instructions</strong><p>Answer from memory. Do not use notes until you have attempted every question.</p></div>'+
-        '<div class="lesson-retrieval-split"><div><strong>Prerequisite retrieval</strong><ol>'+l.recall.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
-        (older.length?'<div><strong>Cumulative retrieval</strong><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">These deliberately revisit earlier learning so knowledge is retained.</p></div>':'')+'</div>';
+      return '<div class="lesson-stage-guidance"><strong>Starter instructions</strong><p>Answer from memory in the boxes below. Your responses save automatically on this device. Only reveal the model answer after you have made a genuine attempt.</p></div>'+
+        starterHTML(l)+
+        (older.length?'<div class="cumulative-retrieval"><span class="eyebrow">Cumulative retrieval</span><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">Say or jot these from memory before moving on; they deliberately revisit earlier learning.</p></div>':'');
     }
     if(stageId==='objectives')return keywordHTML(l)+
       '<div class="lesson-objective-block"><span class="eyebrow">By the end of this lesson you should be able to</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
       '<div class="lesson-stage-guidance"><strong>How to use this lesson</strong><p>Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.</p></div>';
-    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use <em>Next chunk</em>.</p></div>'+teachingStageHTML(l);
+    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use <em>Next chunk</em>.</p></div>'+aqaCoverageHTML(l)+teachingStageHTML(l);
     if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>Apply the knowledge</strong><p>Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.</p></div><p>'+l.simTask+'</p>'+
       (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
       '<div class="lesson-actions-sequence lesson-inline-actions">'+
@@ -778,6 +1009,15 @@
       const i=stages.findIndex(s=>!doneStagesFor(l.n).has(s.id));
       setStage(i<0?0:i,true);
     };
+
+    $$('[data-starter-input]',panel).forEach(input=>input.addEventListener('input',()=>{
+      const i=Number(input.dataset.starterInput);
+      starterAnswers[l.n]=starterAnswers[l.n]||[];
+      starterAnswers[l.n][i]=input.value;
+      try{localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));}catch{}
+      const status=panel.querySelector('[data-starter-status="'+i+'"]');
+      if(status)status.textContent=input.value.trim()?'Saved on this device':'Not answered yet';
+    }));
 
     const bindActivity=()=>{
       $('#sequenceActivity')?.addEventListener('click',()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz'));
@@ -880,7 +1120,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};chunkPosition={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};starterAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
@@ -898,6 +1138,8 @@
     stages,
     taskBank:lessonTaskBank,
     chunkDetail:lessonChunkDetail,
+    specCoverage:aqaCoreKnowledge,
+    starterModels:starterAnswerBank,
     getChunkSupport:(lessonNumber,chunkIndex)=>{const l=lessons.find(x=>x.n===lessonNumber);return l?chunkSupport(l,chunkIndex):null},
     getActiveChunk:()=>activeChunkFor(lessons[current]),
     openStage:i=>setStage(i,true),
