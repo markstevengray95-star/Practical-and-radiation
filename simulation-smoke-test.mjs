@@ -340,10 +340,14 @@ try {
   if ((await page.locator('#studentMasteryPath .mastery-chunk-tab').count()) < 4) throw new Error('Lesson mastery chunks are incomplete');
   const firstMasteryNext = page.locator('#masteryNext');
   if (!(await firstMasteryNext.isDisabled())) throw new Error('Mastery pathway should gate the next chunk before the current chunk is secure');
-  if (!(await page.locator('[data-secure-chunk="0"]').isDisabled())) throw new Error('Chunk should require a retrieval explanation before it can be secured');
+  if (!(await page.locator('[data-secure-chunk="0"]').isDisabled())) throw new Error('Chunk should require its application task and retrieval before it can be secured');
+  if (!(await page.locator('[data-chunk-task="0"]').count())) throw new Error('Mastery application task is missing');
+  await page.locator('[data-chunk-task="0"]').check();
+  await page.waitForTimeout(40);
+  if (!(await page.locator('[data-secure-chunk="0"]').isDisabled())) throw new Error('Chunk unlocked before retrieval was completed');
   await page.locator('[data-retrieval="0"]').fill('The nucleus contains protons and neutrons and proton number identifies the element.');
   await page.waitForTimeout(40);
-  if (await page.locator('[data-secure-chunk="0"]').isDisabled()) throw new Error('Retrieval explanation did not enable the secure action');
+  if (await page.locator('[data-secure-chunk="0"]').isDisabled()) throw new Error('Application task plus retrieval did not enable the secure action');
   await page.locator('[data-secure-chunk="0"]').click();
   await page.waitForTimeout(70);
   if (await page.locator('#masteryNext').isDisabled()) throw new Error('Mastery pathway did not unlock the next chunk after securing the current chunk');
