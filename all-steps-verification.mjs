@@ -70,6 +70,28 @@ try {
         const taskCount=await page.locator('.lesson-active-section .lesson-chunk-task').count();
         const examCount=await page.locator('.lesson-active-section .lesson-chunk-exam').count();
         if(detailCount!==lesson.teach.length||taskCount!==lesson.teach.length||examCount!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' rich chunk support is incomplete');
+
+        const chunkTabs=page.locator('.lesson-active-section [data-core-chunk]');
+        if(await chunkTabs.count()!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' core chunk selector mismatch');
+        for(let ci=0; ci<lesson.teach.length; ci++){
+          await page.locator('.lesson-active-section [data-core-chunk="'+ci+'"]').click();
+          await pause(25);
+          const activeChunk=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
+          if(activeChunk!==ci) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not become active');
+          const visible=page.locator('.lesson-active-section .lesson-chunk-rich:not([hidden])');
+          if(await visible.count()!==1) throw new Error('Lesson '+lesson.n+' should show exactly one teaching chunk');
+          if(Number(await visible.getAttribute('data-lesson-chunk'))!==ci) throw new Error('Lesson '+lesson.n+' visible teaching chunk mismatch');
+        }
+        if(lesson.teach.length>1){
+          await page.locator('.lesson-active-section [data-core-chunk="0"]').click();
+          await pause(20);
+          await page.locator('#coreChunkNext').click();
+          await pause(25);
+          if((await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.()))!==1) throw new Error('Lesson '+lesson.n+' Next chunk button failed');
+          await page.locator('#coreChunkPrev').click();
+          await pause(25);
+          if((await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.()))!==0) throw new Error('Lesson '+lesson.n+' Previous chunk button failed');
+        }
       }
       if(stage.id==='simulate'){
         const activity=page.locator('#sequenceActivity');
@@ -99,7 +121,11 @@ try {
         if(renderedTasks!==expectedTasks) throw new Error('Lesson '+lesson.n+' task bank mismatch: rendered '+renderedTasks+' vs configured '+expectedTasks);
       }
       if(stage.id==='exit'){
-        if((await page.locator('.lesson-active-section li').count())!==lesson.exit.length) throw new Error('Lesson '+lesson.n+' exit ticket mismatch');
+        const expected=Math.min(5,Math.max(3,(taskBankData[lesson.n]||[]).length));
+        const tests=page.locator('.lesson-active-section .short-test-question');
+        if(await tests.count()!==expected) throw new Error('Lesson '+lesson.n+' short-test question count mismatch');
+        if(await page.locator('.lesson-active-section .short-test-question textarea').count()!==expected) throw new Error('Lesson '+lesson.n+' short-test answer boxes missing');
+        if(await page.locator('.lesson-active-section .short-test-question details').count()!==expected) throw new Error('Lesson '+lesson.n+' short-test mark-point reveals missing');
       }
       if(stage.id==='next'){
         const txt=(await page.locator('.lesson-active-section').textContent())||'';
