@@ -799,16 +799,16 @@
     });
 
 
-    $('[data-core-chunk]',panel).forEach(b=>b.addEventListener('click',()=>setActiveChunk(l,+b.dataset.coreChunk,true)));
+    $$('[data-core-chunk]',panel).forEach(b=>b.addEventListener('click',()=>setActiveChunk(l,+b.dataset.coreChunk,true)));
     $('#coreChunkPrev')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)-1,true));
     $('#coreChunkNext')?.addEventListener('click',()=>setActiveChunk(l,activeChunkFor(l)+1,true));
-    $('.native-chunk-list > details[data-lesson-chunk]',panel).forEach(d=>d.addEventListener('toggle',()=>{
+    $$('.native-chunk-list > details[data-lesson-chunk]',panel).forEach(d=>d.addEventListener('toggle',()=>{
       if(!d.open)return;
       const i=Number(d.dataset.lessonChunk);
       if(Number.isInteger(i)&&chunkPosition[l.n]!==i){
         chunkPosition[l.n]=i;
         saveAll();
-        $('[data-core-chunk]',panel).forEach(b=>{
+        $$('[data-core-chunk]',panel).forEach(b=>{
           const active=Number(b.dataset.coreChunk)===i;
           b.classList.toggle('active',active);
           b.setAttribute('aria-selected',String(active));
