@@ -663,6 +663,7 @@
   window.PARTICLELAB_LESSON_SEQUENCE={
     lessons,
     stages,
+    taskBank:lessonTaskBank,
     openLesson:n=>{
       const i=lessons.findIndex(l=>l.n===n);
       if(i>=0){
