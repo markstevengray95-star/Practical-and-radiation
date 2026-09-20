@@ -149,7 +149,7 @@
       if(prev)prev.disabled=current===0;
       if(next){
         next.disabled=current===cards.length-1;
-        next.dataset.chunkOpen=String(Math.min(cards.length-1,current+1));
+        next.removeAttribute('data-chunk-open');
       }
 
       if(scroll){
