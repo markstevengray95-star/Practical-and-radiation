@@ -384,6 +384,123 @@
     ]
   };
 
+  const lessonChunkDetail={
+    1:[
+      'The nucleus contains almost all of the atomic mass. Electrons occupy the much larger surrounding region; the teaching model is deliberately not drawn to scale.',
+      'Use both relative and SI data confidently: proton charge +e, electron charge −e, neutron charge 0; electron mass is tiny compared with a nucleon.',
+      'Z fixes the element because it counts protons. A counts all nucleons, so neutron number is always A − Z.',
+      'Read nuclide notation systematically: element symbol identifies the species, lower number is Z and upper number is A.',
+      'Isotopes keep the same proton number but change neutron number. Losing or gaining electrons makes ions, not new isotopes.'
+    ],
+    2:[
+      'Specific charge compares electrical charge with total mass, so it is a ratio with units C kg⁻¹ rather than just a charge value.',
+      'For nuclei Q = Ze. For ions, count protons and electrons separately so the sign of the net charge is correct before dividing by mass.',
+      'For nuclei and ordinary ions, almost all mass comes from nucleons. Electron mass usually makes a negligible contribution at this level.',
+      'Electron and proton have equal charge magnitude but enormously different masses, which is why the electron has the much larger magnitude of specific charge.'
+    ],
+    3:[
+      'Without another interaction, positively charged protons would repel and nuclei could not remain bound. The strong nuclear force solves this stability problem at nuclear distances.',
+      'At typical nucleon separations the strong force is attractive and can exceed electrostatic repulsion between protons.',
+      'At extremely small separation the force becomes strongly repulsive, helping prevent nucleons collapsing into the same tiny region.',
+      'The strong nuclear force has a very short range, becoming negligible beyond a few femtometres; this is why it does not bind separate atoms together.'
+    ],
+    4:[
+      'An alpha particle is a helium-4 nucleus containing two protons and two neutrons, so alpha emission changes both A and Z in a predictable way.',
+      'In beta-minus decay neutron character changes to proton character. The emitted beta electron is created in the decay; it was not orbiting inside the nucleus.',
+      'The neutrino hypothesis explained why beta-decay measurements appeared to lose energy and momentum. An electron antineutrino accompanies beta-minus decay.',
+      'Keep the specification boundary clear: beta-plus, electron capture and electron–proton interactions are revisited with weak interactions and W bosons.'
+    ],
+    5:[
+      'A photon is a quantum of electromagnetic radiation. Its energy depends on frequency, not intensity, through E = hf.',
+      'Rest energy is the energy associated with mass. Particle rest energies are commonly quoted in electronvolts or MeV in particle physics.',
+      'A particle and its antiparticle have the same mass and rest energy but opposite additive quantum numbers; charged pairs also have opposite charge.',
+      'Neutral particles can still have distinct antiparticles, so “antiparticle means opposite charge” is not a complete definition.'
+    ],
+    6:[
+      'Annihilation converts the available rest and kinetic energy of a particle–antiparticle pair into other particles, commonly photons for an electron–positron pair.',
+      'Creating an electron and positron requires at least twice the electron rest energy: 2 × 0.511 MeV = 1.022 MeV.',
+      'Pair production is the reverse idea: photon energy becomes particle rest energy and kinetic energy, with another body nearby to help conserve momentum.',
+      'Energy conservation alone is not enough. Total momentum must also balance, which is why recoil or two oppositely directed photons matter.'
+    ],
+    7:[
+      'The four fundamental interactions are gravitational, electromagnetic, weak and strong. Particle physics questions mainly focus on the latter three here.',
+      'Exchange-particle diagrams are models of interactions: identify incoming particles, the exchanged boson and outgoing particles before doing any conservation analysis.',
+      'Electromagnetic interactions are represented using virtual photons in this part of the AQA course.',
+      'Weak interactions use W⁺ or W⁻ exchange in the processes studied, including beta decay, electron capture and electron–proton collisions.'
+    ],
+    8:[
+      'Hadrons experience the strong interaction; leptons do not. This is the first split to make when classifying a particle.',
+      'Baryons are hadrons made from three quarks; antibaryons contain three antiquarks. Proton and neutron are the key examples.',
+      'Mesons are hadrons made from a quark–antiquark pair. Pions and kaons are the main AQA examples.',
+      'Electron and muon families have separate lepton numbers. Track each family independently in particle reactions.',
+      'Strange particles are produced through the strong interaction with total strangeness conserved, but they decay through the weak interaction.',
+      'Pions model the exchange responsible for the strong nuclear force between nucleons; muon decay and collaborative evidence illustrate how particle ideas are tested.'
+    ],
+    9:[
+      'Up quarks carry +2/3e, while down and strange carry −1/3e. Every quark has baryon number +1/3.',
+      'Antiquarks reverse additive quantum numbers such as charge, baryon number and strangeness. The bar notation must be read carefully.',
+      'A baryon contains three quarks. Adding the quark charges for uud gives +e for the proton and udd gives 0 for the neutron.',
+      'A meson contains one quark and one antiquark, so its total baryon number is zero.',
+      'In neutron beta-minus decay one down quark changes into an up quark, changing udd into uud while the weak interaction carries away the other products.'
+    ],
+    10:[
+      'A reliable conservation method is to total one quantity at a time on each side of the reaction rather than trying to judge the whole equation at once.',
+      'Charge and baryon number must balance in every reaction studied. Baryon number is especially useful for spotting impossible reactions.',
+      'Track electron and muon lepton numbers separately; a reaction can conserve total charge yet still violate a lepton-family number.',
+      'Strangeness is conserved in strong interactions. In weak interactions it may change by 0 or ±1 in the processes required here.',
+      'At quark level beta-minus changes d → u, while beta-plus changes u → d. Link the quark change to the W boson and emitted leptons.'
+    ],
+    11:[
+      'The key observations are immediate emission above a threshold frequency and no emission below it, however intense the light is.',
+      'The photon model treats absorption as one photon transferring its energy to one electron, which explains the threshold behaviour.',
+      'The work function φ is the minimum energy needed to remove an electron from the metal surface.',
+      'Frequency changes energy per photon; intensity mainly changes the number of photons arriving each second at fixed frequency.',
+      'Stopping potential measures the maximum photoelectron kinetic energy using eVₛ = KEmax, linking an electrical measurement to the photon model.'
+    ],
+    12:[
+      'Excitation moves a bound electron to a higher allowed energy level while leaving it inside the atom.',
+      'Because atomic energy levels are discrete, excitation requires specific energy transfers rather than any arbitrary amount.',
+      'Ionisation removes an electron completely. The transferred energy must be at least the ionisation energy from the starting state.',
+      'One electronvolt is the energy transferred when one electron moves through a potential difference of one volt: 1 eV = 1.602 × 10⁻¹⁹ J.',
+      'In a fluorescent tube, energetic electrons excite mercury atoms; de-excitation produces ultraviolet photons that the coating converts to visible light.'
+    ],
+    13:[
+      'Atomic electrons can occupy only allowed energy levels. The gaps between levels determine the photon energies that can be absorbed or emitted.',
+      'A downward transition releases a photon with energy equal to the energy-level difference, ΔE = hf.',
+      'An upward transition requires absorption of exactly the right energy or an inelastic collision transferring enough energy.',
+      'Discrete energy differences produce discrete spectral lines. Each line corresponds to a particular transition.',
+      'Convert energy units carefully before using equations: joules are SI, while electronvolts are convenient for atomic-scale energies.'
+    ],
+    14:[
+      'Electron diffraction is direct evidence that particles with mass can show wave behaviour when their wavelength is comparable with a lattice spacing.',
+      'The de Broglie relation λ = h/p links a particle property, momentum, with a wave property, wavelength.',
+      'Increasing momentum decreases de Broglie wavelength. For non-relativistic electrons, greater accelerating voltage generally gives greater momentum.',
+      'A shorter wavelength produces smaller diffraction angles for the same crystal spacing, so the diffraction pattern tightens as momentum increases.',
+      'Wave–particle duality means neither a purely classical particle model nor a purely classical wave model explains every observation.',
+      'Scientific models change when new evidence demands it; replication, peer review and large collaborations are central to modern particle physics.'
+    ],
+    15:[
+      'Retrieval should mix equations, definitions and qualitative explanations so students practise choosing knowledge rather than only recognising it.',
+      'Connect the quantum chain: electron collisions excite atoms, de-excitation emits photons, and discrete ΔE values create line spectra.',
+      'Mixed calculations require choosing the correct equation, converting units and stating a sensible final unit before substituting values.',
+      'Strong exam answers identify the physics principle first, apply it to the context, then use precise AQA terminology and a clear logical chain.'
+    ],
+    16:[
+      'Before Rutherford scattering, a diffuse positive-charge model predicted only small deflections for alpha particles.',
+      'Most alpha particles passed straight through, some were deflected and a tiny fraction underwent very large-angle deflections.',
+      'Those observations imply atoms are mostly empty space with positive charge and most mass concentrated in a tiny nucleus.',
+      'Smaller impact parameter means a closer approach to the positive nucleus, stronger electrostatic repulsion and a larger change in direction.',
+      'Rutherford scattering is a useful example of evidence forcing scientists to replace an established model; it is a 3.8 Nuclear Physics extension here.'
+    ]
+  };
+
+  function chunkSupport(l,i){
+    const tasks=lessonTaskBank[l.n]||[];
+    const task=tasks.length?tasks[i%tasks.length]:['Explain it','Explain this idea using the correct physics terms.',l.teach?.[i]?.[1]||''];
+    const detail=lessonChunkDetail[l.n]?.[i]||l.teach?.[i]?.[1]||'';
+    return {detail,taskTitle:task[0],task:task[1],answer:task[2],exam:l.exam||''};
+  }
+
   function taskBankHTML(n){
     const tasks=lessonTaskBank[n]||[];
     if(!tasks.length)return '';
@@ -508,7 +625,7 @@
         (older.length?'<div><strong>Cumulative retrieval</strong><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">These questions deliberately revisit earlier lessons.</p></div>':'')+'</div>';
     }
     if(stageId==='objectives')return '<ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
-    if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map(x=>'<div class="lesson-check"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('')+'</div>'+
+    if(stageId==='teach')return '<div class="lesson-check-list">'+l.teach.map((x,i)=>{const s=chunkSupport(l,i);return '<article class="lesson-check lesson-chunk-rich" data-lesson-chunk="'+i+'><div class="lesson-chunk-main"><span class="eyebrow">Chunk '+(i+1)+' of '+l.teach.length+'</span><strong>'+x[0]+'</strong><p>'+x[1]+'</p></div><div class="lesson-chunk-detail"><strong>More detail</strong><p>'+s.detail+'</p></div><div class="lesson-chunk-task"><strong>Student task · '+s.taskTitle+'</strong><p>'+s.task+'</p><details><summary>Check the answer</summary><p>'+s.answer+'</p></details></div><div class="lesson-chunk-exam"><strong>Exam connection</strong><p>'+s.exam+'</p></div></article>'}).join('')+'</div>'+
       (l.equations.length?'<div class="lesson-key-equation">'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
     if(stageId==='simulate')return '<p>'+l.simTask+'</p>'+
       (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
@@ -669,6 +786,8 @@
     lessons,
     stages,
     taskBank:lessonTaskBank,
+    chunkDetail:lessonChunkDetail,
+    getChunkSupport:(lessonNumber,chunkIndex)=>{const l=lessons.find(x=>x.n===lessonNumber);return l?chunkSupport(l,chunkIndex):null},
     openStage:i=>setStage(i,true),
     openLesson:n=>{
       const i=lessons.findIndex(l=>l.n===n);
