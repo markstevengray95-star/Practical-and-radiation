@@ -57,7 +57,15 @@ try {
       }
       if(stage.id==='teach'){
         const count=await page.locator('.lesson-active-section .lesson-check').count();
-        if(count!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' teaching chunks mismatch: '+count+' vs '+lesson.teach.length);
+        if(count!==lesson.teach.length){
+          const debug=await page.locator('.lesson-active-section').evaluate(el=>({
+            html:el.innerHTML,
+            chunks:[...el.querySelectorAll('[data-lesson-chunk]')].map(x=>({i:x.dataset.lessonChunk,text:(x.textContent||'').slice(0,260)})),
+            checks:[...el.querySelectorAll('.lesson-check')].map(x=>(x.textContent||'').slice(0,180))
+          }));
+          console.error('TEACH_CHUNK_DEBUG',JSON.stringify(debug,null,2));
+          throw new Error('Lesson '+lesson.n+' teaching chunks mismatch: '+count+' vs '+lesson.teach.length);
+        }
         const detailCount=await page.locator('.lesson-active-section .lesson-chunk-detail').count();
         const taskCount=await page.locator('.lesson-active-section .lesson-chunk-task').count();
         const examCount=await page.locator('.lesson-active-section .lesson-chunk-exam').count();
