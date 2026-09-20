@@ -338,6 +338,26 @@ try {
     console.error('LESSON_SEQUENCE_DEBUG', JSON.stringify(debug,null,2));
     throw new Error('Guided current-step view is missing');
   }
+  // Regression: core teaching chunks must switch without any secondary controller.
+  await page.locator('[data-seq-stage="2"]').click();
+  await page.waitForTimeout(80);
+  const coreChunks = page.locator('[data-core-chunk]');
+  if ((await coreChunks.count()) < 4) throw new Error('Lesson 1 core chunk selector is incomplete');
+  const visibleBefore = await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk');
+  if (visibleBefore !== '0') throw new Error('Lesson 1 did not start on teaching chunk 1');
+  const apiBefore = await page.evaluate(() => window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
+  if (apiBefore !== 0) throw new Error('Core chunk state did not start at 0');
+  await page.locator('#coreChunkNext').click();
+  await page.waitForTimeout(80);
+  const visibleAfter = await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk');
+  const apiAfter = await page.evaluate(() => window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
+  if (visibleAfter !== '1' || apiAfter !== 1) throw new Error('Next chunk did not advance from chunk 1 to chunk 2');
+  await page.locator('#coreChunkPrev').click();
+  await page.waitForTimeout(80);
+  if ((await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk')) !== '0') throw new Error('Previous chunk did not return to chunk 1');
+
+  await page.locator('[data-seq-stage="0"]').click();
+  await page.waitForTimeout(50);
   const beforeStep = (await page.locator('#lessonStepProgress').textContent()) || '';
   await page.locator('#lessonStepDone').click();
   await page.waitForTimeout(80);
