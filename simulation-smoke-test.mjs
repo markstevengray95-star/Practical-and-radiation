@@ -343,18 +343,24 @@ try {
   await page.waitForTimeout(80);
   const coreChunks = page.locator('[data-core-chunk]');
   if ((await coreChunks.count()) < 4) throw new Error('Lesson 1 core chunk selector is incomplete');
-  const visibleBefore = await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk');
-  if (visibleBefore !== '0') throw new Error('Lesson 1 did not start on teaching chunk 1');
+  const openBefore = page.locator('.lesson-active-section .lesson-chunk-rich[open]');
+  if (await openBefore.count() !== 1 || await openBefore.getAttribute('data-lesson-chunk') !== '0') throw new Error('Lesson 1 did not start with chunk 1 open');
   const apiBefore = await page.evaluate(() => window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
   if (apiBefore !== 0) throw new Error('Core chunk state did not start at 0');
   await page.locator('#coreChunkNext').click();
   await page.waitForTimeout(80);
-  const visibleAfter = await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk');
+  const openAfter = page.locator('.lesson-active-section .lesson-chunk-rich[open]');
   const apiAfter = await page.evaluate(() => window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
-  if (visibleAfter !== '1' || apiAfter !== 1) throw new Error('Next chunk did not advance from chunk 1 to chunk 2');
+  if (await openAfter.count() !== 1 || await openAfter.getAttribute('data-lesson-chunk') !== '1' || apiAfter !== 1) throw new Error('Next chunk did not advance from chunk 1 to chunk 2');
   await page.locator('#coreChunkPrev').click();
   await page.waitForTimeout(80);
-  if ((await page.locator('.lesson-chunk-rich:not([hidden])').getAttribute('data-lesson-chunk')) !== '0') throw new Error('Previous chunk did not return to chunk 1');
+  const openReturned = page.locator('.lesson-active-section .lesson-chunk-rich[open]');
+  if (await openReturned.count() !== 1 || await openReturned.getAttribute('data-lesson-chunk') !== '0') throw new Error('Previous chunk did not return to chunk 1');
+
+  // Native fallback: a chunk heading must open even without using the JS navigation buttons.
+  await page.locator('.lesson-active-section .lesson-chunk-rich[data-lesson-chunk="1"] > summary').click();
+  await page.waitForTimeout(30);
+  if (!(await page.locator('.lesson-active-section .lesson-chunk-rich[data-lesson-chunk="1"]').evaluate(el => el.open))) throw new Error('Native chunk accordion did not open when its heading was clicked');
 
   await page.locator('[data-seq-stage="0"]').click();
   await page.waitForTimeout(50);
@@ -385,21 +391,7 @@ try {
   if (!/Rutherford/i.test(lastLessonText)) throw new Error('Lesson 16 is not Rutherford extension');
   if (!(await page.locator('#lessonSequenceProgress').count())) throw new Error('Lesson sequence progress is missing');
 
-  if (!(await page.locator('#studentMasteryPath').count())) throw new Error('Student mastery pathway is missing');
-  if ((await page.locator('#studentMasteryPath .mastery-chunk-tab').count()) < 4) throw new Error('Lesson mastery chunks are incomplete');
-  const firstMasteryNext = page.locator('#masteryNext');
-  if (!(await firstMasteryNext.isDisabled())) throw new Error('Mastery pathway should gate the next chunk before the current chunk is secure');
-  if (!(await page.locator('[data-secure-chunk="0"]').isDisabled())) throw new Error('Chunk should require its application task and retrieval before it can be secured');
-  if (!(await page.locator('[data-chunk-task="0"]').count())) throw new Error('Mastery application task is missing');
-  await page.locator('[data-chunk-task="0"]').check();
-  await page.waitForTimeout(40);
-  if (!(await page.locator('[data-secure-chunk="0"]').isDisabled())) throw new Error('Chunk unlocked before retrieval was completed');
-  await page.locator('[data-retrieval="0"]').fill('The nucleus contains protons and neutrons and proton number identifies the element.');
-  await page.waitForTimeout(40);
-  if (await page.locator('[data-secure-chunk="0"]').isDisabled()) throw new Error('Application task plus retrieval did not enable the secure action');
-  await page.locator('[data-secure-chunk="0"]').click();
-  await page.waitForTimeout(70);
-  if (await page.locator('#masteryNext').isDisabled()) throw new Error('Mastery pathway did not unlock the next chunk after securing the current chunk');
+  if (await page.locator('#studentMasteryPath').count()) throw new Error('Duplicate mastery chunk interface should not be present');
 
   await page.locator('[data-view="lab"]').click();
   await page.locator('#simNav .sim-tab[data-sim="atom"]').click();
