@@ -294,8 +294,21 @@ try {
   if (!/Atomic structure/i.test(firstLessonText)) throw new Error('Lesson 1 is not atomic structure');
 
   await sequenceButtons.first().click();
-  await page.waitForTimeout(80);
-  if (!(await page.locator('.lesson-current-step').count())) throw new Error('Guided current-step view is missing');
+  await page.waitForTimeout(120);
+  if (!(await page.locator('.lesson-current-step').count())) {
+    const debug = await page.evaluate(() => ({
+      courseClass: document.querySelector('#courseList')?.className || '',
+      panelClass: document.querySelector('#lessonPanel')?.className || '',
+      panelText: (document.querySelector('#lessonPanel')?.textContent || '').slice(0,1200),
+      panelHTML: (document.querySelector('#lessonPanel')?.innerHTML || '').slice(0,2500),
+      viewStore: localStorage.getItem('particleLessonViewV2'),
+      currentStore: localStorage.getItem('particleLessonCurrentV2'),
+      lessonButtons: [...document.querySelectorAll('[data-seq-lesson]')].length,
+      activeLesson: document.querySelector('[data-seq-lesson].active')?.getAttribute('data-seq-lesson') || null
+    }));
+    console.error('LESSON_SEQUENCE_DEBUG', JSON.stringify(debug,null,2));
+    throw new Error('Guided current-step view is missing');
+  }
   const beforeStep = (await page.locator('#lessonStepProgress').textContent()) || '';
   await page.locator('#lessonStepDone').click();
   await page.waitForTimeout(80);
