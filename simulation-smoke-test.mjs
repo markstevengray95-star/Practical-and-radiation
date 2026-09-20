@@ -304,6 +304,16 @@ try {
   await page.locator('[data-lesson-view="full"]').click();
   await page.waitForTimeout(50);
   if (!(await page.locator('.lesson-full-plan').count())) throw new Error('Full lesson plan view did not open');
+
+  // Regression: stage tabs must open their exact section even when Full lesson plan was previously selected.
+  await page.locator('[data-seq-stage="4"]').click();
+  await page.waitForTimeout(70);
+  if (!(await page.locator('.lesson-current-step').count())) throw new Error('Stage tab did not return to Guided view from Full lesson plan');
+  const practiceHeading = ((await page.locator('.lesson-active-section h3').textContent()) || '').trim();
+  if (!/Worked example|exam practice/i.test(practiceHeading)) throw new Error('Practice section did not open from Full lesson plan');
+  await page.locator('[data-lesson-view="full"]').click();
+  await page.waitForTimeout(50);
+
   const taskCount = await page.locator('.lesson-task-card').count();
   if (taskCount < 6) throw new Error('Lesson 1 independent task bank is incomplete');
   await page.locator('[data-lesson-view="guided"]').click();
