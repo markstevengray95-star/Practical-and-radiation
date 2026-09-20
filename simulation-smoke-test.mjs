@@ -58,9 +58,9 @@ try {
   await page.locator('#atomE').fill('6');
   await page.locator('#atomE').dispatchEvent('input');
   await page.waitForTimeout(80);
-  const neutronToken = page.locator('.atom-drag-token[data-particle="neutron"]');
-  const nucleusZone = page.locator('.atom-nucleus-zone');
-  await neutronToken.dragTo(nucleusZone);
+  const dragNeutronToken = page.locator('.atom-drag-token[data-particle="neutron"]');
+  const dragNucleusZone = page.locator('.atom-nucleus-zone');
+  await dragNeutronToken.dragTo(dragNucleusZone);
   await page.waitForTimeout(100);
   const draggedState = await page.evaluate(() => window.PARTICLELAB_ATOM_STATE);
   if (!draggedState || draggedState.Z !== 6 || draggedState.neutrons !== 7 || draggedState.A !== 13) {
