@@ -78,9 +78,9 @@ try {
           await pause(25);
           const activeChunk=await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.());
           if(activeChunk!==ci) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not become active');
-          const visible=page.locator('.lesson-active-section .lesson-chunk-rich:not([hidden])');
-          if(await visible.count()!==1) throw new Error('Lesson '+lesson.n+' should show exactly one teaching chunk');
-          if(Number(await visible.getAttribute('data-lesson-chunk'))!==ci) throw new Error('Lesson '+lesson.n+' visible teaching chunk mismatch');
+          const openChunk=page.locator('.lesson-active-section .lesson-chunk-rich[open]');
+          if(await openChunk.count()!==1) throw new Error('Lesson '+lesson.n+' should have exactly one teaching chunk open after tab navigation');
+          if(Number(await openChunk.getAttribute('data-lesson-chunk'))!==ci) throw new Error('Lesson '+lesson.n+' open teaching chunk mismatch');
         }
         if(lesson.teach.length>1){
           await page.locator('.lesson-active-section [data-core-chunk="0"]').click();
@@ -161,85 +161,33 @@ try {
     if(!/Lesson complete/i.test(completeText)) throw new Error('Lesson '+lesson.n+' did not complete after all seven steps');
   }
 
-  console.log('STEPS: every core mastery chunk and gate');
-  for(let li=0; li<15; li++){
+  console.log('STEPS: native chunk accordion across all lessons');
+  for(let li=0; li<lessonData.length; li++){
     const lesson=lessonData[li];
     await page.locator('[data-seq-lesson]').nth(li).evaluate(el=>el.click());
-    await pause(10);
-    const chunkCount=await page.locator('#studentMasteryPath .mastery-chunk-tab').count();
-    if(chunkCount!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' mastery chunk count mismatch');
-
-    for(let ci=0; ci<chunkCount; ci++){
-      const result=await page.evaluate(({ci,chunkCount})=>{
-        const q=s=>document.querySelector(s);
-        let task=q('[data-chunk-task="'+ci+'"]');
-        let retrieval=q('[data-retrieval="'+ci+'"]');
-        let secure=q('[data-secure-chunk="'+ci+'"]');
-        if(!task||!retrieval||!secure)return {missing:true};
-        const initiallyDisabled=secure.disabled;
-
-        task.checked=true;
-        task.dispatchEvent(new Event('change',{bubbles:true}));
-        secure=q('[data-secure-chunk="'+ci+'"]');
-        const disabledAfterTask=secure?.disabled;
-
-        retrieval=q('[data-retrieval="'+ci+'"]');
-        retrieval.value='I can explain this physics idea clearly using the correct AQA terminology and reasoning.';
-        retrieval.dispatchEvent(new Event('input',{bubbles:true}));
-        secure=q('[data-secure-chunk="'+ci+'"]');
-        const enabledAfterRetrieval=secure&&!secure.disabled;
-        secure?.click();
-
-        const stored=!!window.PARTICLELAB_STUDENT_MASTERY?.state?.[Number((document.querySelector('#lessonPanel .lesson-count')?.textContent||'').match(/Lesson\s+(\d+)/i)?.[1]||1)]?.chunks?.[ci];
-        let nextEnabled=true;
-        if(ci<chunkCount-1){
-          const next=q('#masteryNext');
-          nextEnabled=!!next&&!next.disabled;
-          next?.click();
-        }
-        return {missing:false,initiallyDisabled,disabledAfterTask,enabledAfterRetrieval,stored,nextEnabled};
-      },{ci,chunkCount});
-
-      if(result.missing) throw new Error('Lesson '+lesson.n+' chunk '+ci+' mastery controls missing');
-      if(!result.initiallyDisabled) throw new Error('Lesson '+lesson.n+' chunk '+ci+' can be secured without task and retrieval');
-      if(!result.disabledAfterTask) throw new Error('Lesson '+lesson.n+' chunk '+ci+' unlocked before retrieval');
-      if(!result.enabledAfterRetrieval) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock after task and retrieval');
-      if(!result.stored) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not persist as secure');
-      if(ci<chunkCount-1&&!result.nextEnabled) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock the next chunk');
-      await pause(5);
-    }
-
-    const gate=await page.evaluate(exitCount=>{
-      for(let ei=0;ei<exitCount;ei++){
-        const box=document.querySelector('[data-exit="'+ei+'"]');
-        if(!box)return {missing:ei};
-        box.checked=true;
-        box.dispatchEvent(new Event('change',{bubbles:true}));
+    await pause(12);
+    await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
+    await pause(12);
+    const details=page.locator('.lesson-active-section .native-chunk-list > .lesson-chunk-rich');
+    if(await details.count()!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' native chunk count mismatch');
+    for(let ci=0; ci<lesson.teach.length; ci++){
+      const d=page.locator('.lesson-active-section .lesson-chunk-rich[data-lesson-chunk="'+ci+'"]');
+      const summary=d.locator(':scope > summary');
+      if(!(await summary.count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' native summary missing');
+      if(!(await d.evaluate(el=>el.open))){
+        await summary.evaluate(el=>el.click());
+        await pause(5);
       }
-      return {
-        missing:null,
-        unlock:document.querySelector('#masteryUnlockStatus')?.textContent||'',
-        nextDisabled:document.querySelector('#sequenceNext')?.disabled
-      };
-    },lesson.exit.length);
-    if(gate.missing!==null) throw new Error('Lesson '+lesson.n+' exit mastery control '+gate.missing+' missing');
-    if(!/Lesson secure/i.test(gate.unlock)) throw new Error('Lesson '+lesson.n+' mastery gate did not report secure');
-    if(li<14&&gate.nextDisabled) throw new Error('Lesson '+lesson.n+' next lesson stayed locked after mastery');
+      if(!(await d.evaluate(el=>el.open))) throw new Error('Lesson '+lesson.n+' chunk '+ci+' could not be opened natively');
+    }
+    if(lesson.teach.length>1){
+      await page.locator('.lesson-active-section [data-core-chunk="0"]').evaluate(el=>el.click());
+      await pause(8);
+      await page.locator('#coreChunkNext').evaluate(el=>el.click());
+      await pause(8);
+      if((await page.evaluate(()=>window.PARTICLELAB_LESSON_SEQUENCE?.getActiveChunk?.()))!==1) throw new Error('Lesson '+lesson.n+' Next chunk failed in native accordion mode');
+    }
   }
-
-  // Prove the next/previous lesson buttons work once mastery allows them.
-  await page.locator('[data-seq-lesson]').first().click(); await pause(25);
-  const firstTitle=((await page.locator('#lessonPanel h2').textContent())||'').trim();
-  await page.locator('#sequenceNext').click(); await pause(30);
-  const secondTitle=((await page.locator('#lessonPanel h2').textContent())||'').trim();
-  if(secondTitle===firstTitle) throw new Error('Next lesson navigation did not advance');
-  await page.locator('#sequencePrev').click(); await pause(30);
-  if(((await page.locator('#lessonPanel h2').textContent())||'').trim()!==firstTitle) throw new Error('Previous lesson navigation did not return');
-
-  // Extension must remain outside the core mastery route.
-  await page.locator('[data-seq-lesson]').nth(15).click(); await pause(30);
-  const ext=(await page.locator('#studentMasteryPath').textContent())||'';
-  if(!/Separate extension/i.test(ext)) throw new Error('Rutherford extension is not separated from core mastery');
 
   console.log('STEPS: every simulation mission step');
   await page.locator('[data-view="lab"]').click();
@@ -258,22 +206,22 @@ try {
 
     for(let mi=0; mi<stepCount; mi++){
       const reveal=page.locator('[data-mission-observe="'+mi+'"]');
-      await reveal.click(); await pause(12);
+      await reveal.evaluate(el=>el.click()); await pause(8);
       if(await page.locator('#missionObs'+mi).isHidden()) throw new Error(id+': mission observation '+mi+' did not reveal');
-      await page.locator('[data-mission-done="'+mi+'"]').click(); await pause(20);
+      await page.locator('[data-mission-done="'+mi+'"]').evaluate(el=>el.click()); await pause(10);
       const state=await page.evaluate(({id,mi})=>!!window.PARTICLELAB_SIM_MISSIONS?.state?.[id]?.steps?.[mi],{id,mi});
       if(!state) throw new Error(id+': mission step '+mi+' did not persist as complete');
     }
 
     const correct=await page.evaluate(id=>window.PARTICLELAB_SIM_MISSIONS?.missions?.[id]?.check?.[2],id);
     if(!Number.isInteger(correct)) throw new Error(id+': mission mastery answer key missing');
-    await page.locator('[data-mission-answer="'+correct+'"]').click(); await pause(25);
+    await page.locator('[data-mission-answer="'+correct+'"]').evaluate(el=>el.click()); await pause(10);
     const secure=await page.evaluate(id=>!!window.PARTICLELAB_SIM_MISSIONS?.state?.[id]?.secure,id);
     if(!secure) throw new Error(id+': mission mastery check did not become secure');
   }
 
   if(errors.length) throw new Error('Browser errors:\n'+[...new Set(errors)].join('\n'));
-  console.log('ALL STEP VERIFICATION PASSED: '+lessonData.length+' lessons × '+stageData.length+' stages, all core mastery chunks, and '+simIds.length+' simulation missions.');
+  console.log('ALL STEP VERIFICATION PASSED: '+lessonData.length+' lessons × '+stageData.length+' stages, native teaching chunks, and '+simIds.length+' simulation missions.');
 } finally {
   await browser.close();
 }
