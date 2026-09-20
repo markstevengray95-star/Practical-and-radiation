@@ -39,3 +39,34 @@
   .chunk-proof-grid{grid-template-columns:1fr}
   .chunk-mastery-summary>div:first-child,.chunk-check-head{align-items:flex-start;flex-direction:column}
 }
+
+/* v2: true one-chunk-at-a-time lesson controller */
+.lesson-chunk-rich[hidden]{display:none!important}
+.lesson-chunk-rich.active-chunk{display:grid;animation:chunkIn .18s ease-out}
+@keyframes chunkIn{from{opacity:.2;transform:translateY(5px)}to{opacity:1;transform:none}}
+.chunk-summary-head{display:flex;align-items:end;justify-content:space-between;gap:12px}
+.chunk-summary-head>div{display:grid;gap:2px}
+.chunk-selector{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:7px;margin-top:2px}
+.chunk-selector button{
+  display:grid;grid-template-columns:28px 1fr;align-items:center;gap:7px;text-align:left;
+  min-height:48px;padding:7px 8px;border-radius:11px;cursor:pointer;
+  border:1px solid rgba(126,216,255,.18);background:rgba(7,22,36,.78);color:#dff3ff
+}
+.chunk-selector button span{
+  display:grid;place-items:center;width:27px;height:27px;border-radius:9px;
+  background:rgba(103,215,255,.1);font-weight:900;color:#9fe6ff
+}
+.chunk-selector button strong{font-size:.72rem;line-height:1.25}
+.chunk-selector button:hover,.chunk-selector button:focus-visible{border-color:rgba(126,216,255,.55)}
+.chunk-selector button.active{
+  border-color:#67d7ff;background:rgba(40,116,157,.22);box-shadow:0 0 0 1px rgba(103,215,255,.08) inset
+}
+.chunk-selector button.active span{background:rgba(103,215,255,.2);color:#effcff}
+.chunk-switch-actions{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.chunk-switch-actions .button{min-width:132px}
+@media(max-width:700px){
+  .chunk-summary-head{align-items:flex-start;flex-direction:column}
+  .chunk-selector{grid-template-columns:1fr 1fr}
+  .chunk-switch-actions{flex-direction:column}
+  .chunk-switch-actions .button{width:100%}
+}
