@@ -58,6 +58,10 @@ try {
       if(stage.id==='teach'){
         const count=await page.locator('.lesson-active-section .lesson-check').count();
         if(count!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' teaching chunks mismatch: '+count+' vs '+lesson.teach.length);
+        const detailCount=await page.locator('.lesson-active-section .lesson-chunk-detail').count();
+        const taskCount=await page.locator('.lesson-active-section .lesson-chunk-task').count();
+        const examCount=await page.locator('.lesson-active-section .lesson-chunk-exam').count();
+        if(detailCount!==lesson.teach.length||taskCount!==lesson.teach.length||examCount!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' rich chunk support is incomplete');
       }
       if(stage.id==='simulate'){
         const activity=page.locator('#sequenceActivity');
@@ -134,12 +138,20 @@ try {
     for(let ci=0; ci<chunkCount; ci++){
       const textarea=page.locator('[data-retrieval="'+ci+'"]');
       if(!(await textarea.count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' retrieval box missing');
+      const taskBox=page.locator('[data-chunk-task="'+ci+'"]');
+      if(!(await taskBox.count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' application task checkbox missing');
+      if(!(await page.locator('.mastery-apply details').count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' check answer missing');
       const secure=page.locator('[data-secure-chunk="'+ci+'"]');
-      if(!(await secure.isDisabled())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' can be secured without retrieval');
-      await textarea.fill('I can explain this physics idea clearly using the correct AQA terminology and reasoning.');
+      if(!(await secure.isDisabled())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' can be secured without task and retrieval');
+      await taskBox.check();
       await pause(15);
-      if(await secure.isDisabled()) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock after retrieval');
-      await secure.click();
+      if(!(await secure.isDisabled())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' unlocked before retrieval');
+      const textarea2=page.locator('[data-retrieval="'+ci+'"]');
+      await textarea2.fill('I can explain this physics idea clearly using the correct AQA terminology and reasoning.');
+      await pause(15);
+      const secure2=page.locator('[data-secure-chunk="'+ci+'"]');
+      if(await secure2.isDisabled()) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock after task and retrieval');
+      await secure2.click();
       await pause(30);
       if(ci<chunkCount-1){
         const next=page.locator('#masteryNext');
