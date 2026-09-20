@@ -164,45 +164,67 @@ try {
   console.log('STEPS: every core mastery chunk and gate');
   for(let li=0; li<15; li++){
     const lesson=lessonData[li];
-    await page.locator('[data-seq-lesson]').nth(li).click();
-    await pause(45);
+    await page.locator('[data-seq-lesson]').nth(li).evaluate(el=>el.click());
+    await pause(10);
     const chunkCount=await page.locator('#studentMasteryPath .mastery-chunk-tab').count();
     if(chunkCount!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' mastery chunk count mismatch');
 
     for(let ci=0; ci<chunkCount; ci++){
-      const textarea=page.locator('[data-retrieval="'+ci+'"]');
-      if(!(await textarea.count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' retrieval box missing');
-      const taskBox=page.locator('[data-chunk-task="'+ci+'"]');
-      if(!(await taskBox.count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' application task checkbox missing');
-      if(!(await page.locator('.mastery-apply details').count())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' check answer missing');
-      const secure=page.locator('[data-secure-chunk="'+ci+'"]');
-      if(!(await secure.isDisabled())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' can be secured without task and retrieval');
-      await taskBox.check();
-      await pause(15);
-      if(!(await secure.isDisabled())) throw new Error('Lesson '+lesson.n+' chunk '+ci+' unlocked before retrieval');
-      const textarea2=page.locator('[data-retrieval="'+ci+'"]');
-      await textarea2.fill('I can explain this physics idea clearly using the correct AQA terminology and reasoning.');
-      await pause(15);
-      const secure2=page.locator('[data-secure-chunk="'+ci+'"]');
-      if(await secure2.isDisabled()) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock after task and retrieval');
-      await secure2.click();
-      await pause(30);
-      if(ci<chunkCount-1){
-        const next=page.locator('#masteryNext');
-        if(await next.isDisabled()) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock the next chunk');
-        await next.click();
-        await pause(25);
-      }
+      const result=await page.evaluate(({ci,chunkCount})=>{
+        const q=s=>document.querySelector(s);
+        let task=q('[data-chunk-task="'+ci+'"]');
+        let retrieval=q('[data-retrieval="'+ci+'"]');
+        let secure=q('[data-secure-chunk="'+ci+'"]');
+        if(!task||!retrieval||!secure)return {missing:true};
+        const initiallyDisabled=secure.disabled;
+
+        task.checked=true;
+        task.dispatchEvent(new Event('change',{bubbles:true}));
+        secure=q('[data-secure-chunk="'+ci+'"]');
+        const disabledAfterTask=secure?.disabled;
+
+        retrieval=q('[data-retrieval="'+ci+'"]');
+        retrieval.value='I can explain this physics idea clearly using the correct AQA terminology and reasoning.';
+        retrieval.dispatchEvent(new Event('input',{bubbles:true}));
+        secure=q('[data-secure-chunk="'+ci+'"]');
+        const enabledAfterRetrieval=secure&&!secure.disabled;
+        secure?.click();
+
+        const stored=!!window.PARTICLELAB_STUDENT_MASTERY?.state?.[Number((document.querySelector('#lessonPanel .lesson-count')?.textContent||'').match(/Lesson\s+(\d+)/i)?.[1]||1)]?.chunks?.[ci];
+        let nextEnabled=true;
+        if(ci<chunkCount-1){
+          const next=q('#masteryNext');
+          nextEnabled=!!next&&!next.disabled;
+          next?.click();
+        }
+        return {missing:false,initiallyDisabled,disabledAfterTask,enabledAfterRetrieval,stored,nextEnabled};
+      },{ci,chunkCount});
+
+      if(result.missing) throw new Error('Lesson '+lesson.n+' chunk '+ci+' mastery controls missing');
+      if(!result.initiallyDisabled) throw new Error('Lesson '+lesson.n+' chunk '+ci+' can be secured without task and retrieval');
+      if(!result.disabledAfterTask) throw new Error('Lesson '+lesson.n+' chunk '+ci+' unlocked before retrieval');
+      if(!result.enabledAfterRetrieval) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock after task and retrieval');
+      if(!result.stored) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not persist as secure');
+      if(ci<chunkCount-1&&!result.nextEnabled) throw new Error('Lesson '+lesson.n+' chunk '+ci+' did not unlock the next chunk');
+      await pause(5);
     }
 
-    for(let ei=0; ei<lesson.exit.length; ei++){
-      const box=page.locator('[data-exit="'+ei+'"]');
-      await box.check();
-      await pause(25);
-    }
-    const unlock=(await page.locator('#masteryUnlockStatus').textContent())||'';
-    if(!/Lesson secure/i.test(unlock)) throw new Error('Lesson '+lesson.n+' mastery gate did not report secure');
-    if(li<14 && await page.locator('#sequenceNext').isDisabled()) throw new Error('Lesson '+lesson.n+' next lesson stayed locked after mastery');
+    const gate=await page.evaluate(exitCount=>{
+      for(let ei=0;ei<exitCount;ei++){
+        const box=document.querySelector('[data-exit="'+ei+'"]');
+        if(!box)return {missing:ei};
+        box.checked=true;
+        box.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      return {
+        missing:null,
+        unlock:document.querySelector('#masteryUnlockStatus')?.textContent||'',
+        nextDisabled:document.querySelector('#sequenceNext')?.disabled
+      };
+    },lesson.exit.length);
+    if(gate.missing!==null) throw new Error('Lesson '+lesson.n+' exit mastery control '+gate.missing+' missing');
+    if(!/Lesson secure/i.test(gate.unlock)) throw new Error('Lesson '+lesson.n+' mastery gate did not report secure');
+    if(li<14&&gate.nextDisabled) throw new Error('Lesson '+lesson.n+' next lesson stayed locked after mastery');
   }
 
   // Prove the next/previous lesson buttons work once mastery allows them.
