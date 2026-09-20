@@ -490,7 +490,7 @@
           '<span class="lesson-route-status">'+(done?'done':(i===current?'now':''))+'</span></button>';
       }).join('')
     ).join('');
-    $('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{
+    $$('[data-seq-lesson]',list).forEach(b=>b.onclick=()=>{
       current=+b.dataset.seqLesson;
       lessonView='guided';
       const nextUndone=stages.findIndex(s=>!doneStagesFor(lessons[current].n).has(s.id));
@@ -564,7 +564,7 @@
       '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?'✓ Lesson complete':'Complete remaining steps to finish lesson')+'</button></div>'+
       '<div class="lesson-nav-row"><button class="button" id="sequencePrev" '+(current===0?'disabled':'')+'>← Previous lesson</button><button class="button" id="sequenceNext" '+(current===lessons.length-1?'disabled':'')+'>Next lesson →</button></div>';
 
-    $('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage,true));
+    $$('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage,true));
     $$('[data-lesson-view]',panel).forEach(b=>b.onclick=()=>{lessonView=b.dataset.lessonView;saveAll();renderLesson();});
     $('#resumeThisLesson').onclick=()=>{
       const i=stages.findIndex(s=>!doneStagesFor(l.n).has(s.id));
