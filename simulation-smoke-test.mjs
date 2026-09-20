@@ -342,6 +342,8 @@ try {
   await page.waitForTimeout(80);
   const lesson11Title = (await page.locator('#lessonPanel h2').textContent()) || '';
   if (!/Photoelectric/i.test(lesson11Title)) throw new Error('Lesson 11 is not photoelectric effect');
+  await page.locator('[data-seq-stage="3"]').click();
+  await page.waitForTimeout(60);
   await page.locator('#sequenceActivity').click();
   await page.waitForTimeout(120);
   if (!(await page.locator('#view-lab').evaluate(el => el.classList.contains('active-view')))) throw new Error('Lesson activity did not open the simulation lab');
