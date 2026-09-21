@@ -242,6 +242,7 @@ const processTimelines={
 };
 
 function appTranslate(text){return window.PARTICLELAB_LANGUAGE?.translate?.(String(text))||String(text)}
+window.PARTICLELAB_APP_TRANSLATE=appTranslate;
 function makeHotspotLabel(text){
  const cv=document.createElement('canvas');cv.width=512;cv.height=96;
  const x=cv.getContext('2d');x.clearRect(0,0,512,96);x.fillStyle='rgba(5,17,30,.88)';x.strokeStyle='rgba(126,216,255,.75)';x.lineWidth=3;
