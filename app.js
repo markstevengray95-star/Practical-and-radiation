@@ -420,7 +420,7 @@ function clearWorld(){animator=()=>{};hotspotGroup=null;selectedHotspot=null;if(
 function randomBall(r){let v;do{v=new THREE.Vector3((Math.random()*2-1)*r,(Math.random()*2-1)*r,(Math.random()*2-1)*r)}while(v.length()>r);return v}
 function cluster(Z,A,size=.16){const g=new THREE.Group(),R=.42+.16*Math.cbrt(Math.min(A,210));for(let i=0;i<A;i++){const m=sphere(size,i<Z?'#ff7777':'#72a9ff');m.position.copy(randomBall(R));g.add(m)}return g}
 function setCamera(z=8){camera.position.set(0,1.3,z);camera.lookAt(0,0,0);world.rotation.set(0,0,0)}
-function control(label,inner){return `<label class="field"><span>${label}</span>${inner}</label>`}
+function control(label,inner){return `<label class="field"><span>${appTranslate(label)}</span>${inner}</label>`}
 function setReadout(html){
  const box=$('#simReadout');
  const parts=String(html)
