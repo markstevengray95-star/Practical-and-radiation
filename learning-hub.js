@@ -174,6 +174,9 @@
   ];
 
   const termZH=[
+    [/\bmass number\b/gi,'核子数'],[/\bproton number\b/gi,'质子数'],[/\bneutron number\b/gi,'中子数'],
+    [/\bnucleon number\b/gi,'核子数'],[/\blight intensity\b/gi,'光强'],[/\bincident electron energy\b/gi,'入射电子能量'],
+    [/\belectron accelerating voltage\b/gi,'电子加速电压'],[/\bnuclear charge\b/gi,'核电荷'],
     [/\bDiagnostic\s*&\s*lesson hub\b/gi,'诊断与课程中心'],
     [/\bRevision Hub\b/gi,'复习中心'],[/\bPractice Studio\b/gi,'练习工作室'],[/\bExam Skills\b/gi,'考试技巧'],
     [/\bStart Here\b/gi,'从这里开始'],[/\bEvidence Lab\b/gi,'证据实验室'],[/\bGlossary\b/gi,'词汇表'],
