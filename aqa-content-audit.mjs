@@ -114,7 +114,7 @@ try{
 
   x=collectLesson(data,[12]);
   for(const [label,re] of [
-    ['ionisation',/ionisation/i],['excitation',/excitation/i],['fluorescent tube',/fluorescent tube/i],['electron volt',/electronvolt|electron volt|\beV\b/i],['eV-J conversion',/1\.602.*10.*19.*J/i]
+    ['ionisation',/ionisation/i],['excitation',/excitation/i],['fluorescent tube',/fluorescent tube/i],['electron volt',/electronvolt|electron volt|\beV\b/i],['eV-J conversion',/1\.602.*(?:10\s*⁻¹⁹|10\s*\^?\s*-?19).*J/i]
   ]) has(x,re,'3.2.2.2 '+label);
 
   x=collectLesson(data,[13]);
