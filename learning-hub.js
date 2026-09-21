@@ -398,7 +398,20 @@
   function renderLanguageButtons(){$$('[data-lang]').forEach(b=>b.classList.toggle('active',b.dataset.lang===hubState.language));}
 
   function installTranslationObserver(){
-    new MutationObserver(ms=>{if(hubState.language!=='zh')return;for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)translateNewNode(n);}).observe(document.body,{childList:true,subtree:true});
+    new MutationObserver(ms=>{
+      if(hubState.language!=='zh'||translating)return;
+      for(const m of ms){
+        for(const n of m.addedNodes){
+          if(n.nodeType===1){
+            translateNewNode(n);
+          }else if(n.nodeType===3&&n.nodeValue?.trim()){
+            if(['SCRIPT','STYLE','TEXTAREA'].includes(n.parentElement?.tagName))continue;
+            if(!originals.has(n))originals.set(n,n.nodeValue);
+            n.nodeValue=translateString(originals.get(n));
+          }
+        }
+      }
+    }).observe(document.body,{childList:true,subtree:true});
   }
 
   function openSim(id){
