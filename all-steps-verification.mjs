@@ -48,8 +48,14 @@ try {
       if(heading!==stage.label) throw new Error('Lesson '+lesson.n+' stage '+stage.id+' heading mismatch: '+heading);
 
       if(stage.id==='recall'){
-        const count=await page.locator('.lesson-active-section li').count();
-        if(count<lesson.recall.length) throw new Error('Lesson '+lesson.n+' recall stage is incomplete');
+        const cards=page.locator('.lesson-active-section .starter-question-card');
+        const inputs=page.locator('.lesson-active-section [data-starter-input]');
+        if(await cards.count()!==lesson.recall.length) throw new Error('Lesson '+lesson.n+' starter question count mismatch');
+        if(await inputs.count()!==lesson.recall.length) throw new Error('Lesson '+lesson.n+' starter answer boxes missing');
+        await inputs.first().fill('Lesson '+lesson.n+' starter response');
+        await pause(5);
+        const saved=await page.evaluate(n=>JSON.parse(localStorage.getItem('particleLessonStarterAnswersV1')||'{}')?.[n]?.[0]||'',lesson.n);
+        if(saved!=='Lesson '+lesson.n+' starter response') throw new Error('Lesson '+lesson.n+' starter response did not persist');
       }
       if(stage.id==='objectives'){
         const count=await page.locator('.lesson-active-section li').count();
@@ -73,6 +79,8 @@ try {
 
         const chunkTabs=page.locator('.lesson-active-section [data-core-chunk]');
         if(await chunkTabs.count()!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' core chunk selector mismatch');
+        const activityBoxes=page.locator('.lesson-active-section [data-chunk-activity-input]');
+        if(await activityBoxes.count()!==lesson.teach.length) throw new Error('Lesson '+lesson.n+' teaching activities are not all answerable in-app');
         for(let ci=0; ci<lesson.teach.length; ci++){
           await page.locator('.lesson-active-section [data-core-chunk="'+ci+'"]').click();
           await pause(25);
@@ -81,6 +89,12 @@ try {
           const openChunk=page.locator('.lesson-active-section .lesson-chunk-rich[open]');
           if(await openChunk.count()!==1) throw new Error('Lesson '+lesson.n+' should have exactly one teaching chunk open after tab navigation');
           if(Number(await openChunk.getAttribute('data-lesson-chunk'))!==ci) throw new Error('Lesson '+lesson.n+' open teaching chunk mismatch');
+          const answer=page.locator('.lesson-active-section [data-chunk-activity-input="'+ci+'"]');
+          const value='Lesson '+lesson.n+' chunk '+ci+' activity response';
+          await answer.fill(value);
+          await pause(4);
+          const saved=await page.evaluate(({n,ci})=>JSON.parse(localStorage.getItem('particleLessonChunkActivityAnswersV1')||'{}')?.[n]?.[ci]||'',{n:lesson.n,ci});
+          if(saved!==value) throw new Error('Lesson '+lesson.n+' chunk '+ci+' activity response did not persist');
         }
         if(lesson.teach.length>1){
           await page.locator('.lesson-active-section [data-core-chunk="0"]').click();
@@ -94,6 +108,15 @@ try {
         }
       }
       if(stage.id==='simulate'){
+        const notebook=page.locator('.lesson-active-section [data-investigation]');
+        if(await notebook.count()!==3) throw new Error('Lesson '+lesson.n+' investigation notebook must contain prediction, observation and explanation');
+        for(const key of ['prediction','observation','explanation']){
+          const value='Lesson '+lesson.n+' '+key+' note';
+          await page.locator('.lesson-active-section [data-investigation="'+key+'"]').fill(value);
+          await pause(4);
+          const saved=await page.evaluate(({n,key})=>JSON.parse(localStorage.getItem('particleLessonInvestigationV1')||'{}')?.[n]?.[key]||'',{n:lesson.n,key});
+          if(saved!==value) throw new Error('Lesson '+lesson.n+' '+key+' investigation note did not persist');
+        }
         const activity=page.locator('#sequenceActivity');
         if(!(await activity.count())) throw new Error('Lesson '+lesson.n+' simulation/activity action missing');
         await activity.click();
@@ -112,20 +135,37 @@ try {
         await pause(30);
         await page.locator('#lessonPanel [data-seq-stage="'+si+'"]').click();
         await pause(20);
+        const retained=await page.locator('.lesson-active-section [data-investigation="prediction"]').inputValue();
+        if(retained!=='Lesson '+lesson.n+' prediction note') throw new Error('Lesson '+lesson.n+' investigation notes were lost after simulation hand-off');
       }
       if(stage.id==='practice'){
         if(!(await page.locator('#sequenceExamPractice').count())) throw new Error('Lesson '+lesson.n+' exam-practice action missing');
         const expectedTasks=(taskBankData[lesson.n]||[]).length;
         const renderedTasks=await page.locator('.lesson-task-card').count();
+        const practiceInputs=page.locator('.lesson-active-section [data-practice-input]');
         if(expectedTasks<3) throw new Error('Lesson '+lesson.n+' configured task bank has fewer than 3 tasks');
         if(renderedTasks!==expectedTasks) throw new Error('Lesson '+lesson.n+' task bank mismatch: rendered '+renderedTasks+' vs configured '+expectedTasks);
+        if(await practiceInputs.count()!==expectedTasks) throw new Error('Lesson '+lesson.n+' independent-practice answer boxes missing');
+        const firstCard=page.locator('.lesson-task-card').first();
+        if(!(await firstCard.evaluate(el=>el.open))) await firstCard.locator(':scope > summary').click();
+        const value='Lesson '+lesson.n+' independent practice response';
+        await practiceInputs.first().fill(value);
+        await pause(5);
+        const saved=await page.evaluate(n=>JSON.parse(localStorage.getItem('particleLessonPracticeAnswersV1')||'{}')?.[n]?.[0]||'',lesson.n);
+        if(saved!==value) throw new Error('Lesson '+lesson.n+' independent-practice response did not persist');
       }
       if(stage.id==='exit'){
         const expected=Math.min(5,Math.max(3,(taskBankData[lesson.n]||[]).length));
         const tests=page.locator('.lesson-active-section .short-test-question');
+        const testInputs=page.locator('.lesson-active-section [data-short-test-input]');
         if(await tests.count()!==expected) throw new Error('Lesson '+lesson.n+' short-test question count mismatch');
-        if(await page.locator('.lesson-active-section .short-test-question textarea').count()!==expected) throw new Error('Lesson '+lesson.n+' short-test answer boxes missing');
+        if(await testInputs.count()!==expected) throw new Error('Lesson '+lesson.n+' short-test answer boxes missing');
         if(await page.locator('.lesson-active-section .short-test-question details').count()!==expected) throw new Error('Lesson '+lesson.n+' short-test mark-point reveals missing');
+        const value='Lesson '+lesson.n+' short test response';
+        await testInputs.first().fill(value);
+        await pause(5);
+        const saved=await page.evaluate(n=>JSON.parse(localStorage.getItem('particleLessonShortTestAnswersV1')||'{}')?.[n]?.[0]||'',lesson.n);
+        if(saved!==value) throw new Error('Lesson '+lesson.n+' short-test response did not persist');
       }
       if(stage.id==='next'){
         const txt=(await page.locator('.lesson-active-section').textContent())||'';
