@@ -34,6 +34,9 @@ try{
     if(!(await textbook.count())) throw new Error('Lesson '+lessonNo+' guided mini textbook missing');
     const textbookSections=textbook.locator('.textbook-section');
     if(await textbookSections.count()<4) throw new Error('Lesson '+lessonNo+' mini textbook is too short');
+    const confidenceButtons=textbook.locator('[data-textbook-secure]');
+    if(await confidenceButtons.count()!==await textbookSections.count()) throw new Error('Lesson '+lessonNo+' mastery buttons missing');
+
     const textbookInput=textbook.locator('[data-textbook-input]').first();
     await textbookInput.fill('Saved textbook checkpoint response');
     await page.waitForTimeout(5);
@@ -41,6 +44,16 @@ try{
       try{return JSON.parse(localStorage.getItem('particleLessonTextbookAnswersV1')||'{}')?.[lessonNo]?.[0]||''}catch{return ''}
     },lessonNo);
     if(storedTextbook!=='Saved textbook checkpoint response') throw new Error('Lesson '+lessonNo+' textbook checkpoint did not save');
+    if(lessonNo===1){
+      await textbook.locator('[data-textbook-secure="0"]').evaluate(el=>el.click());
+      await page.waitForTimeout(20);
+      const savedMastery=await page.evaluate(()=>{
+        try{return JSON.parse(localStorage.getItem('particleLessonTextbookMasteryV1')||'{}')?.[1]?.[0]||''}catch{return ''}
+      });
+      if(savedMastery!=='secure') throw new Error('Lesson 1 textbook mastery did not persist');
+      const nextOpen=page.locator('.lesson-active-section .textbook-section[data-textbook-section="1"]');
+      if(!(await nextOpen.evaluate(el=>el.open))) throw new Error('Lesson 1 secure action did not open the next textbook section');
+    }
 
     const coverage=page.locator('.lesson-active-section .aqa-core-knowledge');
     if(!(await coverage.count())) throw new Error('Lesson '+lessonNo+' AQA core knowledge panel missing');
