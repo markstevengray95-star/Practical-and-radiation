@@ -41,6 +41,7 @@ jobs:
           node --check particle-depth.js
           node --check simulation-smoke-test.mjs
           node --check all-steps-verification.mjs
+          node --check aqa-content-audit.mjs
           node --check lesson-chunk-smoke-test.mjs
           node --check mandarin-global.js
           node --check mandarin-lessons.js
@@ -85,6 +86,7 @@ jobs:
           test -s particle-depth.css
           test -s simulation-smoke-test.mjs
           test -s all-steps-verification.mjs
+          test -s aqa-content-audit.mjs
           test -s lesson-chunk-smoke-test.mjs
           test -s mandarin-global.js
           test -s mandarin-lessons.js
@@ -137,16 +139,16 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Mandarin simulation UI verification
+      - name: Official AQA content audit
         run: |
-          python3 -m http.server 4176 --bind 127.0.0.1 >/tmp/particle-mandarin-sim-server.log 2>&1 &
+          python3 -m http.server 4171 --bind 127.0.0.1 >/tmp/particle-aqa-audit-server.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then break; fi
+            if curl -fsS http://127.0.0.1:4171/ >/dev/null; then break; fi
             sleep 1
           done
-          TEST_URL=http://127.0.0.1:4176/ timeout 180s node mandarin-simulation-ui-test.mjs
+          TEST_URL=http://127.0.0.1:4171/ timeout 180s node aqa-content-audit.mjs
 
       - name: Focused lesson chunk verification
         run: |
@@ -158,6 +160,17 @@ jobs:
             sleep 1
           done
           TEST_URL=http://127.0.0.1:4172/ timeout 180s node lesson-chunk-smoke-test.mjs
+
+      - name: Mandarin simulation UI verification
+        run: |
+          python3 -m http.server 4176 --bind 127.0.0.1 >/tmp/particle-mandarin-sim-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then break; fi
+            sleep 1
+          done
+          TEST_URL=http://127.0.0.1:4176/ timeout 180s node mandarin-simulation-ui-test.mjs
 
       - name: App-wide Mandarin UI verification
         run: |
