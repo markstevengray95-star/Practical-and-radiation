@@ -28,6 +28,20 @@ try{
     },lessonNo);
     if(storedStarter!=='Saved starter test response') throw new Error('Lesson '+lessonNo+' starter answer did not save');
 
+    await page.locator('#lessonPanel [data-seq-stage="3"]').evaluate(el=>el.click());
+    await page.waitForTimeout(8);
+    const investigation=page.locator('.lesson-active-section .investigation-notebook');
+    if(!(await investigation.count())) throw new Error('Lesson '+lessonNo+' investigation notebook missing');
+    if(await investigation.locator('[data-investigation]').count()!==3) throw new Error('Lesson '+lessonNo+' investigation fields missing');
+    if(lessonNo===1){
+      await investigation.locator('[data-investigation="prediction"]').fill('Prediction persistence test');
+      await page.waitForTimeout(5);
+      const storedInvestigation=await page.evaluate(()=>{
+        try{return JSON.parse(localStorage.getItem('particleLessonInvestigationV1')||'{}')?.[1]?.prediction||''}catch{return ''}
+      });
+      if(storedInvestigation!=='Prediction persistence test') throw new Error('Lesson 1 investigation note did not persist');
+    }
+
     await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
     await page.waitForTimeout(15);
     const textbook=page.locator('.lesson-active-section .lesson-textbook');
