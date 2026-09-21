@@ -252,6 +252,7 @@
   };
 
   Object.assign(window.PARTICLELAB_MANDARIN_GLOBAL,{
+    'Diagnostic & lesson hub':'诊断与课程中心',
     "Nucleus":"原子核",
     "Electron cloud":"电子云",
     "Mass of the ion/nucleus":"离子/原子核质量",
