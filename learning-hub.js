@@ -174,6 +174,11 @@
   ];
 
   const termZH=[
+    [/\bRevision Hub\b/gi,'复习中心'],[/\bPractice Studio\b/gi,'练习工作室'],[/\bExam Skills\b/gi,'考试技巧'],
+    [/\bStart Here\b/gi,'从这里开始'],[/\bEvidence Lab\b/gi,'证据实验室'],[/\bGlossary\b/gi,'词汇表'],
+    [/\bDiagnostic\s*&\s*lessons\b/gi,'诊断与课程'],[/\bLearning tools\b/gi,'学习工具'],[/\bSimulation lab\b/gi,'模拟实验室'],
+    [/\bParticle atlas\b/gi,'粒子图鉴'],[/\bFormula coach\b/gi,'公式辅导'],[/\bPractice quiz\b/gi,'练习测验'],
+    [/\bTopic map\b/gi,'主题地图'],[/\bGuided course\b/gi,'引导课程'],[/\bAQA checklist\b/gi,'AQA 清单'],
     [/\bphotoelectric effect\b/gi,'光电效应'],[/\bwork function\b/gi,'逸出功'],[/\bthreshold frequency\b/gi,'截止频率'],
     [/\bstopping potential\b/gi,'遏止电势'],[/\benergy levels?\b/gi,'能级'],[/\bwave.?particle duality\b/gi,'波粒二象性'],
     [/\bde Broglie wavelength\b/gi,'德布罗意波长'],[/\bstrong nuclear force\b/gi,'强核力'],[/\bstrong interaction\b/gi,'强相互作用'],
