@@ -162,7 +162,7 @@
     [/^(\d+) min$/,m=>m.match(/\d+/)[0]+' 分钟'],
     [/^Lesson (\d+)$/,m=>'第 '+m.match(/\d+/)[0]+' 课'],
     [/^Open (.+) simulation$/,m=>'打开 '+m.replace(/^Open | simulation$/g,'')+' 模拟'],
-    [/^(\d+) \/ (\d+) specification points checked · (\d+) logged errors\.$/,m=>{const x=m.match(/\d+/g);return x[0]+' / '+x[1]+' 个规格点已检查 · '+x[2]+' 个错误已记录。';}]
+    [/^(\d+) \/ (\d+) specification points checked · (\d+) logged errors\.$/,m=>{const x=m.match(/\d+/g);return x[0]+' / '+x[1]+' 个规格点已检查 · '+x[2]+' 个错误已记录。';}],
     [/^Selected isotope: Z = (\d+), A = (\d+), neutrons = (\d+)\.$/,m=>{const x=m.match(/\d+/g);return '已选同位素：Z = '+x[0]+'，A = '+x[1]+'，中子数 = '+x[2]+'。';}],
     [/^Net charge = ([^;]+); specific charge ≈ ([^ ]+) C kg⁻¹\.$/,m=>{const x=m.match(/^Net charge = ([^;]+); specific charge ≈ ([^ ]+)/);return '净电荷 = '+x[1]+'；比荷 ≈ '+x[2]+' C kg⁻¹。';}],
     [/^Nucleon separation = ([\d.]+) fm, so the strong force is currently (repulsive|attractive|negligible)\.$/,m=>{const x=m.match(/^Nucleon separation = ([\d.]+) fm, so the strong force is currently (.+)\.$/);const st={repulsive:'排斥',attractive:'吸引',negligible:'可忽略'}[x[2]]||x[2];return '核子间距 = '+x[1]+' fm，因此当前强核力为'+st+'。';}],
