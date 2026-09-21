@@ -696,3 +696,72 @@
   .aqa-core-head{flex-direction:column}
   .aqa-core-head>span{white-space:normal}
 }
+
+
+/* Guided AQA mini-textbook */
+.lesson-textbook{
+  display:grid;
+  gap:10px;
+  margin:0 0 14px;
+  padding:13px;
+  border-radius:15px;
+  border:1px solid rgba(126,216,255,.2);
+  background:linear-gradient(180deg,rgba(28,74,104,.12),rgba(5,17,28,.36))
+}
+.textbook-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.textbook-title h3{margin:2px 0 0;font-size:1rem;color:#f0fbff}
+.textbook-title>span{
+  white-space:nowrap;padding:5px 8px;border-radius:999px;
+  background:rgba(103,215,255,.08);color:#a8e6ff;font-size:.58rem;font-weight:900
+}
+.textbook-intro{margin:0;color:#b9ccd9;line-height:1.5}
+.textbook-sections{display:grid;gap:8px}
+.textbook-section{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;
+  overflow:hidden;
+  background:rgba(2,12,22,.36)
+}
+.textbook-section[open]{border-color:rgba(103,215,255,.35);background:rgba(4,19,31,.58)}
+.textbook-section>summary{
+  list-style:none;cursor:pointer;display:grid;
+  grid-template-columns:32px 1fr;gap:9px;align-items:center;
+  padding:11px 12px;color:#eaf8ff
+}
+.textbook-section>summary::-webkit-details-marker{display:none}
+.textbook-section>summary>span{
+  display:grid;place-items:center;width:30px;height:30px;border-radius:9px;
+  background:rgba(103,215,255,.11);color:#a8eaff;font-weight:900
+}
+.textbook-section>summary strong{line-height:1.3}
+.textbook-section-body{display:grid;gap:10px;padding:0 12px 12px}
+.textbook-section-body>p{margin:0;color:#d4e4ee;line-height:1.58}
+.textbook-keyfacts{
+  padding:10px 11px;border-radius:11px;
+  border:1px solid rgba(126,240,178,.14);background:rgba(126,240,178,.045)
+}
+.textbook-keyfacts ul{margin:6px 0 0;padding-left:20px;display:grid;gap:5px}
+.textbook-keyfacts li{color:#d8efe4;line-height:1.45}
+.textbook-check{
+  display:grid;gap:7px;padding:10px 11px;border-radius:11px;
+  border:1px solid rgba(255,207,110,.14);background:rgba(255,207,110,.04)
+}
+.textbook-check>strong{color:#fff1ce;line-height:1.4}
+.textbook-check textarea{
+  width:100%;box-sizing:border-box;resize:vertical;min-height:72px;
+  border:1px solid rgba(255,207,110,.2);border-radius:9px;
+  background:rgba(2,12,22,.78);color:#f4fbff;padding:9px 10px;font:inherit;line-height:1.45
+}
+.textbook-check textarea:focus{outline:2px solid rgba(255,207,110,.24);outline-offset:1px}
+.textbook-save-state{font-size:.58rem;color:#9caebc}
+.textbook-model{
+  padding:8px 9px;border-radius:9px;
+  border:1px solid rgba(126,240,178,.12);background:rgba(126,240,178,.04)
+}
+.textbook-model summary{cursor:pointer;font-weight:850;color:#dff7ec}
+.textbook-model p{margin:7px 0 0;color:#cfe7da;line-height:1.48}
+@media(max-width:700px){
+  .textbook-title{flex-direction:column}
+  .textbook-title>span{white-space:normal}
+  .lesson-textbook{padding:10px}
+}
