@@ -859,9 +859,10 @@
   function shortTestHTML(l){
     const zh=isMandarin(),bank=localPractice(l.n);
     const count=Math.min(5,Math.max(3,bank.length));
-    const chosen=bank.slice(0,count);
-    return '<div class="lesson-short-test"><div class="short-test-intro"><strong>'+(zh?'课末小测验':'Short end-of-lesson test')+'</strong><p>'+(zh?'先不看笔记完成。然后打开每题参考答案进行自我检查。':'Complete this without notes first. Then open each mark point and self-check your answer.')+'</p></div>'+
-      chosen.map((q,i)=>'<article class="short-test-question"><span>Q'+(i+1)+'</span><div><strong>'+q[0]+'</strong><p>'+q[1]+'</p><textarea rows="2" placeholder="'+(zh?'检查前先写出你的答案……':'Write your answer before checking...')+'"></textarea><details><summary>'+(zh?'显示评分点':'Reveal mark point')+'</summary><p>'+q[2]+'</p></details></div></article>').join('')+
+    const chosen=bank.slice(0,count),saved=shortTestAnswers[l.n]||[];
+    const answered=chosen.reduce((n,_,i)=>n+((saved[i]||'').trim()?1:0),0);
+    return '<div class="lesson-short-test"><div class="short-test-intro"><div><strong>'+(zh?'课末小测验':'Short end-of-lesson test')+'</strong><p>'+(zh?'先不看笔记完成。答案会自动保存；然后打开每题参考答案进行自我检查。':'Complete this without notes first. Your answers save automatically; then open each mark point and self-check.')+'</p></div><span class="short-test-progress">'+answered+' / '+chosen.length+(zh?' 已作答':' answered')+'</span></div>'+
+      chosen.map((q,i)=>'<article class="short-test-question"><span>Q'+(i+1)+'</span><div><strong>'+q[0]+'</strong><p>'+q[1]+'</p><textarea rows="2" data-short-test-input="'+i+'" placeholder="'+(zh?'检查前先写出你的答案……':'Write your answer before checking...')+'">'+esc(saved[i]||'')+'</textarea><small data-short-test-status="'+i+'">'+((saved[i]||'').trim()?(zh?'已保存':'Saved'):(zh?'尚未作答':'Not answered yet'))+'</small><details><summary>'+(zh?'显示评分点':'Reveal mark point')+'</summary><p>'+q[2]+'</p></details></div></article>').join('')+
       '<div class="lesson-ready"><strong>'+(zh?'掌握检查：':'Mastery check:')+'</strong> '+(zh?'目标是在不看笔记的情况下准确回答所有问题；若缺少关键点，返回相应学习章节。':'Aim to answer every question accurately without notes. Revisit the relevant teaching chunk if a mark point is missing.')+'</div></div>';
   }
 
@@ -873,6 +874,7 @@
   const TEXTBOOK_STORE='particleLessonTextbookAnswersV1';
   const TEXTBOOK_MASTERY_STORE='particleLessonTextbookMasteryV1';
   const INVESTIGATION_STORE='particleLessonInvestigationV1';
+  const SHORT_TEST_STORE='particleLessonShortTestAnswersV1';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -883,7 +885,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},investigationNotes={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},investigationNotes={},shortTestAnswers={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -897,6 +899,7 @@
   try{textbookAnswers=JSON.parse(localStorage.getItem(TEXTBOOK_STORE)||'{}')||{}}catch{}
   try{textbookMastery=JSON.parse(localStorage.getItem(TEXTBOOK_MASTERY_STORE)||'{}')||{}}catch{}
   try{investigationNotes=JSON.parse(localStorage.getItem(INVESTIGATION_STORE)||'{}')||{}}catch{}
+  try{shortTestAnswers=JSON.parse(localStorage.getItem(SHORT_TEST_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
@@ -908,6 +911,7 @@
     localStorage.setItem(TEXTBOOK_STORE,JSON.stringify(textbookAnswers));
     localStorage.setItem(TEXTBOOK_MASTERY_STORE,JSON.stringify(textbookMastery));
     localStorage.setItem(INVESTIGATION_STORE,JSON.stringify(investigationNotes));
+    localStorage.setItem(SHORT_TEST_STORE,JSON.stringify(shortTestAnswers));
     updateProgress();
   }
 
@@ -1184,6 +1188,21 @@
       }
     }));
 
+    $$('[data-short-test-input]',panel).forEach(input=>input.addEventListener('input',()=>{
+      const i=Number(input.dataset.shortTestInput);
+      shortTestAnswers[l.n]=shortTestAnswers[l.n]||[];
+      shortTestAnswers[l.n][i]=input.value;
+      try{localStorage.setItem(SHORT_TEST_STORE,JSON.stringify(shortTestAnswers));}catch{}
+      const status=panel.querySelector('[data-short-test-status="'+i+'"]');
+      if(status)status.textContent=input.value.trim()?bi('Saved','已保存'):bi('Not answered yet','尚未作答');
+      const progress=panel.querySelector('.short-test-progress');
+      if(progress){
+        const inputs=$$('[data-short-test-input]',panel);
+        const answered=inputs.reduce((n,x)=>n+(x.value.trim()?1:0),0);
+        progress.textContent=answered+' / '+inputs.length+' '+bi('answered','已作答');
+      }
+    }));
+
     const bindActivity=()=>{
       $('#sequenceActivity')?.addEventListener('click',()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz'));
       $('#sequenceAtomPractice')?.addEventListener('click',()=>{openView('lab','atom');setTimeout(()=>window.PARTICLELAB_ATOM_PRACTICE?.open?.(0),120)});
@@ -1289,7 +1308,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};investigationNotes={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};investigationNotes={};shortTestAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
