@@ -872,6 +872,7 @@
   const STARTER_STORE='particleLessonStarterAnswersV1';
   const TEXTBOOK_STORE='particleLessonTextbookAnswersV1';
   const TEXTBOOK_MASTERY_STORE='particleLessonTextbookMasteryV1';
+  const INVESTIGATION_STORE='particleLessonInvestigationV1';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -882,7 +883,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},investigationNotes={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -895,6 +896,7 @@
   try{starterAnswers=JSON.parse(localStorage.getItem(STARTER_STORE)||'{}')||{}}catch{}
   try{textbookAnswers=JSON.parse(localStorage.getItem(TEXTBOOK_STORE)||'{}')||{}}catch{}
   try{textbookMastery=JSON.parse(localStorage.getItem(TEXTBOOK_MASTERY_STORE)||'{}')||{}}catch{}
+  try{investigationNotes=JSON.parse(localStorage.getItem(INVESTIGATION_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
@@ -905,6 +907,7 @@
     localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));
     localStorage.setItem(TEXTBOOK_STORE,JSON.stringify(textbookAnswers));
     localStorage.setItem(TEXTBOOK_MASTERY_STORE,JSON.stringify(textbookMastery));
+    localStorage.setItem(INVESTIGATION_STORE,JSON.stringify(investigationNotes));
     updateProgress();
   }
 
@@ -1033,6 +1036,21 @@
     });
   }
 
+  function investigationNotebookHTML(l){
+    const zh=isMandarin(),saved=investigationNotes[l.n]||{};
+    const fields=[
+      ['prediction',zh?'预测':'Prediction',zh?'在运行模拟前，你认为会发生什么？说明理由。':'Before running the simulation, what do you predict will happen? Explain why.'],
+      ['observation',zh?'观察':'Observation',zh?'改变一个变量后，你实际观察到了什么？':'After changing one variable, what did you actually observe?'],
+      ['explanation',zh?'物理解释':'Physics explanation',zh?'用本课的 AQA 物理知识解释你的观察结果。':'Explain your observation using the AQA physics from this lesson.']
+    ];
+    const done=fields.reduce((n,[k])=>n+((saved[k]||'').trim()?1:0),0);
+    return '<section class="investigation-notebook"><div class="investigation-head"><div><span class="eyebrow">'+(zh?'模拟探究记录':'Simulation investigation notebook')+'</span><strong>'+(zh?'预测 → 观察 → 解释':'Predict → observe → explain')+'</strong></div><span>'+done+' / 3 '+(zh?'已完成':'complete')+'</span></div>'+
+      '<p>'+(zh?'像物理学家一样使用模拟：先预测，只改变一个变量，记录观察结果，再用规范物理语言解释。':'Use the model like a physicist: predict first, change one variable, record what you observe, then explain it using precise physics.')+'</p>'+
+      '<div class="investigation-grid">'+fields.map(([key,label,prompt])=>
+        '<label class="investigation-field"><span><strong>'+label+'</strong><small>'+prompt+'</small></span><textarea rows="3" data-investigation="'+key+'" placeholder="'+prompt+'">'+esc(saved[key]||'')+'</textarea><em data-investigation-status="'+key+'">'+((saved[key]||'').trim()?(zh?'已保存':'Saved'):(zh?'尚未填写':'Not completed'))+'</em></label>'
+      ).join('')+'</div></section>';
+  }
+
   function stageBody(l,stageId){
     const zh=isMandarin();
     if(stageId==='recall'){
@@ -1047,7 +1065,7 @@
       '<div class="lesson-objective-block"><span class="eyebrow">'+bi('By the end of this lesson you should be able to','本课结束时你应该能够')+'</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
       '<div class="lesson-stage-guidance"><strong>'+bi('How to use this lesson','如何使用本课')+'</strong><p>'+bi('Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.','按顺序完成各学习段。每一段先给出知识讲解，再完成活动并核对答案，然后进入下一段。')+'</p></div>';
     if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>'+bi('Learn → apply → check → continue','学习 → 应用 → 检查 → 继续')+'</strong><p>'+bi('Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use Next chunk.','按顺序学习。先阅读关键信息，完成活动后再查看答案，然后进入下一学习段。')+'</p></div>'+textbookHTML(l)+aqaCoverageHTML(l)+teachingStageHTML(l);
-    if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>'+bi('Apply the knowledge','应用知识')+'</strong><p>'+bi('Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.','先做预测，再使用模型或活动，最后用本课学习的物理知识解释观察结果。')+'</p></div><p>'+l.simTask+'</p>'+
+    if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>'+bi('Apply the knowledge','应用知识')+'</strong><p>'+bi('Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.','先做预测，再使用模型或活动，最后用本课学习的物理知识解释观察结果。')+'</p></div>'+investigationNotebookHTML(l)+'<p>'+l.simTask+'</p>'+
       (l.n===1?'<div class="lesson-ready"><strong>'+bi('Atom-builder goal:','原子构建目标：')+'</strong> '+bi('Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.','按顺序完成前四个原子构建练习：Z → A → 中子 → 电子，然后再完成钠-23。')+'</div>':'')+
       '<div class="lesson-actions-sequence lesson-inline-actions">'+
       (l.sim?'<button class="button primary" id="sequenceActivity">'+bi('Open simulation','打开模拟')+'</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||bi('Open activity','打开活动'))+'</button>')+
@@ -1149,6 +1167,21 @@
         const next=panel.querySelector('.textbook-section[data-textbook-section="'+Math.min(i+1,(chapter?.sections?.length||1)-1)+'"]');
         if(next){next.open=true;next.scrollIntoView({behavior:'smooth',block:'center'});}
       });
+    }));
+
+    $$('[data-investigation]',panel).forEach(input=>input.addEventListener('input',()=>{
+      const key=input.dataset.investigation;
+      investigationNotes[l.n]=investigationNotes[l.n]||{};
+      investigationNotes[l.n][key]=input.value;
+      try{localStorage.setItem(INVESTIGATION_STORE,JSON.stringify(investigationNotes));}catch{}
+      const status=panel.querySelector('[data-investigation-status="'+key+'"]');
+      if(status)status.textContent=input.value.trim()?bi('Saved','已保存'):bi('Not completed','尚未填写');
+      const badge=panel.querySelector('.investigation-head>span');
+      if(badge){
+        const fields=['prediction','observation','explanation'];
+        const done=fields.reduce((n,k)=>n+((investigationNotes[l.n]?.[k]||'').trim()?1:0),0);
+        badge.textContent=done+' / 3 '+bi('complete','已完成');
+      }
     }));
 
     const bindActivity=()=>{
@@ -1256,7 +1289,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};investigationNotes={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
