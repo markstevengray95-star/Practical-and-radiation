@@ -503,6 +503,7 @@
   function lessonUI(text){
     return isMandarin()?(window.PARTICLELAB_MANDARIN_LESSONS?.ui?.[text]||text):text;
   }
+  function bi(en,zh){return isMandarin()?zh:en;}
   function phaseLabel(text){
     if(!isMandarin())return text;
     return ({'Foundations':'基础','Particle physics':'粒子物理','Quantum phenomena':'量子现象','Consolidation':'综合复习','A-level extension':'A-level 扩展'})[text]||text;
@@ -1025,31 +1026,32 @@
   }
 
   function stageBody(l,stageId){
+    const zh=isMandarin();
     if(stageId==='recall'){
       const older=[];
       if(current>0){const p=localLesson(lessons[current-1]);older.push(p.exit[0]);}
       if(current>1){const p=localLesson(lessons[current-2]);older.push(p.exit[1]||p.exit[0]);}
-      return '<div class="lesson-stage-guidance"><strong>Starter instructions</strong><p>Answer from memory in the boxes below. Your responses save automatically on this device. Only reveal the model answer after you have made a genuine attempt.</p></div>'+
+      return '<div class="lesson-stage-guidance"><strong>'+bi('Starter instructions','启动任务说明')+'</strong><p>'+bi('Answer from memory in the boxes below. Your responses save automatically on this device. Only reveal the model answer after you have made a genuine attempt.','请在下方输入框中凭记忆作答。答案会自动保存在此设备上。认真尝试后再查看参考答案。')+'</p></div>'+
         starterHTML(l)+
-        (older.length?'<div class="cumulative-retrieval"><span class="eyebrow">Cumulative retrieval</span><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">Say or jot these from memory before moving on; they deliberately revisit earlier learning.</p></div>':'');
+        (older.length?'<div class="cumulative-retrieval"><span class="eyebrow">'+bi('Cumulative retrieval','累积检索')+'</span><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">'+bi('These deliberately revisit earlier learning so knowledge is retained.','这些问题会有意回顾较早内容，帮助长期记忆。')+'</p></div>':'');
     }
     if(stageId==='objectives')return keywordHTML(l)+
-      '<div class="lesson-objective-block"><span class="eyebrow">By the end of this lesson you should be able to</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
-      '<div class="lesson-stage-guidance"><strong>How to use this lesson</strong><p>Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.</p></div>';
-    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>Learn → apply → check → continue</strong><p>Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use <em>Next chunk</em>.</p></div>'+textbookHTML(l)+aqaCoverageHTML(l)+teachingStageHTML(l);
-    if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>Apply the knowledge</strong><p>Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.</p></div><p>'+l.simTask+'</p>'+
-      (l.n===1?'<div class="lesson-ready"><strong>Atom-builder goal:</strong> Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.</div>':'')+
+      '<div class="lesson-objective-block"><span class="eyebrow">'+bi('By the end of this lesson you should be able to','本课结束时你应该能够')+'</span><ul>'+l.objectives.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+      '<div class="lesson-stage-guidance"><strong>'+bi('How to use this lesson','如何使用本课')+'</strong><p>'+bi('Work through the teaching chunks in order. Each chunk gives you the information first, then an activity and answer check before you move on.','按顺序完成各学习段。每一段先给出知识讲解，再完成活动并核对答案，然后进入下一段。')+'</p></div>';
+    if(stageId==='teach')return '<div class="lesson-learning-cycle-intro"><strong>'+bi('Learn → apply → check → continue','学习 → 应用 → 检查 → 继续')+'</strong><p>'+bi('Work through the chunks in order. Read the key information, complete the activity before revealing the answer, then use Next chunk.','按顺序学习。先阅读关键信息，完成活动后再查看答案，然后进入下一学习段。')+'</p></div>'+textbookHTML(l)+aqaCoverageHTML(l)+teachingStageHTML(l);
+    if(stageId==='simulate')return '<div class="lesson-stage-guidance"><strong>'+bi('Apply the knowledge','应用知识')+'</strong><p>'+bi('Predict first, use the model or activity second, then explain what happened using the physics from the teaching chunks.','先做预测，再使用模型或活动，最后用本课学习的物理知识解释观察结果。')+'</p></div><p>'+l.simTask+'</p>'+
+      (l.n===1?'<div class="lesson-ready"><strong>'+bi('Atom-builder goal:','原子构建目标：')+'</strong> '+bi('Complete the first four Atom Builder Practice targets in order. They teach Z → A → neutrons → electrons before the sodium-23 question.','按顺序完成前四个原子构建练习：Z → A → 中子 → 电子，然后再完成钠-23。')+'</div>':'')+
       '<div class="lesson-actions-sequence lesson-inline-actions">'+
-      (l.sim?'<button class="button primary" id="sequenceActivity">Open '+l.title+' simulation</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||'Open activity')+'</button>')+
-      (l.n===1?'<button class="button" id="sequenceAtomPractice">Open atom-builder practice</button>':'')+
-      '<button class="button" id="sequenceFullTools">Open full learning tools</button></div>';
-    if(stageId==='practice')return '<div class="lesson-stage-guidance"><strong>Exam practice</strong><p>Use the worked example to model the method, then complete the independent questions without copying it.</p></div>'+
-      '<p><strong>Worked example:</strong> '+l.worked+'</p><p><strong>High-value exam wording:</strong> '+l.exam+'</p>'+taskBankHTML(l.n)+
-      '<div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">Open additional exam questions</button></div>';
+      (l.sim?'<button class="button primary" id="sequenceActivity">'+bi('Open simulation','打开模拟')+'</button>':'<button class="button primary" id="sequenceActivity">'+(l.viewLabel||bi('Open activity','打开活动'))+'</button>')+
+      (l.n===1?'<button class="button" id="sequenceAtomPractice">'+bi('Open atom-builder practice','打开原子构建练习')+'</button>':'')+
+      '<button class="button" id="sequenceFullTools">'+bi('Open full learning tools','打开完整学习工具')+'</button></div>';
+    if(stageId==='practice')return '<div class="lesson-stage-guidance"><strong>'+bi('Exam practice','考试练习')+'</strong><p>'+bi('Use the worked example to model the method, then complete the independent questions without copying it.','先学习示例方法，再独立完成练习，不要直接照抄示例。')+'</p></div>'+
+      '<p><strong>'+bi('Worked example:','示例：')+'</strong> '+l.worked+'</p><p><strong>'+bi('High-value exam wording:','高分考试表述：')+'</strong> '+l.exam+'</p>'+taskBankHTML(l.n)+
+      '<div class="lesson-actions-sequence lesson-inline-actions"><button class="button primary" id="sequenceExamPractice">'+bi('Open additional exam questions','打开更多考试题')+'</button></div>';
     if(stageId==='exit')return shortTestHTML(l);
-    return '<div class="lesson-stage-guidance"><strong>Review the lesson</strong><p>Return to any chunk you could not explain confidently. Then complete the homework or move to the next lesson.</p></div>'+
-      '<p><strong>Homework:</strong> '+l.homework+'</p><p><strong>Next lesson:</strong> '+l.next+'</p>'+
-      (current<lessons.length-1?'<div class="lesson-next-preview"><span>Up next</span><strong>'+lessons[current+1].title+'</strong><p>'+lessons[current+1].overview+'</p></div>':'<div class="lesson-ready"><strong>Sequence complete.</strong> Use the Mastery Map and mixed quiz for targeted revision.</div>');
+    return '<div class="lesson-stage-guidance"><strong>'+bi('Review the lesson','复习本课')+'</strong><p>'+bi('Return to any chunk you could not explain confidently. Then complete the homework or move to the next lesson.','返回任何你还不能自信解释的学习段，然后完成作业或进入下一课。')+'</p></div>'+
+      '<p><strong>'+bi('Homework:','作业：')+'</strong> '+l.homework+'</p><p><strong>'+bi('Next lesson:','下一课：')+'</strong> '+l.next+'</p>'+
+      (current<lessons.length-1?'<div class="lesson-next-preview"><span>'+bi('Up next','接下来')+'</span><strong>'+localLesson(lessons[current+1]).title+'</strong><p>'+localLesson(lessons[current+1]).overview+'</p></div>':'<div class="lesson-ready"><strong>'+bi('Sequence complete.','课程序列完成。')+'</strong> '+bi('Use the Mastery Map and mixed quiz for targeted revision.','使用掌握度地图和混合测验进行针对性复习。')+'</div>');
   }
 
   function sectionClass(id){
@@ -1059,14 +1061,13 @@
   function renderGuidedContent(l){
     const step=stages[activeStage],done=doneStagesFor(l.n),isDone=done.has(step.id),stepLabel=lessonUI(step.label),stepTime=lessonTime(step.time);
     return '<div class="lesson-current-step">'+
-      '<div class="lesson-now-banner"><div><span class="eyebrow">Do this now · Step '+(activeStage+1)+' of '+stages.length+'</span><h3>'+stepLabel+'</h3><p>'+stepTime+'</p></div>'+
-      '<div class="lesson-step-progress"><span id="lessonStepProgress">'+done.size+' / '+stages.length+' steps</span><div class="lesson-route-track compact"><div id="lessonStepFill" class="lesson-route-fill" style="width:'+(done.size/stages.length*100)+'%"></div></div></div></div>'+
+      '<div class="lesson-now-banner"><div><span class="eyebrow">'+bi('Do this now','现在完成')+' · '+bi('Step','步骤')+' '+(activeStage+1)+' / '+stages.length+'</span><h3>'+stepLabel+'</h3><p>'+stepTime+'</p></div>'+
+      '<div class="lesson-step-progress"><span id="lessonStepProgress">'+done.size+' / '+stages.length+' '+bi('steps','步')+'</span><div class="lesson-route-track compact"><div id="lessonStepFill" class="lesson-route-fill" style="width:'+(done.size/stages.length*100)+'%"></div></div></div></div>'+
       '<section class="lesson-section '+sectionClass(step.id)+' lesson-active-section"><span class="lesson-mini-time">'+stepTime+'</span><h3>'+stepLabel+'</h3>'+stageBody(l,step.id)+'</section>'+
       '<div class="lesson-step-actions">'+
-        '<button class="button" id="lessonStepBack" '+(activeStage===0?'disabled':'')+'>← Previous step</button>'+
-        '<button class="button primary" id="lessonStepDone">'+(isDone?'✓ Done — next step':'Mark step done →')+'</button>'+
-      '</div>'+
-    '</div>';
+        '<button class="button" id="lessonStepBack" '+(activeStage===0?'disabled':'')+'>← '+bi('Previous step','上一步')+'</button>'+
+        '<button class="button primary" id="lessonStepDone">'+(isDone?bi('✓ Done — next step','✓ 已完成 — 下一步'):bi('Mark step done →','标记本步骤完成 →'))+'</button>'+
+      '</div></div>';
   }
 
   function renderFullPlan(l){
@@ -1081,18 +1082,18 @@
     panel.className='panel lesson-route-panel';
     panel.innerHTML=
       '<div class="lesson-hero">'+
-        (l.extension?'<div class="lesson-extension-banner"><strong>Extension:</strong> this is AQA 3.8.1.1 Nuclear Physics, not part of core section 3.2.</div>':'')+
+        (l.extension?'<div class="lesson-extension-banner"><strong>'+bi('Extension:','扩展：')+'</strong> '+bi('this is AQA 3.8.1.1 Nuclear Physics, not part of core section 3.2.','这是 AQA 3.8.1.1 核物理内容，不属于核心 3.2。')+'</div>':'')+
         '<div class="lesson-hero-top"><span class="eyebrow">'+phaseLabel(base.phase)+' · '+base.code+'</span><span class="lesson-count">'+(isMandarin()?'第 '+l.n+' / '+lessons.length+' 课':'Lesson '+l.n+' of '+lessons.length)+'</span></div>'+
         '<h2>'+l.title+'</h2><p>'+l.overview+'</p>'+
         '<div class="lesson-meta"><span>'+lessonTime(base.duration)+'</span><span>'+l.objectives.length+(isMandarin()?' 个学习目标':' objectives')+'</span><span>'+(base.sim?(isMandarin()?'3D 模拟':'3D simulation'):(isMandarin()?'引导活动':'guided activity'))+'</span></div>'+
       '</div>'+
-      '<div class="lesson-view-toolbar"><div><span class="study-label">Lesson view</span><button class="study-mode-button '+(lessonView==='guided'?'active':'')+'" data-lesson-view="guided">Guided steps</button><button class="study-mode-button '+(lessonView==='full'?'active':'')+'" data-lesson-view="full">Full lesson plan</button></div><button class="text-button" id="resumeThisLesson">Jump to first unfinished step</button></div>'+
+      '<div class="lesson-view-toolbar"><div><span class="study-label">'+bi('Lesson view','课程视图')+'</span><button class="study-mode-button '+(lessonView==='guided'?'active':'')+'" data-lesson-view="guided">'+bi('Guided steps','引导步骤')+'</button><button class="study-mode-button '+(lessonView==='full'?'active':'')+'" data-lesson-view="full">'+bi('Full lesson plan','完整课程计划')+'</button></div><button class="text-button" id="resumeThisLesson">'+bi('Jump to first unfinished step','跳到第一个未完成步骤')+'</button></div>'+
       '<div class="lesson-stage-strip">'+
         stages.map((st,i)=>'<button class="lesson-stage '+(i===activeStage?'active ':'')+(doneSet.has(st.id)?'done':'')+'" data-seq-stage="'+i+'"><span>'+(doneSet.has(st.id)?'✓':i+1)+'</span>'+lessonUI(st.short)+'</button>').join('')+
       '</div>'+
       (lessonView==='guided'?renderGuidedContent(l):renderFullPlan(l))+
-      '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?'✓ Lesson complete':'Complete remaining steps to finish lesson')+'</button></div>'+
-      '<div class="lesson-nav-row"><button class="button" id="sequencePrev" '+(current===0?'disabled':'')+'>← Previous lesson</button><button class="button" id="sequenceNext" '+(current===lessons.length-1?'disabled':'')+'>Next lesson →</button></div>';
+      '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?bi('✓ Lesson complete','✓ 本课完成'):bi('Complete remaining steps to finish lesson','完成剩余步骤以结束本课'))+'</button></div>'+
+      '<div class="lesson-nav-row"><button class="button" id="sequencePrev" '+(current===0?'disabled':'')+'>← '+bi('Previous lesson','上一课')+'</button><button class="button" id="sequenceNext" '+(current===lessons.length-1?'disabled':'')+'>'+bi('Next lesson','下一课')+' →</button></div>';
 
     $$('[data-seq-stage]',panel).forEach(b=>b.onclick=()=>setStage(+b.dataset.seqStage,true));
     $$('[data-lesson-view]',panel).forEach(b=>b.onclick=()=>{lessonView=b.dataset.lessonView;saveAll();renderLesson();});
@@ -1107,7 +1108,7 @@
       starterAnswers[l.n][i]=input.value;
       try{localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));}catch{}
       const status=panel.querySelector('[data-starter-status="'+i+'"]');
-      if(status)status.textContent=input.value.trim()?(isMandarin()?'已保存在此设备':'Saved on this device'):(isMandarin()?'尚未作答':'Not answered yet');
+      if(status)status.textContent=input.value.trim()?bi('Saved on this device','已保存在此设备'):bi('Not answered yet','尚未作答');
     }));
 
     $$('[data-textbook-input]',panel).forEach(input=>input.addEventListener('input',()=>{
@@ -1188,7 +1189,7 @@
     const section=$('#view-course');if(!section)return;
     const head=$('.section-head',section);
     if(head){
-      head.innerHTML='<div><span class="eyebrow">Classroom teaching route</span><h2>Particles & Radiation lesson sequence</h2></div><p class="subtle">Open one lesson, follow the highlighted step, then press “Mark step done” to move through it.</p>';
+      head.innerHTML='<div><span class="eyebrow">'+bi('Classroom teaching route','课堂学习路线')+'</span><h2>'+bi('Particles & Radiation lesson sequence','粒子与辐射课程序列')+'</h2></div><p class="subtle">'+bi('Open one lesson, follow the highlighted step, then press “Mark step done” to move through it.','打开一课，按高亮步骤学习，完成后点击“标记本步骤完成”继续。')+'</p>';
     }
     let summary=$('#lessonRouteSummary');
     if(!summary){
@@ -1196,19 +1197,19 @@
       summary.id='lessonRouteSummary';summary.className='lesson-route-summary';
       head?.insertAdjacentElement('afterend',summary);
     }
-    const l=lessons[current],step=stages[activeStage];
-    summary.innerHTML='<div class="lesson-route-overview"><span class="eyebrow">Continue where you left off</span><h3>Lesson '+l.n+' · '+l.title+'</h3><p>Current step: <strong>'+step.label+'</strong>. The app remembers this lesson and step on this device.</p><div class="lesson-route-phases">'+
-      phaseGroups().map(g=>'<span class="lesson-phase-chip">'+g.phase+' · '+g.items.length+' lessons</span>').join('')+
-      '</div><button class="button primary" id="resumeLessonSequence" style="margin-top:8px">Continue lesson '+l.n+'</button></div>'+
-      '<div class="lesson-route-progress"><div class="lesson-progress-line"><div><span class="eyebrow">Sequence progress</span><h3 id="lessonSequenceProgress"></h3></div><strong>'+lessons.length+'</strong></div><div class="lesson-route-track"><div id="lessonSequenceFill" class="lesson-route-fill"></div></div><p style="margin-top:6px">A lesson completes after all seven steps are ticked.</p></div>';
+    const l=localLesson(lessons[current]),step=stages[activeStage];
+    summary.innerHTML='<div class="lesson-route-overview"><span class="eyebrow">'+bi('Continue where you left off','从上次位置继续')+'</span><h3>'+bi('Lesson','第')+' '+l.n+(isMandarin()?' 课 · ':' · ')+l.title+'</h3><p>'+bi('Current step:','当前步骤：')+' <strong>'+lessonUI(step.label)+'</strong>。 '+bi('The app remembers this lesson and step on this device.','应用会在此设备上记住你的课程与步骤。')+'</p><div class="lesson-route-phases">'+
+      phaseGroups().map(g=>'<span class="lesson-phase-chip">'+phaseLabel(g.phase)+' · '+g.items.length+(isMandarin()?' 课':' lessons')+'</span>').join('')+
+      '</div><button class="button primary" id="resumeLessonSequence" style="margin-top:8px">'+bi('Continue lesson','继续第')+' '+l.n+(isMandarin()?' 课':'')+'</button></div>'+
+      '<div class="lesson-route-progress"><div class="lesson-progress-line"><div><span class="eyebrow">'+bi('Sequence progress','课程进度')+'</span><h3 id="lessonSequenceProgress"></h3></div><strong>'+lessons.length+'</strong></div><div class="lesson-route-track"><div id="lessonSequenceFill" class="lesson-route-fill"></div></div><p style="margin-top:6px">'+bi('A lesson completes after all seven steps are ticked.','完成七个步骤后，本课即完成。')+'</p></div>';
     $('#resumeLessonSequence').onclick=()=>{$('#lessonPanel')?.scrollIntoView({behavior:'smooth',block:'start'})};
     const layout=$('.course-layout',section);
     layout?.classList.add('lesson-sequence-layout');
   }
 
   function relabelNavigation(){
-    const nav=$('.nav-button[data-view="course"]');if(nav)nav.textContent='Lesson sequence';
-    const jump=$('[data-jump="course"]');if(jump)jump.textContent='Continue lesson sequence';
+    const nav=$('.nav-button[data-view="course"]');if(nav)nav.textContent=bi('Lesson sequence','课程序列');
+    const jump=$('[data-jump="course"]');if(jump)jump.textContent=bi('Continue lesson sequence','继续课程序列');
   }
 
   function init(){
@@ -1219,7 +1220,7 @@
     updateProgress();
 
     window.addEventListener('particlelab:languagechange',()=>{
-      renderSummary();renderList();renderLesson();updateProgress();
+      relabelNavigation();renderSummary();renderList();renderLesson();updateProgress();
     });
 
     $('#resetProgress')?.addEventListener('click',()=>{
