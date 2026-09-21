@@ -154,6 +154,17 @@
     'Open simulation':'打开模拟'
   };
 
+  const dynamicZH=[
+    [/^(\d+) flashcards due$/,m=>m.match(/\d+/)[0]+' 张闪卡待复习'],
+    [/^(\d+) cards due$/,m=>m.match(/\d+/)[0]+' 张卡片待复习'],
+    [/^(\d+)% current evidence$/,m=>m.match(/\d+/)[0]+'% 当前掌握证据'],
+    [/^(\d+) question\(s\) added to the error log\.$/,m=>m.match(/\d+/)[0]+' 道题已加入错题记录。'],
+    [/^(\d+) min$/,m=>m.match(/\d+/)[0]+' 分钟'],
+    [/^Lesson (\d+)$/,m=>'第 '+m.match(/\d+/)[0]+' 课'],
+    [/^Open (.+) simulation$/,m=>'打开 '+m.replace(/^Open | simulation$/g,'')+' 模拟'],
+    [/^(\d+) \/ (\d+) specification points checked · (\d+) logged errors\.$/,m=>{const x=m.match(/\d+/g);return x[0]+' / '+x[1]+' 个规格点已检查 · '+x[2]+' 个错误已记录。';}]
+  ];
+
   const termZH=[
     [/\bphotoelectric effect\b/gi,'光电效应'],[/\bwork function\b/gi,'逸出功'],[/\bthreshold frequency\b/gi,'截止频率'],
     [/\bstopping potential\b/gi,'遏止电势'],[/\benergy levels?\b/gi,'能级'],[/\bwave.?particle duality\b/gi,'波粒二象性'],
@@ -182,6 +193,14 @@
     if(globalExact){
       const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
       return lead+globalExact+tail;
+    }
+    for(const [re,replace] of dynamicZH){
+      if(re.test(trimmed)){
+        re.lastIndex=0;
+        const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
+        return lead+trimmed.replace(re,replace)+tail;
+      }
+      re.lastIndex=0;
     }
     if(phraseZH[trimmed]){
       const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
