@@ -241,11 +241,12 @@ const processTimelines={
  rutherford:{duration:3000,steps:['Alpha particle approaches','Coulomb repulsion increases near nucleus','Trajectory bends','Detector records the scattering angle']}
 };
 
+function appTranslate(text){return window.PARTICLELAB_LANGUAGE?.translate?.(String(text))||String(text)}
 function makeHotspotLabel(text){
  const cv=document.createElement('canvas');cv.width=512;cv.height=96;
  const x=cv.getContext('2d');x.clearRect(0,0,512,96);x.fillStyle='rgba(5,17,30,.88)';x.strokeStyle='rgba(126,216,255,.75)';x.lineWidth=3;
  x.beginPath();x.roundRect(8,8,496,80,20);x.fill();x.stroke();
- x.fillStyle='#eaf7ff';x.font='700 28px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,49);
+ x.fillStyle='#eaf7ff';x.font='700 28px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(appTranslate(text),256,49);
  const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
  const mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false});
  const sp=new THREE.Sprite(mat);sp.scale.set(2.4,.45,1);sp.position.y=.52;sp.renderOrder=50;return sp;
@@ -330,21 +331,21 @@ function currentTimelineStage(){
 function updateLivePanel(){
  ensureInteractionPanel();
  const stage=currentTimelineStage();
- if($('#live3DStage'))$('#live3DStage').textContent=stage.label+' · '+stage.text;
- if($('#live3DNow'))$('#live3DNow').textContent=currentDynamicState();
+ if($('#live3DStage'))$('#live3DStage').textContent=appTranslate(stage.label)+' · '+appTranslate(stage.text);
+ if($('#live3DNow'))$('#live3DNow').textContent=appTranslate(currentDynamicState());
  const base=hotspotDefs[currentSim]?.[0];
  if(!selectedHotspot&&base){
-  if($('#live3DScience'))$('#live3DScience').textContent=base.science;
-  if($('#live3DExam'))$('#live3DExam').textContent=base.exam;
+  if($('#live3DScience'))$('#live3DScience').textContent=appTranslate(base.science);
+  if($('#live3DExam'))$('#live3DExam').textContent=appTranslate(base.exam);
  }
 }
 window.addEventListener('particlelab:guide-select',e=>{
  const info=e.detail;
  if(!info)return;
  selectedHotspot=info;
- if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+info.title+'</strong> · '+info.what;
- if($('#live3DScience'))$('#live3DScience').textContent=info.science;
- if($('#live3DExam'))$('#live3DExam').textContent=info.exam;
+ if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+appTranslate(info.title)+'</strong> · '+appTranslate(info.what);
+ if($('#live3DScience'))$('#live3DScience').textContent=appTranslate(info.science);
+ if($('#live3DExam'))$('#live3DExam').textContent=appTranslate(info.exam);
 });
 function selectHotspotAt(e){
  if(!raycaster||!pointer||!camera||!world||!hotspotGroup||hotspotGroup.visible===false)return false;
@@ -354,9 +355,9 @@ function selectHotspotAt(e){
  const info=hotspotInfoFromObject(hits[0].object),node=hotspotNodeFromObject(hits[0].object);if(!info)return false;
  selectedHotspot=info;
  hotspotGroup.children.forEach(g=>g.scale.setScalar(g===node?1.32:1));
- if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+info.title+'</strong> · '+info.what;
- if($('#live3DScience'))$('#live3DScience').textContent=info.science;
- if($('#live3DExam'))$('#live3DExam').textContent=info.exam;
+ if($('#live3DSelected'))$('#live3DSelected').innerHTML='<strong>'+appTranslate(info.title)+'</strong> · '+appTranslate(info.what);
+ if($('#live3DScience'))$('#live3DScience').textContent=appTranslate(info.science);
+ if($('#live3DExam'))$('#live3DExam').textContent=appTranslate(info.exam);
  window.dispatchEvent(new CustomEvent('particlelab:hotspot',{detail:{sim:currentSim,title:info.title}}));
  return true;
 }
