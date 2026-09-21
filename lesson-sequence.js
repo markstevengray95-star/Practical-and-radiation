@@ -570,9 +570,15 @@
   function taskBankHTML(n){
     const tasks=localPractice(n);
     if(!tasks.length)return '';
-    const zh=isMandarin();
-    return '<div class="lesson-independent-tasks"><div class="lesson-task-heading"><span class="eyebrow">'+(zh?'独立练习':'Independent practice')+'</span><strong>'+tasks.length+(zh?' 道额外练习':' extra tasks')+'</strong></div>'+
-      tasks.map((t,i)=>'<details class="lesson-task-card"><summary><span>'+(zh?'练习 ':'Task ')+(i+1)+'</span>'+t[0]+' — '+t[1]+'</summary><div class="lesson-task-answer"><strong>'+(zh?'检查：':'Check:')+'</strong> '+t[2]+'</div></details>').join('')+
+    const zh=isMandarin(),saved=practiceAnswers[n]||[];
+    const answered=tasks.reduce((sum,_,i)=>sum+((saved[i]||'').trim()?1:0),0);
+    return '<div class="lesson-independent-tasks"><div class="lesson-task-heading"><div><span class="eyebrow">'+(zh?'独立练习':'Independent practice')+'</span><strong>'+tasks.length+(zh?' 道额外练习':' extra tasks')+'</strong></div><span class="lesson-task-progress">'+answered+' / '+tasks.length+(zh?' 已作答':' answered')+'</span></div>'+
+      tasks.map((t,i)=>'<details class="lesson-task-card"><summary><span>'+(zh?'练习 ':'Task ')+(i+1)+'</span><strong>'+t[0]+'</strong></summary>'+
+        '<div class="lesson-task-body"><p>'+t[1]+'</p>'+
+          '<textarea rows="3" data-practice-input="'+i+'" placeholder="'+(zh?'先独立写出答案……':'Write your answer independently first...')+'">'+esc(saved[i]||'')+'</textarea>'+
+          '<small data-practice-status="'+i+'">'+((saved[i]||'').trim()?(zh?'已保存':'Saved'):(zh?'尚未作答':'Not answered yet'))+'</small>'+
+          '<details class="lesson-task-check"><summary>'+(zh?'完成后检查答案':'Check answer after attempting')+'</summary><div class="lesson-task-answer"><strong>'+(zh?'检查：':'Check:')+'</strong> '+t[2]+'</div></details>'+
+        '</div></details>').join('')+
       '</div>';
   }
 
@@ -875,6 +881,8 @@
   const TEXTBOOK_MASTERY_STORE='particleLessonTextbookMasteryV1';
   const INVESTIGATION_STORE='particleLessonInvestigationV1';
   const SHORT_TEST_STORE='particleLessonShortTestAnswersV1';
+  const CHUNK_ACTIVITY_STORE='particleLessonChunkActivityAnswersV1';
+  const PRACTICE_STORE='particleLessonPracticeAnswersV1';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -885,7 +893,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},investigationNotes={},shortTestAnswers={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},investigationNotes={},shortTestAnswers={},chunkActivityAnswers={},practiceAnswers={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -900,6 +908,8 @@
   try{textbookMastery=JSON.parse(localStorage.getItem(TEXTBOOK_MASTERY_STORE)||'{}')||{}}catch{}
   try{investigationNotes=JSON.parse(localStorage.getItem(INVESTIGATION_STORE)||'{}')||{}}catch{}
   try{shortTestAnswers=JSON.parse(localStorage.getItem(SHORT_TEST_STORE)||'{}')||{}}catch{}
+  try{chunkActivityAnswers=JSON.parse(localStorage.getItem(CHUNK_ACTIVITY_STORE)||'{}')||{}}catch{}
+  try{practiceAnswers=JSON.parse(localStorage.getItem(PRACTICE_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
@@ -912,6 +922,8 @@
     localStorage.setItem(TEXTBOOK_MASTERY_STORE,JSON.stringify(textbookMastery));
     localStorage.setItem(INVESTIGATION_STORE,JSON.stringify(investigationNotes));
     localStorage.setItem(SHORT_TEST_STORE,JSON.stringify(shortTestAnswers));
+    localStorage.setItem(CHUNK_ACTIVITY_STORE,JSON.stringify(chunkActivityAnswers));
+    localStorage.setItem(PRACTICE_STORE,JSON.stringify(practiceAnswers));
     updateProgress();
   }
 
@@ -962,7 +974,7 @@
     const active=activeChunkFor(l);
     const guided=lessonView==='guided';
     const selector=guided?
-      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">'+(isMandarin()?'教学顺序':'Teaching sequence')+'</span><strong>'+(isMandarin()?'学习段 ':'Chunk ')+(active+1)+(isMandarin()?' / ':' of ')+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
+      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">'+(isMandarin()?'教学顺序':'Teaching sequence')+'</span><strong>'+(isMandarin()?'学习段 ':'Chunk ')+(active+1)+(isMandarin()?' / ':' of ')+l.teach.length+'</strong><small>'+((chunkActivityAnswers[l.n]||[]).filter(x=>String(x||'').trim()).length)+' / '+l.teach.length+(isMandarin()?' 个活动已作答':' activities answered')+'</small></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
         l.teach.map((x,i)=>'<button type="button" role="tab" data-core-chunk="'+i+'" class="'+(i===active?'active':'')+'" aria-selected="'+(i===active?'true':'false')+'"><span>'+(i+1)+'</span><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></button>').join('')+
       '</div></div>':'';
 
@@ -974,7 +986,10 @@
         '<div class="native-chunk-content">'+
           '<div class="lesson-chunk-main"><span class="eyebrow">'+(isMandarin()?'核心概念':'Core idea')+'</span><p>'+x[1]+'</p></div>'+
           '<div class="lesson-chunk-detail"><span class="eyebrow">'+(isMandarin()?'关键信息':'Key information')+'</span><p>'+cs.detail+'</p></div>'+
-          '<div class="lesson-chunk-task"><span class="eyebrow">'+(isMandarin()?'活动':'Activity')+'</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details class="chunk-answer"><summary>'+(isMandarin()?'完成尝试后再查看答案':'Check the answer only after attempting it')+'</summary><p>'+cs.answer+'</p></details></div>'+
+          '<div class="lesson-chunk-task"><span class="eyebrow">'+(isMandarin()?'活动':'Activity')+'</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p>'+
+            '<textarea rows="3" data-chunk-activity-input="'+i+'" placeholder="'+(isMandarin()?'先在这里完成活动……':'Complete the activity here before checking...')+'">'+esc((chunkActivityAnswers[l.n]||[])[i]||'')+'</textarea>'+
+            '<small data-chunk-activity-status="'+i+'">'+(((chunkActivityAnswers[l.n]||[])[i]||'').trim()?(isMandarin()?'已保存':'Saved'):(isMandarin()?'尚未作答':'Not answered yet'))+'</small>'+
+            '<details class="chunk-answer"><summary>'+(isMandarin()?'完成尝试后再查看答案':'Check the answer only after attempting it')+'</summary><p>'+cs.answer+'</p></details></div>'+
           '<div class="lesson-chunk-exam"><span class="eyebrow">'+(isMandarin()?'考试表述':'Exam language')+'</span><p>'+cs.exam+'</p></div>'+
         '</div>'+
       '</details>';
@@ -1139,6 +1154,24 @@
       try{localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));}catch{}
       const status=panel.querySelector('[data-starter-status="'+i+'"]');
       if(status)status.textContent=input.value.trim()?bi('Saved on this device','已保存在此设备'):bi('Not answered yet','尚未作答');
+    }));
+
+    $$('[data-chunk-activity-input]',panel).forEach(input=>input.addEventListener('input',()=>{
+      const i=Number(input.dataset.chunkActivityInput);
+      chunkActivityAnswers[l.n]=chunkActivityAnswers[l.n]||[];
+      chunkActivityAnswers[l.n][i]=input.value;
+      try{localStorage.setItem(CHUNK_ACTIVITY_STORE,JSON.stringify(chunkActivityAnswers));}catch{}
+      const status=panel.querySelector('[data-chunk-activity-status="'+i+'"]');
+      if(status)status.textContent=input.value.trim()?bi('Saved','已保存'):bi('Not answered yet','尚未作答');
+    }));
+
+    $$('[data-practice-input]',panel).forEach(input=>input.addEventListener('input',()=>{
+      const i=Number(input.dataset.practiceInput);
+      practiceAnswers[l.n]=practiceAnswers[l.n]||[];
+      practiceAnswers[l.n][i]=input.value;
+      try{localStorage.setItem(PRACTICE_STORE,JSON.stringify(practiceAnswers));}catch{}
+      const status=panel.querySelector('[data-practice-status="'+i+'"]');
+      if(status)status.textContent=input.value.trim()?bi('Saved','已保存'):bi('Not answered yet','尚未作答');
     }));
 
     $$('[data-textbook-input]',panel).forEach(input=>input.addEventListener('input',()=>{
@@ -1308,7 +1341,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};investigationNotes={};shortTestAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};investigationNotes={};shortTestAnswers={};chunkActivityAnswers={};practiceAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
