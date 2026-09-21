@@ -30,6 +30,18 @@ try{
 
     await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
     await page.waitForTimeout(15);
+    const textbook=page.locator('.lesson-active-section .lesson-textbook');
+    if(!(await textbook.count())) throw new Error('Lesson '+lessonNo+' guided mini textbook missing');
+    const textbookSections=textbook.locator('.textbook-section');
+    if(await textbookSections.count()<4) throw new Error('Lesson '+lessonNo+' mini textbook is too short');
+    const textbookInput=textbook.locator('[data-textbook-input]').first();
+    await textbookInput.fill('Saved textbook checkpoint response');
+    await page.waitForTimeout(5);
+    const storedTextbook=await page.evaluate(lessonNo=>{
+      try{return JSON.parse(localStorage.getItem('particleLessonTextbookAnswersV1')||'{}')?.[lessonNo]?.[0]||''}catch{return ''}
+    },lessonNo);
+    if(storedTextbook!=='Saved textbook checkpoint response') throw new Error('Lesson '+lessonNo+' textbook checkpoint did not save');
+
     const coverage=page.locator('.lesson-active-section .aqa-core-knowledge');
     if(!(await coverage.count())) throw new Error('Lesson '+lessonNo+' AQA core knowledge panel missing');
     if((await coverage.locator('li').count())<4) throw new Error('Lesson '+lessonNo+' AQA core knowledge is too thin');
