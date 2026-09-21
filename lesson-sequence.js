@@ -494,7 +494,72 @@
     ]
   };
 
+  function isMandarin(){
+    return (document.documentElement.lang||'').toLowerCase().startsWith('zh');
+  }
+  function zhLesson(n){
+    return window.PARTICLELAB_MANDARIN_LESSONS?.lessons?.[n]||null;
+  }
+  function lessonUI(text){
+    return isMandarin()?(window.PARTICLELAB_MANDARIN_LESSONS?.ui?.[text]||text):text;
+  }
+  function phaseLabel(text){
+    if(!isMandarin())return text;
+    return ({'Foundations':'基础','Particle physics':'粒子物理','Quantum phenomena':'量子现象','Consolidation':'综合复习','A-level extension':'A-level 扩展'})[text]||text;
+  }
+  function lessonTime(text){
+    return isMandarin()?String(text).replace(/min/g,'分钟'):text;
+  }
+  function localLesson(base){
+    if(!isMandarin())return base;
+    const z=zhLesson(base.n);
+    if(!z)return base;
+    return {
+      ...base,
+      title:z.title||base.title,
+      overview:z.overview||base.overview,
+      objectives:z.objectives||base.objectives,
+      recall:(z.recall||[]).map(x=>x[0]),
+      teach:(z.sections||[]).map((x,i)=>[(i+1)+'. '+x[0],(x[1]||[]).join(' ')]),
+      simTask:z.simTask||base.simTask,
+      worked:z.worked||base.worked,
+      exam:z.exam||base.exam,
+      exit:z.exit||base.exit,
+      next:z.next||base.next,
+      homework:z.homework||base.homework
+    };
+  }
+  function localTextbook(n){
+    if(isMandarin()){
+      const z=zhLesson(n);
+      if(z)return {title:z.title,sections:(z.sections||[]).map(x=>({h:x[0],p:x[1],k:x[2],q:x[3],a:x[4]}))};
+    }
+    return lessonTextbook[n];
+  }
+  function localKeywords(n){
+    if(isMandarin())return zhLesson(n)?.keywords||keywordBank[n]||[];
+    return keywordBank[n]||[];
+  }
+  function localSpec(n){
+    if(isMandarin()){
+      const z=zhLesson(n);
+      if(z)return {section:lessons.find(x=>x.n===n)?.code||'',title:z.title,points:z.spec||[]};
+    }
+    return aqaCoreKnowledge[n];
+  }
+  function localPractice(n){
+    if(isMandarin()){
+      const z=zhLesson(n);
+      if(z)return (z.sections||[]).map((x,i)=>['检查理解 '+(i+1),x[3],x[4]]);
+    }
+    return lessonTaskBank[n]||[];
+  }
+
   function chunkSupport(l,i){
+    if(isMandarin()){
+      const z=zhLesson(l.n),sec=z?.sections?.[i];
+      if(sec)return {detail:(sec[1]||[]).join(' '),taskTitle:'检查理解',task:sec[3],answer:sec[4],exam:z.exam||''};
+    }
     const tasks=lessonTaskBank[l.n]||[];
     const task=tasks.length?tasks[i%tasks.length]:['Explain it','Explain this idea using the correct physics terms.',l.teach?.[i]?.[1]||''];
     const detail=lessonChunkDetail[l.n]?.[i]||l.teach?.[i]?.[1]||'';
@@ -502,10 +567,11 @@
   }
 
   function taskBankHTML(n){
-    const tasks=lessonTaskBank[n]||[];
+    const tasks=localPractice(n);
     if(!tasks.length)return '';
-    return '<div class="lesson-independent-tasks"><div class="lesson-task-heading"><span class="eyebrow">Independent practice</span><strong>'+tasks.length+' extra tasks</strong></div>'+
-      tasks.map((t,i)=>'<details class="lesson-task-card"><summary><span>Task '+(i+1)+'</span>'+t[0]+' — '+t[1]+'</summary><div class="lesson-task-answer"><strong>Check:</strong> '+t[2]+'</div></details>').join('')+
+    const zh=isMandarin();
+    return '<div class="lesson-independent-tasks"><div class="lesson-task-heading"><span class="eyebrow">'+(zh?'独立练习':'Independent practice')+'</span><strong>'+tasks.length+(zh?' 道额外练习':' extra tasks')+'</strong></div>'+
+      tasks.map((t,i)=>'<details class="lesson-task-card"><summary><span>'+(zh?'练习 ':'Task ')+(i+1)+'</span>'+t[0]+' — '+t[1]+'</summary><div class="lesson-task-answer"><strong>'+(zh?'检查：':'Check:')+'</strong> '+t[2]+'</div></details>').join('')+
       '</div>';
   }
 
@@ -721,40 +787,41 @@
   }
 
   function textbookHTML(l){
-    const chapter=lessonTextbook[l.n];
+    const chapter=localTextbook(l.n);
     if(!chapter)return '';
-    const saved=textbookAnswers[l.n]||[];
-    return '<section class="lesson-textbook"><div class="textbook-title"><div><span class="eyebrow">Guided mini textbook</span><h3>'+chapter.title+'</h3></div><span>'+chapter.sections.length+' guided sections</span></div>'+
-      '<p class="textbook-intro">Read one section at a time. Use the key points to summarise it, answer the checkpoint from memory, then reveal the model response before moving to the teaching activity.</p>'+
+    const saved=textbookAnswers[l.n]||[],zh=isMandarin();
+    return '<section class="lesson-textbook"><div class="textbook-title"><div><span class="eyebrow">'+(zh?'引导式小教材':'Guided mini textbook')+'</span><h3>'+chapter.title+'</h3></div><span>'+chapter.sections.length+(zh?' 个引导章节':' guided sections')+'</span></div>'+
+      '<p class="textbook-intro">'+(zh?'每次只学习一个章节。先阅读解释，再用要点总结；随后不看答案完成检查题，最后再打开参考答案。':'Read one section at a time. Use the key points to summarise it, answer the checkpoint from memory, then reveal the model response before moving to the teaching activity.')+'</p>'+
       '<div class="textbook-sections">'+chapter.sections.map((sec,i)=>
         '<details class="textbook-section" '+(i===0?'open':'')+' data-textbook-section="'+i+'"><summary><span>'+(i+1)+'</span><strong>'+sec.h+'</strong></summary>'+
-        '<div class="textbook-section-body">'+
-          sec.p.map(p=>'<p>'+p+'</p>').join('')+
-          '<div class="textbook-keyfacts"><span class="eyebrow">Key points to retain</span><ul>'+sec.k.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>'+
-          '<div class="textbook-check"><span class="eyebrow">Check your understanding</span><strong>'+sec.q+'</strong>'+
-            '<textarea rows="3" data-textbook-input="'+i+'" placeholder="Write your answer before revealing the model response...">'+esc(saved[i]||'')+'</textarea>'+
-            '<div class="textbook-save-state" data-textbook-status="'+i+'">'+((saved[i]||'').trim()?'Saved on this device':'Not answered yet')+'</div>'+
-            '<details class="textbook-model"><summary>Reveal model response</summary><p>'+sec.a+'</p></details>'+
-          '</div>'+
-        '</div></details>').join('')+'</div></section>';
+        '<div class="textbook-section-body">'+sec.p.map(p=>'<p>'+p+'</p>').join('')+
+          '<div class="textbook-keyfacts"><span class="eyebrow">'+(zh?'必须记住的要点':'Key points to retain')+'</span><ul>'+sec.k.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>'+
+          '<div class="textbook-check"><span class="eyebrow">'+(zh?'检查你的理解':'Check your understanding')+'</span><strong>'+sec.q+'</strong>'+
+            '<textarea rows="3" data-textbook-input="'+i+'" placeholder="'+(zh?'请先写出答案，再查看参考答案……':'Write your answer before revealing the model response...')+'">'+esc(saved[i]||'')+'</textarea>'+
+            '<div class="textbook-save-state" data-textbook-status="'+i+'">'+((saved[i]||'').trim()?(zh?'已保存在此设备':'Saved on this device'):(zh?'尚未作答':'Not answered yet'))+'</div>'+
+            '<details class="textbook-model"><summary>'+(zh?'显示参考答案':'Reveal model response')+'</summary><p>'+sec.a+'</p></details>'+
+          '</div></div></details>').join('')+'</div></section>';
   }
 
   function aqaCoverageHTML(l){
-    const item=aqaCoreKnowledge[l.n];
+    const item=localSpec(l.n);
     if(!item)return '';
-    return '<section class="aqa-core-knowledge"><div class="aqa-core-head"><div><span class="eyebrow">AQA 7408 specification coverage</span><strong>'+item.section+' · '+item.title+'</strong></div><span>'+item.points.length+' must-know points</span></div>'+
-      '<p class="aqa-core-intro">Use this as the knowledge checklist for the lesson. The teaching chunks below explain and apply each point.</p>'+
+    const zh=isMandarin();
+    return '<section class="aqa-core-knowledge"><div class="aqa-core-head"><div><span class="eyebrow">'+(zh?'AQA 7408 规格要求覆盖':'AQA 7408 specification coverage')+'</span><strong>'+item.section+' · '+item.title+'</strong></div><span>'+item.points.length+(zh?' 个必会要点':' must-know points')+'</span></div>'+
+      '<p class="aqa-core-intro">'+(zh?'把这里作为本课的知识清单。下方的小教材、学习段和活动会逐项解释并应用这些要求。':'Use this as the knowledge checklist for the lesson. The teaching chunks below explain and apply each point.')+'</p>'+
       '<ul>'+item.points.map(p=>'<li>'+p+'</li>').join('')+'</ul></section>';
   }
 
   function starterHTML(l){
-    const models=starterAnswerBank[l.n]||[];
+    const zh=isMandarin(),z=zhLesson(l.n);
+    const models=zh?(z?.recall||[]).map(x=>x[1]):starterAnswerBank[l.n]||[];
+    const questions=zh?(z?.recall||[]).map(x=>x[0]):l.recall;
     const saved=starterAnswers[l.n]||[];
-    return '<div class="starter-answer-grid">'+l.recall.map((q,i)=>
+    return '<div class="starter-answer-grid">'+questions.map((q,i)=>
       '<article class="starter-question-card"><div class="starter-question-head"><span>'+(i+1)+'</span><strong>'+q+'</strong></div>'+
-      '<textarea rows="3" data-starter-input="'+i+'" placeholder="Type your answer here...">'+esc(saved[i]||'')+'</textarea>'+
-      '<div class="starter-save-state" data-starter-status="'+i+'">'+((saved[i]||'').trim()?'Saved on this device':'Not answered yet')+'</div>'+
-      (models[i]?'<details class="starter-model-answer"><summary>Check model answer after attempting</summary><p>'+models[i]+'</p></details>':'')+
+      '<textarea rows="3" data-starter-input="'+i+'" placeholder="'+(zh?'在这里输入答案……':'Type your answer here...')+'">'+esc(saved[i]||'')+'</textarea>'+
+      '<div class="starter-save-state" data-starter-status="'+i+'">'+((saved[i]||'').trim()?(zh?'已保存在此设备':'Saved on this device'):(zh?'尚未作答':'Not answered yet'))+'</div>'+
+      (models[i]?'<details class="starter-model-answer"><summary>'+(zh?'完成尝试后查看参考答案':'Check model answer after attempting')+'</summary><p>'+models[i]+'</p></details>':'')+
       '</article>').join('')+'</div>';
   }
 
@@ -778,18 +845,18 @@
   };
 
   function keywordHTML(l){
-    const words=keywordBank[l.n]||[];
+    const words=localKeywords(l.n);
     if(!words.length)return '';
-    return '<div class="lesson-keywords"><span class="eyebrow">Key words</span><div class="lesson-keyword-grid">'+words.map(w=>'<div class="lesson-keyword"><strong>'+w[0]+'</strong><span>'+w[1]+'</span></div>').join('')+'</div></div>';
+    return '<div class="lesson-keywords"><span class="eyebrow">'+(isMandarin()?'关键词':'Key words')+'</span><div class="lesson-keyword-grid">'+words.map(w=>'<div class="lesson-keyword"><strong>'+w[0]+'</strong><span>'+w[1]+'</span></div>').join('')+'</div></div>';
   }
 
   function shortTestHTML(l){
-    const bank=lessonTaskBank[l.n]||[];
+    const zh=isMandarin(),bank=localPractice(l.n);
     const count=Math.min(5,Math.max(3,bank.length));
     const chosen=bank.slice(0,count);
-    return '<div class="lesson-short-test"><div class="short-test-intro"><strong>Short end-of-lesson test</strong><p>Complete this without notes first. Then open each mark point and self-check your answer.</p></div>'+
-      chosen.map((q,i)=>'<article class="short-test-question"><span>Q'+(i+1)+'</span><div><strong>'+q[0]+'</strong><p>'+q[1]+'</p><textarea rows="2" placeholder="Write your answer before checking..."></textarea><details><summary>Reveal mark point</summary><p>'+q[2]+'</p></details></div></article>').join('')+
-      '<div class="lesson-ready"><strong>Mastery check:</strong> Aim to answer every question accurately without notes. Revisit the relevant teaching chunk if a mark point is missing.</div></div>';
+    return '<div class="lesson-short-test"><div class="short-test-intro"><strong>'+(zh?'课末小测验':'Short end-of-lesson test')+'</strong><p>'+(zh?'先不看笔记完成。然后打开每题参考答案进行自我检查。':'Complete this without notes first. Then open each mark point and self-check your answer.')+'</p></div>'+
+      chosen.map((q,i)=>'<article class="short-test-question"><span>Q'+(i+1)+'</span><div><strong>'+q[0]+'</strong><p>'+q[1]+'</p><textarea rows="2" placeholder="'+(zh?'检查前先写出你的答案……':'Write your answer before checking...')+'"></textarea><details><summary>'+(zh?'显示评分点':'Reveal mark point')+'</summary><p>'+q[2]+'</p></details></div></article>').join('')+
+      '<div class="lesson-ready"><strong>'+(zh?'掌握检查：':'Mastery check:')+'</strong> '+(zh?'目标是在不看笔记的情况下准确回答所有问题；若缺少关键点，返回相应学习章节。':'Aim to answer every question accurately without notes. Revisit the relevant teaching chunk if a mark point is missing.')+'</div></div>';
   }
 
   const CURRENT_STORE='particleLessonCurrentV2';
@@ -879,7 +946,7 @@
     const active=activeChunkFor(l);
     const guided=lessonView==='guided';
     const selector=guided?
-      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">Teaching sequence</span><strong>Chunk '+(active+1)+' of '+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
+      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">'+(isMandarin()?'教学顺序':'Teaching sequence')+'</span><strong>Chunk '+(active+1)+' of '+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
         l.teach.map((x,i)=>'<button type="button" role="tab" data-core-chunk="'+i+'" class="'+(i===active?'active':'')+'" aria-selected="'+(i===active?'true':'false')+'"><span>'+(i+1)+'</span><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></button>').join('')+
       '</div></div>':'';
 
@@ -889,16 +956,16 @@
       return '<details class="lesson-check lesson-chunk-rich '+(guided&&i===active?'active-chunk':'')+'" data-lesson-chunk="'+i+'"'+open+'>'+
         '<summary class="native-chunk-summary"><span class="native-chunk-number">'+(i+1)+'</span><span><small>Teaching chunk '+(i+1)+' of '+l.teach.length+'</small><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></span></summary>'+
         '<div class="native-chunk-content">'+
-          '<div class="lesson-chunk-main"><span class="eyebrow">Core idea</span><p>'+x[1]+'</p></div>'+
-          '<div class="lesson-chunk-detail"><span class="eyebrow">Key information</span><p>'+cs.detail+'</p></div>'+
-          '<div class="lesson-chunk-task"><span class="eyebrow">Activity</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details class="chunk-answer"><summary>Check the answer only after attempting it</summary><p>'+cs.answer+'</p></details></div>'+
-          '<div class="lesson-chunk-exam"><span class="eyebrow">Exam language</span><p>'+cs.exam+'</p></div>'+
+          '<div class="lesson-chunk-main"><span class="eyebrow">'+(isMandarin()?'核心概念':'Core idea')+'</span><p>'+x[1]+'</p></div>'+
+          '<div class="lesson-chunk-detail"><span class="eyebrow">'+(isMandarin()?'关键信息':'Key information')+'</span><p>'+cs.detail+'</p></div>'+
+          '<div class="lesson-chunk-task"><span class="eyebrow">'+(isMandarin()?'活动':'Activity')+'</span><strong>'+cs.taskTitle+'</strong><p>'+cs.task+'</p><details class="chunk-answer"><summary>'+(isMandarin()?'完成尝试后再查看答案':'Check the answer only after attempting it')+'</summary><p>'+cs.answer+'</p></details></div>'+
+          '<div class="lesson-chunk-exam"><span class="eyebrow">'+(isMandarin()?'考试表述':'Exam language')+'</span><p>'+cs.exam+'</p></div>'+
         '</div>'+
       '</details>';
     }).join('')+'</div>';
 
     const controls=guided?
-      '<div class="chunk-switch-actions"><button type="button" class="button" id="coreChunkPrev" '+(active===0?'disabled':'')+'>← Previous chunk</button><button type="button" class="button primary" id="coreChunkNext" '+(active===l.teach.length-1?'disabled':'')+'>Next chunk →</button></div>':'';
+      '<div class="chunk-switch-actions"><button type="button" class="button" id="coreChunkPrev" '+(active===0?'disabled':'')+'>← '+(isMandarin()?'上一学习段':'Previous chunk')+'</button><button type="button" class="button primary" id="coreChunkNext" '+(active===l.teach.length-1?'disabled':'')+'>'+(isMandarin()?'下一学习段':'Next chunk')+' →</button></div>':'';
 
     return selector+cards+controls+
       (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">Equations from this lesson</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
@@ -939,12 +1006,12 @@
     const list=$('#courseList');if(!list)return;
     list.className='course-list lesson-sequence-sidebar';
     list.innerHTML=phaseGroups().map(g=>
-      '<div class="lesson-phase-heading">'+g.phase+'</div>'+
-      g.items.map(l=>{
-        const i=lessons.indexOf(l),done=completed.has(l.n),stepCount=doneStagesFor(l.n).size;
+      '<div class="lesson-phase-heading">'+phaseLabel(g.phase)+'</div>'+
+      g.items.map(base=>{
+        const l=localLesson(base),i=lessons.indexOf(base),done=completed.has(base.n),stepCount=doneStagesFor(base.n).size;
         return '<button class="lesson-route-button '+(i===current?'active ':'')+(done?'complete':'')+'" data-seq-lesson="'+i+'">'+
-          '<span class="lesson-route-number">'+(done?'✓':l.n)+'</span>'+
-          '<span class="lesson-route-title"><strong>'+l.title+'</strong><span>'+l.code+' · '+stepCount+'/'+stages.length+' steps</span></span>'+
+          '<span class="lesson-route-number">'+(done?'✓':base.n)+'</span>'+
+          '<span class="lesson-route-title"><strong>'+l.title+'</strong><span>'+base.code+' · '+stepCount+'/'+stages.length+(isMandarin()?' 步':' steps')+'</span></span>'+
           '<span class="lesson-route-status">'+(done?'done':(i===current?'now':''))+'</span></button>';
       }).join('')
     ).join('');
@@ -960,8 +1027,8 @@
   function stageBody(l,stageId){
     if(stageId==='recall'){
       const older=[];
-      if(current>0) older.push(lessons[current-1].exit[0]);
-      if(current>1) older.push(lessons[current-2].exit[1]||lessons[current-2].exit[0]);
+      if(current>0){const p=localLesson(lessons[current-1]);older.push(p.exit[0]);}
+      if(current>1){const p=localLesson(lessons[current-2]);older.push(p.exit[1]||p.exit[0]);}
       return '<div class="lesson-stage-guidance"><strong>Starter instructions</strong><p>Answer from memory in the boxes below. Your responses save automatically on this device. Only reveal the model answer after you have made a genuine attempt.</p></div>'+
         starterHTML(l)+
         (older.length?'<div class="cumulative-retrieval"><span class="eyebrow">Cumulative retrieval</span><ol>'+older.map(x=>'<li>'+x+'</li>').join('')+'</ol><p class="small subtle">Say or jot these from memory before moving on; they deliberately revisit earlier learning.</p></div>':'');
@@ -990,11 +1057,11 @@
   }
 
   function renderGuidedContent(l){
-    const step=stages[activeStage],done=doneStagesFor(l.n),isDone=done.has(step.id);
+    const step=stages[activeStage],done=doneStagesFor(l.n),isDone=done.has(step.id),stepLabel=lessonUI(step.label),stepTime=lessonTime(step.time);
     return '<div class="lesson-current-step">'+
-      '<div class="lesson-now-banner"><div><span class="eyebrow">Do this now · Step '+(activeStage+1)+' of '+stages.length+'</span><h3>'+step.label+'</h3><p>'+step.time+'</p></div>'+
+      '<div class="lesson-now-banner"><div><span class="eyebrow">Do this now · Step '+(activeStage+1)+' of '+stages.length+'</span><h3>'+stepLabel+'</h3><p>'+stepTime+'</p></div>'+
       '<div class="lesson-step-progress"><span id="lessonStepProgress">'+done.size+' / '+stages.length+' steps</span><div class="lesson-route-track compact"><div id="lessonStepFill" class="lesson-route-fill" style="width:'+(done.size/stages.length*100)+'%"></div></div></div></div>'+
-      '<section class="lesson-section '+sectionClass(step.id)+' lesson-active-section"><span class="lesson-mini-time">'+step.time+'</span><h3>'+step.label+'</h3>'+stageBody(l,step.id)+'</section>'+
+      '<section class="lesson-section '+sectionClass(step.id)+' lesson-active-section"><span class="lesson-mini-time">'+stepTime+'</span><h3>'+stepLabel+'</h3>'+stageBody(l,step.id)+'</section>'+
       '<div class="lesson-step-actions">'+
         '<button class="button" id="lessonStepBack" '+(activeStage===0?'disabled':'')+'>← Previous step</button>'+
         '<button class="button primary" id="lessonStepDone">'+(isDone?'✓ Done — next step':'Mark step done →')+'</button>'+
@@ -1003,25 +1070,25 @@
   }
 
   function renderFullPlan(l){
-    return '<div class="lesson-content lesson-full-plan">'+stages.map((s,i)=>
-      '<section class="lesson-section '+sectionClass(s.id)+'" data-full-stage="'+i+'"><span class="lesson-mini-time">'+s.time+'</span><h3>'+s.label+'</h3>'+stageBody(l,s.id)+'</section>'
+    return '<div class="lesson-content lesson-full-plan">'+stages.map((st,i)=>
+      '<section class="lesson-section '+sectionClass(st.id)+'" data-full-stage="'+i+'"><span class="lesson-mini-time">'+lessonTime(st.time)+'</span><h3>'+lessonUI(st.label)+'</h3>'+stageBody(l,st.id)+'</section>'
     ).join('')+'</div>';
   }
 
   function renderLesson(){
     const panel=$('#lessonPanel');if(!panel)return;
-    const l=lessons[current],done=completed.has(l.n),doneSet=doneStagesFor(l.n);
+    const base=lessons[current],l=localLesson(base),done=completed.has(base.n),doneSet=doneStagesFor(base.n);
     panel.className='panel lesson-route-panel';
     panel.innerHTML=
       '<div class="lesson-hero">'+
         (l.extension?'<div class="lesson-extension-banner"><strong>Extension:</strong> this is AQA 3.8.1.1 Nuclear Physics, not part of core section 3.2.</div>':'')+
-        '<div class="lesson-hero-top"><span class="eyebrow">'+l.phase+' · '+l.code+'</span><span class="lesson-count">Lesson '+l.n+' of '+lessons.length+'</span></div>'+
+        '<div class="lesson-hero-top"><span class="eyebrow">'+phaseLabel(base.phase)+' · '+base.code+'</span><span class="lesson-count">'+(isMandarin()?'第 '+l.n+' / '+lessons.length+' 课':'Lesson '+l.n+' of '+lessons.length)+'</span></div>'+
         '<h2>'+l.title+'</h2><p>'+l.overview+'</p>'+
-        '<div class="lesson-meta"><span>'+l.duration+'</span><span>'+l.objectives.length+' objectives</span><span>'+(l.sim?'3D simulation':'guided activity')+'</span></div>'+
+        '<div class="lesson-meta"><span>'+lessonTime(base.duration)+'</span><span>'+l.objectives.length+(isMandarin()?' 个学习目标':' objectives')+'</span><span>'+(base.sim?(isMandarin()?'3D 模拟':'3D simulation'):(isMandarin()?'引导活动':'guided activity'))+'</span></div>'+
       '</div>'+
       '<div class="lesson-view-toolbar"><div><span class="study-label">Lesson view</span><button class="study-mode-button '+(lessonView==='guided'?'active':'')+'" data-lesson-view="guided">Guided steps</button><button class="study-mode-button '+(lessonView==='full'?'active':'')+'" data-lesson-view="full">Full lesson plan</button></div><button class="text-button" id="resumeThisLesson">Jump to first unfinished step</button></div>'+
       '<div class="lesson-stage-strip">'+
-        stages.map((s,i)=>'<button class="lesson-stage '+(i===activeStage?'active ':'')+(doneSet.has(s.id)?'done':'')+'" data-seq-stage="'+i+'"><span>'+(doneSet.has(s.id)?'✓':i+1)+'</span>'+s.short+'</button>').join('')+
+        stages.map((st,i)=>'<button class="lesson-stage '+(i===activeStage?'active ':'')+(doneSet.has(st.id)?'done':'')+'" data-seq-stage="'+i+'"><span>'+(doneSet.has(st.id)?'✓':i+1)+'</span>'+lessonUI(st.short)+'</button>').join('')+
       '</div>'+
       (lessonView==='guided'?renderGuidedContent(l):renderFullPlan(l))+
       '<div class="lesson-actions-sequence lesson-footer-actions"><button class="button '+(done?'success':'')+'" id="sequenceComplete">'+(done?'✓ Lesson complete':'Complete remaining steps to finish lesson')+'</button></div>'+
@@ -1040,7 +1107,7 @@
       starterAnswers[l.n][i]=input.value;
       try{localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));}catch{}
       const status=panel.querySelector('[data-starter-status="'+i+'"]');
-      if(status)status.textContent=input.value.trim()?'Saved on this device':'Not answered yet';
+      if(status)status.textContent=input.value.trim()?(isMandarin()?'已保存在此设备':'Saved on this device'):(isMandarin()?'尚未作答':'Not answered yet');
     }));
 
     $$('[data-textbook-input]',panel).forEach(input=>input.addEventListener('input',()=>{
@@ -1151,6 +1218,10 @@
     renderLesson();
     updateProgress();
 
+    window.addEventListener('particlelab:languagechange',()=>{
+      renderSummary();renderList();renderLesson();updateProgress();
+    });
+
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
         completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
@@ -1174,6 +1245,7 @@
     specCoverage:aqaCoreKnowledge,
     textbook:lessonTextbook,
     starterModels:starterAnswerBank,
+    getLocalizedLesson:n=>{const b=lessons.find(x=>x.n===n);return b?localLesson(b):null},
     getChunkSupport:(lessonNumber,chunkIndex)=>{const l=lessons.find(x=>x.n===lessonNumber);return l?chunkSupport(l,chunkIndex):null},
     getActiveChunk:()=>activeChunkFor(lessons[current]),
     openStage:i=>setStage(i,true),
