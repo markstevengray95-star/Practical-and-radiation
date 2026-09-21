@@ -765,3 +765,24 @@
   .textbook-title>span{white-space:normal}
   .lesson-textbook{padding:10px}
 }
+
+
+/* Guided textbook mastery controls */
+.textbook-mastery-count{font-weight:850}
+.textbook-mastery-track{height:6px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.textbook-mastery-track>div{height:100%;background:currentColor;color:#7ee0b5;transition:width .25s ease}
+.textbook-section.secure{border-color:rgba(126,240,178,.34);background:rgba(126,240,178,.035)}
+.textbook-section.needs-help{border-color:rgba(255,207,110,.30);background:rgba(255,207,110,.03)}
+.textbook-section>summary{grid-template-columns:32px 1fr auto}
+.textbook-section-state{font-style:normal;font-size:.58rem;font-weight:850;color:#9eb5c4}
+.textbook-section.secure .textbook-section-state{color:#aaf0cc}
+.textbook-section.needs-help .textbook-section-state{color:#ffe0a1}
+.textbook-confidence{display:grid;gap:7px;margin-top:3px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)}
+.textbook-confidence>span{font-size:.64rem;font-weight:800;color:#bed0dc}
+.textbook-confidence>div{display:flex;gap:7px;flex-wrap:wrap}
+.textbook-confidence .button.active{box-shadow:0 0 0 2px rgba(126,240,178,.2) inset}
+@media(max-width:700px){
+  .textbook-section>summary{grid-template-columns:30px 1fr}
+  .textbook-section-state{grid-column:2}
+  .textbook-confidence>div .button{flex:1 1 150px}
+}
