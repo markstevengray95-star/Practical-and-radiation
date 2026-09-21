@@ -252,6 +252,11 @@
   };
 
   Object.assign(window.PARTICLELAB_MANDARIN_GLOBAL,{
+    'electrons':'电子',
+    'protons':'质子',
+    'neutrons':'中子',
+    'mass number':'质量数',
+    'proton number':'质子数',
     "Quick isotope preset":"快速同位素预设",
     "Protons · Z":"质子 · Z",
     "Neutrons · N":"中子 · N",
