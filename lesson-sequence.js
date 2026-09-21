@@ -727,7 +727,7 @@
     return '<section class="lesson-textbook"><div class="textbook-title"><div><span class="eyebrow">Guided mini textbook</span><h3>'+chapter.title+'</h3></div><span>'+chapter.sections.length+' guided sections</span></div>'+
       '<p class="textbook-intro">Read one section at a time. Use the key points to summarise it, answer the checkpoint from memory, then reveal the model response before moving to the teaching activity.</p>'+
       '<div class="textbook-sections">'+chapter.sections.map((sec,i)=>
-        '<details class="textbook-section" '+(i===0?'open':'')+' data-textbook-section="'+i+'><summary><span>'+(i+1)+'</span><strong>'+sec.h+'</strong></summary>'+
+        '<details class="textbook-section" '+(i===0?'open':'')+' data-textbook-section="'+i+'"><summary><span>'+(i+1)+'</span><strong>'+sec.h+'</strong></summary>'+
         '<div class="textbook-section-body">'+
           sec.p.map(p=>'<p>'+p+'</p>').join('')+
           '<div class="textbook-keyfacts"><span class="eyebrow">Key points to retain</span><ul>'+sec.k.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>'+
