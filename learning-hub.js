@@ -178,6 +178,11 @@
       const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
       return lead+external+tail;
     }
+    const globalExact=window.PARTICLELAB_MANDARIN_GLOBAL?.[trimmed];
+    if(globalExact){
+      const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
+      return lead+globalExact+tail;
+    }
     if(phraseZH[trimmed]){
       const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
       return lead+phraseZH[trimmed]+tail;
