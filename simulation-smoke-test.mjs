@@ -443,10 +443,50 @@ try {
 
   await page.locator('[data-hub="language"]').click();
   await page.locator('[data-lang="zh"]').click();
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(160);
   if ((await page.locator('html').getAttribute('lang')) !== 'zh-CN') throw new Error('Mandarin mode did not activate');
+  if (!(await page.evaluate(() => !!window.PARTICLELAB_MANDARIN_GLOBAL))) throw new Error('Global Mandarin catalogue did not load');
+
+  const hasCJK = text => /[\u3400-\u9fff]/.test(text || '');
+
+  // Simulation lab: title and all core explanations must be Mandarin.
+  await page.locator('[data-view="lab"]').click();
+  await page.locator('.sim-tab[data-sim="atom"]').click();
+  await page.waitForTimeout(100);
+  for (const selector of ['#simTitle','#simSubtitle','#simpleExplain','#examExplain','#mistakeExplain']) {
+    const txt=(await page.locator(selector).textContent())||'';
+    if(!hasCJK(txt)) throw new Error('Mandarin simulation text missing at '+selector+': '+txt);
+  }
+
+  // Quiz question, choices and static controls.
+  await page.locator('[data-view="quiz"]').click();
+  await page.waitForTimeout(60);
+  if(!hasCJK((await page.locator('#quizQuestion').textContent())||'')) throw new Error('Quiz question did not translate to Mandarin');
+  if(!hasCJK((await page.locator('#quizChoices .choice-button').first().textContent())||'')) throw new Error('Quiz choices did not translate to Mandarin');
+
+  // Particle atlas name and description.
+  await page.locator('[data-view="atlas"]').click();
+  await page.waitForTimeout(60);
+  if(!hasCJK((await page.locator('#particleInfo h2').textContent())||'')) throw new Error('Particle atlas title did not translate to Mandarin');
+  if(!hasCJK((await page.locator('#particleInfo p').textContent())||'')) throw new Error('Particle atlas description did not translate to Mandarin');
+
+  // Conservation checker.
+  await page.locator('[data-view="conserve"]').click();
+  await page.waitForTimeout(60);
+  const conserveText=((await page.locator('#view-conserve').textContent())||'');
+  if(!hasCJK(conserveText)) throw new Error('Conservation checker did not translate to Mandarin');
+
+  // Formula coach.
+  await page.locator('[data-view="formula"]').click();
+  await page.waitForTimeout(60);
+  const formulaText=((await page.locator('#view-formula').textContent())||'');
+  if(!hasCJK(formulaText)) throw new Error('Formula coach did not translate to Mandarin');
+
+  // Restore English and make sure exact source text returns.
+  await hubNav.click();
+  await page.locator('[data-hub="language"]').click();
   await page.locator('[data-lang="en"]').click();
-  await page.waitForTimeout(80);
+  await page.waitForTimeout(100);
   if ((await page.locator('html').getAttribute('lang')) !== 'en') throw new Error('English mode did not restore');
 
   console.log('SMOKE: Rutherford experiment');
