@@ -433,30 +433,32 @@ function setReadout(html){
 }
 
 builders.atom=()=>{clearWorld();setCamera(8);
+  const zh=window.PARTICLELAB_LANGUAGE?.get?.()==='zh';
   const presets=[
-    ['1,0,1','Hydrogen-1 · ¹₁H'],['6,6,6','Carbon-12 · ¹²₆C'],['6,8,6','Carbon-14 · ¹⁴₆C'],
-    ['8,8,8','Oxygen-16 · ¹⁶₈O'],['11,12,11','Sodium-23 · ²³₁₁Na'],['17,18,17','Chlorine-35 · ³⁵₁₇Cl'],
-    ['17,20,17','Chlorine-37 · ³⁷₁₇Cl'],['79,118,79','Gold-197 · ¹⁹⁷₇₉Au'],['custom','Custom isotope / ion']
+    ['1,0,1',zh?'氢-1 · ¹₁H':'Hydrogen-1 · ¹₁H'],['6,6,6',zh?'碳-12 · ¹²₆C':'Carbon-12 · ¹²₆C'],['6,8,6',zh?'碳-14 · ¹⁴₆C':'Carbon-14 · ¹⁴₆C'],
+    ['8,8,8',zh?'氧-16 · ¹⁶₈O':'Oxygen-16 · ¹⁶₈O'],['11,12,11',zh?'钠-23 · ²³₁₁Na':'Sodium-23 · ²³₁₁Na'],['17,18,17',zh?'氯-35 · ³⁵₁₇Cl':'Chlorine-35 · ³⁵₁₇Cl'],
+    ['17,20,17',zh?'氯-37 · ³⁷₁₇Cl':'Chlorine-37 · ³⁷₁₇Cl'],['79,118,79',zh?'金-197 · ¹⁹⁷₇₉Au':'Gold-197 · ¹⁹⁷₇₉Au'],['custom',zh?'自定义同位素 / 离子':'Custom isotope / ion']
   ];
   const symbols={1:'H',2:'He',3:'Li',4:'Be',5:'B',6:'C',7:'N',8:'O',9:'F',10:'Ne',11:'Na',12:'Mg',13:'Al',14:'Si',15:'P',16:'S',17:'Cl',18:'Ar',19:'K',20:'Ca',21:'Sc',22:'Ti',23:'V',24:'Cr',25:'Mn',26:'Fe',27:'Co',28:'Ni',29:'Cu',30:'Zn',79:'Au'};
   const names={1:'Hydrogen',2:'Helium',3:'Lithium',4:'Beryllium',5:'Boron',6:'Carbon',7:'Nitrogen',8:'Oxygen',9:'Fluorine',10:'Neon',11:'Sodium',12:'Magnesium',13:'Aluminium',14:'Silicon',15:'Phosphorus',16:'Sulfur',17:'Chlorine',18:'Argon',19:'Potassium',20:'Calcium',26:'Iron',29:'Copper',30:'Zinc',79:'Gold'};
+  const namesZH={1:'氢',2:'氦',3:'锂',4:'铍',5:'硼',6:'碳',7:'氮',8:'氧',9:'氟',10:'氖',11:'钠',12:'镁',13:'铝',14:'硅',15:'磷',16:'硫',17:'氯',18:'氩',19:'钾',20:'钙',26:'铁',29:'铜',30:'锌',79:'金'};
   const sup={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
   const sub={'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
   const digits=(n,map)=>String(n).split('').map(x=>map[x]||x).join('');
   const notation=(A,Z,symbol)=>digits(A,sup)+digits(Z,sub)+symbol;
 
   $('#simControls').innerHTML=
-    '<div class="atom-isotope-intro"><strong>Build an isotope:</strong> keep the proton number <b>Z</b> fixed and change the <b>neutron number</b>. The mass number <b>A</b> updates automatically.</div>'+
-    control('Quick isotope preset','<select id="iso">'+presets.map((p,i)=>'<option value="'+p[0]+'" '+(i===1?'selected':'')+'>'+p[1]+'</option>').join('')+'</select>')+
+    '<div class="atom-isotope-intro">'+(zh?'构建同位素：保持质子数 Z 不变，只改变中子数；核子数 A 会自动更新。':'Build an isotope: keep proton number Z fixed and change neutron number. Mass number A updates automatically.')+'</div>'+
+    control(zh?'快速同位素预设':'Quick isotope preset','<select id="iso">'+presets.map((p,i)=>'<option value="'+p[0]+'" '+(i===1?'selected':'')+'>'+p[1]+'</option>').join('')+'</select>')+
     '<div class="atom-builder-grid">'+
-      control('Protons · Z','<input id="atomZ" type="number" min="1" max="100" value="6"><div class="field-readout" id="atomZr">Z = 6</div>')+
-      control('Neutrons · N','<input id="atomN" type="number" min="0" max="180" value="6"><div class="field-readout" id="atomNr">N = 6</div>')+
-      control('Mass number · A','<input id="atomA" type="number" value="12" readonly aria-readonly="true"><div class="field-readout" id="atomAr">A = Z + N = 12</div>')+
-      control('Electrons','<input id="atomE" type="number" min="0" max="100" value="6"><div class="field-readout" id="atomEr">electrons = 6</div>')+
+      control(zh?'质子 · Z':'Protons · Z','<input id="atomZ" type="number" min="1" max="100" value="6"><div class="field-readout" id="atomZr">'+(zh?'Z = 6 个质子':'Z = 6 protons')+'</div>')+
+      control(zh?'中子 · N':'Neutrons · N','<input id="atomN" type="number" min="0" max="180" value="6"><div class="field-readout" id="atomNr">'+(zh?'N = 6 个中子':'N = 6 neutrons')+'</div>')+
+      control(zh?'核子数 · A':'Mass number · A','<input id="atomA" type="number" value="12" readonly aria-readonly="true"><div class="field-readout" id="atomAr">A = Z + N = 12</div>')+
+      control(zh?'电子':'Electrons','<input id="atomE" type="number" min="0" max="100" value="6"><div class="field-readout" id="atomEr">'+(zh?'电子数 = 6':'electrons = 6')+'</div>')+
     '</div>'+
-    '<div class="atom-isotope-actions"><span>Change isotope:</span><button class="button" id="atomNMinus">− neutron</button><button class="button primary" id="atomNPlus">+ neutron</button><span class="atom-isotope-note">Z stays fixed</span></div>'+
-    '<div class="atom-builder-actions"><button class="button" id="atomNeutral">Make neutral</button><button class="button" id="atomPlus">Make +1 ion</button><button class="button" id="atomMinus">Make −1 ion</button></div>'+
-    '<div class="atom-builder-help"><strong>Rules:</strong> element = Z · isotope changes N · A = Z + N · neutral atom: electrons = Z · ion formation changes electrons only.</div>';
+    '<div class="atom-isotope-actions"><span>'+(zh?'改变同位素：':'Change isotope:')+'</span><button class="button" id="atomNMinus">'+(zh?'− 中子':'− neutron')+'</button><button class="button primary" id="atomNPlus">'+(zh?'+ 中子':'+ neutron')+'</button><span class="atom-isotope-note">'+(zh?'Z 保持不变':'Z stays fixed')+'</span></div>'+
+    '<div class="atom-builder-actions"><button class="button" id="atomNeutral">'+(zh?'变为中性':'Make neutral')+'</button><button class="button" id="atomPlus">'+(zh?'变为 +1 离子':'Make +1 ion')+'</button><button class="button" id="atomMinus">'+(zh?'变为 −1 离子':'Make −1 ion')+'</button></div>'+
+    '<div class="atom-builder-help">'+(zh?'规则：元素由 Z 决定 · 同位素改变 N · A = Z + N · 中性原子的电子数 = Z · 形成离子时只改变电子数。':'Rules: element = Z · isotope changes N · A = Z + N · neutral atom: electrons = Z · ion formation changes electrons only.')+'</div>';
 
   const build=()=>{
     let Z=Math.max(1,Math.min(100,+$('#atomZ').value||1));
@@ -464,11 +466,11 @@ builders.atom=()=>{clearWorld();setCamera(8);
     let A=Z+N;
     let ne=Math.max(0,Math.min(100,+$('#atomE').value||0));
     $('#atomZ').value=Z;$('#atomN').value=N;$('#atomA').value=A;$('#atomE').value=ne;
-    $('#atomZr').textContent='Z = '+Z+' protons';
-    $('#atomNr').textContent='N = '+N+' neutrons';
+    $('#atomZr').textContent=zh?'Z = '+Z+' 个质子':'Z = '+Z+' protons';
+    $('#atomNr').textContent=zh?'N = '+N+' 个中子':'N = '+N+' neutrons';
     $('#atomAr').textContent='A = Z + N = '+A;
     const charge=Z-ne;
-    $('#atomEr').textContent='electrons = '+ne+' · charge = '+(charge===0?'0':(charge>0?'+':'')+charge+'e');
+    $('#atomEr').textContent=zh?'电子数 = '+ne+' · 电荷 = '+(charge===0?'0':(charge>0?'+':'')+charge+'e'):'electrons = '+ne+' · charge = '+(charge===0?'0':(charge>0?'+':'')+charge+'e');
     clearWorld();
     const nuc=cluster(Z,A,A>120?.065:A>60?.08:.15);world.add(nuc);
     const visible=Math.min(ne,30),electronGroup=new THREE.Group();
@@ -485,9 +487,9 @@ builders.atom=()=>{clearWorld();setCamera(8);
     const pts=[];for(let i=0;i<Math.min(1000,180+ne*8);i++){let v=randomBall(4);if(v.length()<1.5)v.setLength(1.5+Math.random()*2.3);pts.push(v.x,v.y,v.z)}
     const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
     const cloud=new THREE.Points(geom,new THREE.PointsMaterial({color:'#76d8ff',size:.035,transparent:true,opacity:.16,depthWrite:false}));world.add(cloud);
-    const symbol=symbols[Z]||('Z'+Z),element=names[Z]||('Element Z='+Z),nuclide=notation(A,Z,symbol);
-    const kind=charge===0?'neutral atom':(charge>0?charge+'+ ion':Math.abs(charge)+'− ion');
-    setReadout('nuclide = '+nuclide+' · '+element+'-'+A+' · Z = '+Z+' · A = '+A+' · protons = '+Z+' · neutrons = '+N+' · electrons = '+ne+' · '+kind);
+    const symbol=symbols[Z]||('Z'+Z),element=(zh?namesZH[Z]:names[Z])||(zh?'元素 Z='+Z:'Element Z='+Z),nuclide=notation(A,Z,symbol);
+    const kind=zh?(charge===0?'中性原子':(charge>0?charge+'+ 离子':Math.abs(charge)+'− 离子')):(charge===0?'neutral atom':(charge>0?charge+'+ ion':Math.abs(charge)+'− ion'));
+    setReadout(zh?('核素 = '+nuclide+' · '+element+'-'+A+' · Z = '+Z+' · A = '+A+' · 质子 = '+Z+' · 中子 = '+N+' · 电子 = '+ne+' · '+kind):('nuclide = '+nuclide+' · '+element+'-'+A+' · Z = '+Z+' · A = '+A+' · protons = '+Z+' · neutrons = '+N+' · electrons = '+ne+' · '+kind));
     animator=t=>{cloud.rotation.y=t*.08;nuc.rotation.y=-t*.05;electronGroup.rotation.y=t*.12};
     window.PARTICLELAB_ATOM_STATE={Z,A,electrons:ne,neutrons:N,charge,symbol,element,nuclide,kind};
     window.dispatchEvent(new CustomEvent('particlelab:atom-change',{detail:window.PARTICLELAB_ATOM_STATE}));
