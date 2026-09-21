@@ -38,6 +38,9 @@ jobs:
           node --check simulation-smoke-test.mjs
           node --check all-steps-verification.mjs
           node --check lesson-chunk-smoke-test.mjs
+          node --check mandarin-global.js
+          node --check mandarin-lessons.js
+          node --check mandarin-ui-smoke-test.mjs
           node --check simulation-presentation.js
           node --check learning-tools.js
           node --check learning-hub.js
@@ -78,6 +81,9 @@ jobs:
           test -s simulation-smoke-test.mjs
           test -s all-steps-verification.mjs
           test -s lesson-chunk-smoke-test.mjs
+          test -s mandarin-global.js
+          test -s mandarin-lessons.js
+          test -s mandarin-ui-smoke-test.mjs
           test -s simulation-presentation.js
           test -s simulation-presentation.css
           test -s learning-tools.js
@@ -135,6 +141,17 @@ jobs:
             sleep 1
           done
           TEST_URL=http://127.0.0.1:4172/ timeout 180s node lesson-chunk-smoke-test.mjs
+
+      - name: App-wide Mandarin UI verification
+        run: |
+          python3 -m http.server 4175 --bind 127.0.0.1 >/tmp/particle-mandarin-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4175/ >/dev/null; then break; fi
+            sleep 1
+          done
+          TEST_URL=http://127.0.0.1:4175/ timeout 180s node mandarin-ui-smoke-test.mjs
 
       - name: Smoke test every simulation in Chromium
         run: |
