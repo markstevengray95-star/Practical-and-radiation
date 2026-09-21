@@ -815,3 +815,25 @@
 .short-test-progress{white-space:nowrap;padding:5px 8px;border-radius:999px;background:rgba(126,216,255,.08);color:#a8ddff;font-size:.58rem;font-weight:900}
 .short-test-question small[data-short-test-status]{display:block;margin-top:5px;color:#8fa7b8;font-size:.58rem}
 @media(max-width:700px){.short-test-intro{flex-direction:column}.short-test-progress{white-space:normal}}
+
+
+/* Final lesson-flow polish: every activity can be completed inside the app */
+.lesson-chunk-task textarea,
+.lesson-task-body textarea{
+  width:100%;box-sizing:border-box;resize:vertical;min-height:78px;
+  margin-top:8px;padding:9px 10px;border-radius:9px;
+  border:1px solid rgba(126,216,255,.18);
+  background:rgba(2,12,22,.76);color:#effbff;font:inherit;line-height:1.45
+}
+.lesson-chunk-task textarea:focus,
+.lesson-task-body textarea:focus{outline:2px solid rgba(103,215,255,.28);outline-offset:1px}
+.lesson-chunk-task>small,
+.lesson-task-body>small{display:block;margin-top:5px;color:#8fa9ba;font-size:.62rem}
+.lesson-task-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.lesson-task-progress{font-size:.62rem;color:#a9dff7;font-weight:800;white-space:nowrap}
+.lesson-task-body{padding:10px 12px 12px;display:grid;gap:7px}
+.lesson-task-body>p{margin:0;line-height:1.5}
+.lesson-task-check{margin-top:3px;padding:8px 9px;border-radius:9px;border:1px solid rgba(126,240,178,.13);background:rgba(126,240,178,.04)}
+.lesson-task-check>summary{cursor:pointer;font-weight:850;color:#dff7ec}
+.core-chunk-status small{display:block;margin-top:3px;color:#91afc1;font-size:.6rem}
+@media(max-width:700px){.lesson-task-heading{flex-direction:column}.lesson-task-progress{white-space:normal}}
