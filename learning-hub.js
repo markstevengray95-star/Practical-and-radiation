@@ -163,6 +163,14 @@
     [/^Lesson (\d+)$/,m=>'第 '+m.match(/\d+/)[0]+' 课'],
     [/^Open (.+) simulation$/,m=>'打开 '+m.replace(/^Open | simulation$/g,'')+' 模拟'],
     [/^(\d+) \/ (\d+) specification points checked · (\d+) logged errors\.$/,m=>{const x=m.match(/\d+/g);return x[0]+' / '+x[1]+' 个规格点已检查 · '+x[2]+' 个错误已记录。';}]
+    [/^Selected isotope: Z = (\d+), A = (\d+), neutrons = (\d+)\.$/,m=>{const x=m.match(/\d+/g);return '已选同位素：Z = '+x[0]+'，A = '+x[1]+'，中子数 = '+x[2]+'。';}],
+    [/^Net charge = ([^;]+); specific charge ≈ ([^ ]+) C kg⁻¹\.$/,m=>{const x=m.match(/^Net charge = ([^;]+); specific charge ≈ ([^ ]+)/);return '净电荷 = '+x[1]+'；比荷 ≈ '+x[2]+' C kg⁻¹。';}],
+    [/^Nucleon separation = ([\d.]+) fm, so the strong force is currently (repulsive|attractive|negligible)\.$/,m=>{const x=m.match(/^Nucleon separation = ([\d.]+) fm, so the strong force is currently (.+)\.$/);const st={repulsive:'排斥',attractive:'吸引',negligible:'可忽略'}[x[2]]||x[2];return '核子间距 = '+x[1]+' fm，因此当前强核力为'+st+'。';}],
+    [/^Selected interaction: (.+)\.$/,m=>'已选相互作用：'+m.replace(/^Selected interaction: |\.$/g,'').replace('electromagnetic virtual-photon exchange','电磁虚光子交换').replace('beta-minus weak interaction','β⁻ 弱相互作用').replace('beta-plus weak interaction','β⁺ 弱相互作用').replace('electron capture','电子俘获').replace('electron–proton collision','电子—质子碰撞')+'。'],
+    [/^Highlighted family: (.+)\. Use the Model guide to compare groups\.$/,m=>'高亮粒子家族：'+m.match(/^Highlighted family: (.+)\./)[1]+'。使用模型指南比较各组。'],
+    [/^Selected hadron: (.+)\. Add the quark quantum numbers to check the totals\.$/,m=>'已选强子：'+m.match(/^Selected hadron: (.+)\./)[1]+'。将夸克量子数相加以检查总量。'],
+    [/^Photon energy ([\d.]+) eV exceeds φ = ([\d.]+) eV; photoemission occurs with KEmax = ([\d.]+) eV\.$/,m=>{const x=m.match(/[\d.]+/g);return '光子能量 '+x[0]+' eV 大于 φ = '+x[1]+' eV；发生光电子发射，KEmax = '+x[2]+' eV。';}],
+    [/^Photon energy ([\d.]+) eV is below φ = ([\d.]+) eV; no photoemission occurs\.$/,m=>{const x=m.match(/[\d.]+/g);return '光子能量 '+x[0]+' eV 小于 φ = '+x[1]+' eV；不发生光电子发射。';}],
   ];
 
   const termZH=[
@@ -394,7 +402,8 @@
 
   window.PARTICLELAB_LANGUAGE={
     get:()=>hubState.language,
-    set:setLanguage
+    set:setLanguage,
+    translate:translateString
   };
 
   function init(){
