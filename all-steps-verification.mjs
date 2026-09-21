@@ -44,7 +44,7 @@ try {
       if(!(await active.evaluate(el=>el.classList.contains('active')))) throw new Error('Lesson '+lesson.n+' stage '+si+' did not become active');
 
       const stage=stageData[si];
-      const heading=((await page.locator('.lesson-active-section h3').textContent())||'').trim();
+      const heading=((await page.locator('.lesson-active-section > h3').textContent())||'').trim();
       if(heading!==stage.label) throw new Error('Lesson '+lesson.n+' stage '+stage.id+' heading mismatch: '+heading);
 
       if(stage.id==='recall'){
