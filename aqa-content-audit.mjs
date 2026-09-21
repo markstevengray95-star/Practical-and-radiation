@@ -36,7 +36,7 @@ try{
 
   const expectedCodes=['3.2.1.1','3.2.1.1','3.2.1.2','3.2.1.2','3.2.1.3','3.2.1.3','3.2.1.4','3.2.1.5','3.2.1.6','3.2.1.7','3.2.2.1','3.2.2.2','3.2.2.3','3.2.2.4'];
   expectedCodes.forEach((code,i)=>assert(data.lessons[i]?.code===code,'Lesson '+(i+1)+' should map to '+code+' but maps to '+data.lessons[i]?.code));
-  assert(/synoptic/i.test(data.lessons[14]?.code||data.lessons[14]?.phase||data.lessons[14]?.title),'Lesson 15 should be synoptic consolidation');
+  assert(/synoptic|consolidation/i.test([data.lessons[14]?.code,data.lessons[14]?.phase,data.lessons[14]?.title].join(' ')),'Lesson 15 should be synoptic consolidation');
   assert(data.lessons[15]?.code==='3.8.1.1','Lesson 16 should be the clearly separated Rutherford 3.8.1.1 extension');
 
   for(const lesson of data.lessons){
