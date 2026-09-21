@@ -241,7 +241,16 @@ const processTimelines={
  rutherford:{duration:3000,steps:['Alpha particle approaches','Coulomb repulsion increases near nucleus','Trajectory bends','Detector records the scattering angle']}
 };
 
-function appTranslate(text){return window.PARTICLELAB_LANGUAGE?.translate?.(String(text))||String(text)}
+function appTranslate(text){
+ const raw=String(text);
+ const zh=(document.documentElement.lang||'').toLowerCase().startsWith('zh');
+ if(!zh)return raw;
+ const exact=window.PARTICLELAB_MANDARIN_GLOBAL?.[raw];
+ if(exact)return exact;
+ const step=raw.match(/^Step\s+(\d+)\s+of\s+(\d+)$/i);
+ if(step)return '第 '+step[1]+' / '+step[2]+' 步';
+ return window.PARTICLELAB_LANGUAGE?.translate?.(raw)||raw;
+}
 window.PARTICLELAB_APP_TRANSLATE=appTranslate;
 function makeHotspotLabel(text){
  const cv=document.createElement('canvas');cv.width=512;cv.height=96;
