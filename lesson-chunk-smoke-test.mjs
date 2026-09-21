@@ -91,6 +91,21 @@ try{
       if(!(await detail.evaluate(el=>el.open))) throw new Error('Lesson '+lessonNo+' chunk '+(ci+1)+' would not open');
     }
 
+    await page.locator('#lessonPanel [data-seq-stage="5"]').evaluate(el=>el.click());
+    await page.waitForTimeout(8);
+    const shortInputs=page.locator('.lesson-active-section [data-short-test-input]');
+    if(await shortInputs.count()<3) throw new Error('Lesson '+lessonNo+' short test inputs missing');
+    if(lessonNo===1){
+      await shortInputs.first().fill('Persistent short-test response');
+      await page.waitForTimeout(5);
+      const savedShort=await page.evaluate(()=>{
+        try{return JSON.parse(localStorage.getItem('particleLessonShortTestAnswersV1')||'{}')?.[1]?.[0]||''}catch{return ''}
+      });
+      if(savedShort!=='Persistent short-test response') throw new Error('Lesson 1 short-test response did not persist');
+    }
+    await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
+    await page.waitForTimeout(8);
+
     if(count>1){
       await page.locator('[data-core-chunk="0"]').evaluate(el=>el.click());
       await page.waitForTimeout(8);
