@@ -167,11 +167,17 @@
   ];
 
   const originals=new WeakMap();
+  const attrOriginals=new WeakMap();
   let translating=false;
 
   function translateString(text){
     const trimmed=text.trim();
     if(!trimmed)return text;
+    const external=window.PARTICLELAB_MANDARIN_LESSONS?.ui?.[trimmed];
+    if(external){
+      const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
+      return lead+external+tail;
+    }
     if(phraseZH[trimmed]){
       const lead=text.match(/^\s*/)?.[0]||'',tail=text.match(/\s*$/)?.[0]||'';
       return lead+phraseZH[trimmed]+tail;
@@ -179,6 +185,21 @@
     let out=text;
     for(const [re,to] of termZH)out=out.replace(re,to);
     return out;
+  }
+
+  function translateAttributes(root,lang){
+    const nodes=[root,...(root?.querySelectorAll?.('[placeholder],[title],[aria-label]')||[])].filter(Boolean);
+    for(const el of nodes){
+      if(!el?.getAttribute)continue;
+      let saved=attrOriginals.get(el);
+      if(!saved){saved={};attrOriginals.set(el,saved);}
+      for(const attr of ['placeholder','title','aria-label']){
+        const current=el.getAttribute(attr);
+        if(current==null)continue;
+        if(saved[attr]==null)saved[attr]=current;
+        el.setAttribute(attr,lang==='zh'?translateString(saved[attr]):saved[attr]);
+      }
+    }
   }
 
   function setLanguage(lang){
@@ -198,8 +219,11 @@
         n.nodeValue=originals.get(n);
       }
     }
+    translateAttributes(document.body,lang);
     translating=false;
+    window.PARTICLELAB_LANGUAGE_STATE=lang;
     renderLanguageButtons();
+    window.dispatchEvent(new CustomEvent('particlelab:languagechange',{detail:{language:lang}}));
   }
 
   function translateNewNode(node){
@@ -210,6 +234,7 @@
       if(!originals.has(n))originals.set(n,n.nodeValue);
       n.nodeValue=translateString(originals.get(n));
     }
+    translateAttributes(node,'zh');
   }
 
   function injectHub(){
@@ -342,6 +367,11 @@
     $('[data-view="lab"]')?.click();
     setTimeout(()=>document.querySelector('.sim-tab[data-sim="'+id+'"]')?.click(),60);
   }
+
+  window.PARTICLELAB_LANGUAGE={
+    get:()=>hubState.language,
+    set:setLanguage
+  };
 
   function init(){
     injectHub();
