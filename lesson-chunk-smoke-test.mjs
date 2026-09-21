@@ -79,6 +79,48 @@ try{
     }
   }
 
+  // Full Mandarin lesson regression: switch language through the real controller.
+  await page.evaluate(()=>window.PARTICLELAB_LANGUAGE?.set?.('zh'));
+  await page.waitForTimeout(80);
+  if((await page.locator('html').getAttribute('lang'))!=='zh-CN') throw new Error('Mandarin mode did not set zh-CN');
+
+  for(let li=0;li<lessonCount;li++){
+    await page.locator('[data-seq-lesson]').nth(li).evaluate(el=>el.click());
+    await page.waitForTimeout(8);
+    const lessonNo=li+1;
+
+    const title=(await page.locator('#lessonPanel .lesson-hero h2').textContent())||'';
+    if(!/[\u3400-\u9fff]/.test(title)) throw new Error('Lesson '+lessonNo+' title did not render in Mandarin');
+
+    await page.locator('#lessonPanel [data-seq-stage="0"]').evaluate(el=>el.click());
+    await page.waitForTimeout(5);
+    const starterQ=(await page.locator('.lesson-active-section .starter-question-head strong').first().textContent())||'';
+    const starterPlaceholder=await page.locator('.lesson-active-section [data-starter-input]').first().getAttribute('placeholder');
+    if(!/[\u3400-\u9fff]/.test(starterQ)) throw new Error('Lesson '+lessonNo+' starter question is not Mandarin');
+    if(!/[\u3400-\u9fff]/.test(starterPlaceholder||'')) throw new Error('Lesson '+lessonNo+' starter placeholder is not Mandarin');
+
+    await page.locator('#lessonPanel [data-seq-stage="2"]').evaluate(el=>el.click());
+    await page.waitForTimeout(5);
+    const tb=(await page.locator('.lesson-active-section .textbook-section-body > p').first().textContent())||'';
+    const spec=(await page.locator('.lesson-active-section .aqa-core-knowledge li').first().textContent())||'';
+    const tbPlaceholder=await page.locator('.lesson-active-section [data-textbook-input]').first().getAttribute('placeholder');
+    if(!/[\u3400-\u9fff]/.test(tb)) throw new Error('Lesson '+lessonNo+' textbook paragraph is not Mandarin');
+    if(!/[\u3400-\u9fff]/.test(spec)) throw new Error('Lesson '+lessonNo+' AQA knowledge point is not Mandarin');
+    if(!/[\u3400-\u9fff]/.test(tbPlaceholder||'')) throw new Error('Lesson '+lessonNo+' textbook placeholder is not Mandarin');
+
+    const englishLeak=[title,starterQ,tb,spec].join(' ')
+      .replace(/AQA|MeV|eV|SI|Na|Cl|Hz|fm|kg|W|UV|Q|KE|Z|A|N|B|S|E|h|f|c|p|m|V|J|C/g,'');
+    if(/\b(?:the|and|with|from|energy|particle|electron|proton|neutron|lesson|question|answer)\b/i.test(englishLeak)){
+      throw new Error('Lesson '+lessonNo+' contains obvious English leakage in Mandarin core content');
+    }
+  }
+
+  await page.evaluate(()=>window.PARTICLELAB_LANGUAGE?.set?.('en'));
+  await page.waitForTimeout(50);
+  if((await page.locator('html').getAttribute('lang'))!=='en') throw new Error('English mode did not restore after Mandarin test');
+
+  console.log('MANDARIN LESSON TEST PASSED: all 16 lessons render Mandarin title, starter, textbook, AQA content and placeholders.');
+
   console.log('LESSON CHUNK TEST PASSED: all 16 lessons, all native chunk headings, Next and Previous.');
 }finally{
   await browser.close();
