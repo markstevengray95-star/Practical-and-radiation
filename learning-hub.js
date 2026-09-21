@@ -174,6 +174,7 @@
   ];
 
   const termZH=[
+    [/\bDiagnostic\s*&\s*lesson hub\b/gi,'诊断与课程中心'],
     [/\bRevision Hub\b/gi,'复习中心'],[/\bPractice Studio\b/gi,'练习工作室'],[/\bExam Skills\b/gi,'考试技巧'],
     [/\bStart Here\b/gi,'从这里开始'],[/\bEvidence Lab\b/gi,'证据实验室'],[/\bGlossary\b/gi,'词汇表'],
     [/\bDiagnostic\s*&\s*lessons\b/gi,'诊断与课程'],[/\bLearning tools\b/gi,'学习工具'],[/\bSimulation lab\b/gi,'模拟实验室'],
