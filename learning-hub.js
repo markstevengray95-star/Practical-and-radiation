@@ -190,7 +190,7 @@
     [/\bpair production\b/gi,'对产生'],[/\bannihilation\b/gi,'湮灭'],[/\bexcitation\b/gi,'激发'],[/\bionisation\b/gi,'电离'],
     [/\bscattering angle\b/gi,'散射角'],[/\bimpact parameter\b/gi,'碰撞参数'],[/\bdiffraction\b/gi,'衍射'],
     [/\bhadron\b/gi,'强子'],[/\bbaryon\b/gi,'重子'],[/\bmeson\b/gi,'介子'],[/\blepton\b/gi,'轻子'],[/\bstrangeness\b/gi,'奇异数'],
-    [/\bproton\b/gi,'质子'],[/\bneutron\b/gi,'中子'],[/\belectron\b/gi,'电子'],[/\bpositron\b/gi,'正电子'],[/\bphoton\b/gi,'光子'],
+    [/\bprotons?\b/gi,'质子'],[/\bneutrons?\b/gi,'中子'],[/\belectrons?\b/gi,'电子'],[/\bpositrons?\b/gi,'正电子'],[/\bphotons?\b/gi,'光子'],
     [/\bneutrino\b/gi,'中微子'],[/\bnucleus\b/gi,'原子核'],[/\bquark\b/gi,'夸克'],[/\bantiquark\b/gi,'反夸克']
   ];
 
