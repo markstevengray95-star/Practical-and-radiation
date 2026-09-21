@@ -133,6 +133,17 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
+      - name: Mandarin simulation UI verification
+        run: |
+          python3 -m http.server 4176 --bind 127.0.0.1 >/tmp/particle-mandarin-sim-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then break; fi
+            sleep 1
+          done
+          TEST_URL=http://127.0.0.1:4176/ timeout 180s node mandarin-simulation-ui-test.mjs
+
       - name: Focused lesson chunk verification
         run: |
           python3 -m http.server 4172 --bind 127.0.0.1 >/tmp/particle-chunk-server.log 2>&1 &
@@ -154,17 +165,6 @@ jobs:
             sleep 1
           done
           TEST_URL=http://127.0.0.1:4175/ timeout 180s node mandarin-ui-smoke-test.mjs
-
-      - name: Mandarin simulation UI verification
-        run: |
-          python3 -m http.server 4176 --bind 127.0.0.1 >/tmp/particle-mandarin-sim-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID || true' EXIT
-          for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then break; fi
-            sleep 1
-          done
-          TEST_URL=http://127.0.0.1:4176/ timeout 180s node mandarin-simulation-ui-test.mjs
 
       - name: Smoke test every simulation in Chromium
         run: |
