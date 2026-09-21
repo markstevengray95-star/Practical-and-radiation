@@ -252,6 +252,9 @@
   };
 
   Object.assign(window.PARTICLELAB_MANDARIN_GLOBAL,{
+    'Learning tools':'学习工具',
+    'Glossary':'词汇表',
+    'Evidence Lab':'证据实验室',
     'Start here':'从这里开始',
     'No prior knowledge required':'无需先备知识',
     'Your route':'你的学习路线',
