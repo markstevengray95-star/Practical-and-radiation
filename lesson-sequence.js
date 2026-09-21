@@ -790,18 +790,23 @@
   function textbookHTML(l){
     const chapter=localTextbook(l.n);
     if(!chapter)return '';
-    const saved=textbookAnswers[l.n]||[],zh=isMandarin();
-    return '<section class="lesson-textbook"><div class="textbook-title"><div><span class="eyebrow">'+(zh?'引导式小教材':'Guided mini textbook')+'</span><h3>'+chapter.title+'</h3></div><span>'+chapter.sections.length+(zh?' 个引导章节':' guided sections')+'</span></div>'+
-      '<p class="textbook-intro">'+(zh?'每次只学习一个章节。先阅读解释，再用要点总结；随后不看答案完成检查题，最后再打开参考答案。':'Read one section at a time. Use the key points to summarise it, answer the checkpoint from memory, then reveal the model response before moving to the teaching activity.')+'</p>'+
-      '<div class="textbook-sections">'+chapter.sections.map((sec,i)=>
-        '<details class="textbook-section" '+(i===0?'open':'')+' data-textbook-section="'+i+'"><summary><span>'+(i+1)+'</span><strong>'+sec.h+'</strong></summary>'+
+    const saved=textbookAnswers[l.n]||[],mastery=textbookMastery[l.n]||{},zh=isMandarin();
+    const secureCount=chapter.sections.reduce((n,_,i)=>n+(mastery[i]==='secure'?1:0),0);
+    return '<section class="lesson-textbook"><div class="textbook-title"><div><span class="eyebrow">'+(zh?'引导式小教材':'Guided mini textbook')+'</span><h3>'+chapter.title+'</h3></div><span class="textbook-mastery-count">'+secureCount+' / '+chapter.sections.length+(zh?' 个章节已掌握':' sections secure')+'</span></div>'+
+      '<div class="textbook-mastery-track"><div style="width:'+(chapter.sections.length?secureCount/chapter.sections.length*100:0)+'%"></div></div>'+
+      '<p class="textbook-intro">'+(zh?'每次只学习一个章节。先阅读解释，再用要点总结；随后不看答案完成检查题，最后再打开参考答案。完成后标记“已理解”或“需要更多帮助”。':'Read one section at a time. Use the key points to summarise it, answer the checkpoint from memory, then reveal the model response. Finish by marking whether you understand it or need more help.')+'</p>'+
+      '<div class="textbook-sections">'+chapter.sections.map((sec,i)=>{
+        const status=mastery[i]||'';
+        return '<details class="textbook-section '+(status==='secure'?'secure ':status==='help'?'needs-help ':'')+'" '+(i===0?'open':'')+' data-textbook-section="'+i+'"><summary><span>'+(i+1)+'</span><strong>'+sec.h+'</strong><em class="textbook-section-state">'+(status==='secure'?(zh?'✓ 已掌握':'✓ Secure'):status==='help'?(zh?'需要帮助':'Needs help'):'')+'</em></summary>'+
         '<div class="textbook-section-body">'+sec.p.map(p=>'<p>'+p+'</p>').join('')+
           '<div class="textbook-keyfacts"><span class="eyebrow">'+(zh?'必须记住的要点':'Key points to retain')+'</span><ul>'+sec.k.map(k=>'<li>'+k+'</li>').join('')+'</ul></div>'+
           '<div class="textbook-check"><span class="eyebrow">'+(zh?'检查你的理解':'Check your understanding')+'</span><strong>'+sec.q+'</strong>'+
             '<textarea rows="3" data-textbook-input="'+i+'" placeholder="'+(zh?'请先写出答案，再查看参考答案……':'Write your answer before revealing the model response...')+'">'+esc(saved[i]||'')+'</textarea>'+
             '<div class="textbook-save-state" data-textbook-status="'+i+'">'+((saved[i]||'').trim()?(zh?'已保存在此设备':'Saved on this device'):(zh?'尚未作答':'Not answered yet'))+'</div>'+
             '<details class="textbook-model"><summary>'+(zh?'显示参考答案':'Reveal model response')+'</summary><p>'+sec.a+'</p></details>'+
-          '</div></div></details>').join('')+'</div></section>';
+            '<div class="textbook-confidence"><span>'+ (zh?'这一节你掌握了吗？':'How secure are you on this section?') +'</span><div><button type="button" class="button '+(status==='help'?'active':'')+'" data-textbook-help="'+i+'">'+(zh?'我需要更多帮助':'I need more help')+'</button><button type="button" class="button primary '+(status==='secure'?'active':'')+'" data-textbook-secure="'+i+'">'+(zh?'✓ 我理解了 — 继续':'✓ I understand — continue')+'</button></div></div>'+
+          '</div></div></details>';
+      }).join('')+'</div></section>';
   }
 
   function aqaCoverageHTML(l){
@@ -866,6 +871,7 @@
   const CHUNK_POS_STORE='particleLessonChunkPositionV3';
   const STARTER_STORE='particleLessonStarterAnswersV1';
   const TEXTBOOK_STORE='particleLessonTextbookAnswersV1';
+  const TEXTBOOK_MASTERY_STORE='particleLessonTextbookMasteryV1';
   const stages=[
     {id:'recall',label:'Starter / retrieval',short:'Starter',time:'5 min'},
     {id:'objectives',label:'Key words & objectives',short:'Set up',time:'3 min'},
@@ -876,7 +882,7 @@
     {id:'next',label:'Review & next steps',short:'Review',time:'2 min'}
   ];
 
-  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},current=0,activeStage=0,lessonView='guided';
+  let completed=new Set(),stageDone={},chunkPosition={},starterAnswers={},textbookAnswers={},textbookMastery={},current=0,activeStage=0,lessonView='guided';
   try{completed=new Set(JSON.parse(localStorage.getItem(STORE)||'[]'))}catch{}
   try{stageDone=JSON.parse(localStorage.getItem(STAGE_STORE)||'{}')||{}}catch{}
   try{
@@ -888,6 +894,7 @@
   try{chunkPosition=JSON.parse(localStorage.getItem(CHUNK_POS_STORE)||'{}')||{}}catch{}
   try{starterAnswers=JSON.parse(localStorage.getItem(STARTER_STORE)||'{}')||{}}catch{}
   try{textbookAnswers=JSON.parse(localStorage.getItem(TEXTBOOK_STORE)||'{}')||{}}catch{}
+  try{textbookMastery=JSON.parse(localStorage.getItem(TEXTBOOK_MASTERY_STORE)||'{}')||{}}catch{}
 
   function saveAll(){
     localStorage.setItem(STORE,JSON.stringify([...completed]));
@@ -897,6 +904,7 @@
     localStorage.setItem(CHUNK_POS_STORE,JSON.stringify(chunkPosition));
     localStorage.setItem(STARTER_STORE,JSON.stringify(starterAnswers));
     localStorage.setItem(TEXTBOOK_STORE,JSON.stringify(textbookAnswers));
+    localStorage.setItem(TEXTBOOK_MASTERY_STORE,JSON.stringify(textbookMastery));
     updateProgress();
   }
 
@@ -947,7 +955,7 @@
     const active=activeChunkFor(l);
     const guided=lessonView==='guided';
     const selector=guided?
-      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">'+(isMandarin()?'教学顺序':'Teaching sequence')+'</span><strong>Chunk '+(active+1)+' of '+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
+      '<div class="core-chunk-nav"><div class="core-chunk-status"><span class="eyebrow">'+(isMandarin()?'教学顺序':'Teaching sequence')+'</span><strong>'+(isMandarin()?'学习段 ':'Chunk ')+(active+1)+(isMandarin()?' / ':' of ')+l.teach.length+'</strong></div><div class="chunk-selector" role="tablist" aria-label="Lesson teaching chunks">'+
         l.teach.map((x,i)=>'<button type="button" role="tab" data-core-chunk="'+i+'" class="'+(i===active?'active':'')+'" aria-selected="'+(i===active?'true':'false')+'"><span>'+(i+1)+'</span><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></button>').join('')+
       '</div></div>':'';
 
@@ -955,7 +963,7 @@
       const cs=chunkSupport(l,i);
       const open=(!guided||i===active)?' open':'';
       return '<details class="lesson-check lesson-chunk-rich '+(guided&&i===active?'active-chunk':'')+'" data-lesson-chunk="'+i+'"'+open+'>'+
-        '<summary class="native-chunk-summary"><span class="native-chunk-number">'+(i+1)+'</span><span><small>Teaching chunk '+(i+1)+' of '+l.teach.length+'</small><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></span></summary>'+
+        '<summary class="native-chunk-summary"><span class="native-chunk-number">'+(i+1)+'</span><span><small>'+(isMandarin()?'教学学习段 ':'Teaching chunk ')+(i+1)+(isMandarin()?' / ':' of ')+l.teach.length+'</small><strong>'+x[0].replace(/^\d+\.\s*/,'')+'</strong></span></summary>'+
         '<div class="native-chunk-content">'+
           '<div class="lesson-chunk-main"><span class="eyebrow">'+(isMandarin()?'核心概念':'Core idea')+'</span><p>'+x[1]+'</p></div>'+
           '<div class="lesson-chunk-detail"><span class="eyebrow">'+(isMandarin()?'关键信息':'Key information')+'</span><p>'+cs.detail+'</p></div>'+
@@ -969,7 +977,7 @@
       '<div class="chunk-switch-actions"><button type="button" class="button" id="coreChunkPrev" '+(active===0?'disabled':'')+'>← '+(isMandarin()?'上一学习段':'Previous chunk')+'</button><button type="button" class="button primary" id="coreChunkNext" '+(active===l.teach.length-1?'disabled':'')+'>'+(isMandarin()?'下一学习段':'Next chunk')+' →</button></div>':'';
 
     return selector+cards+controls+
-      (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">Equations from this lesson</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
+      (l.equations.length?'<div class="lesson-key-equation"><span class="eyebrow">'+(isMandarin()?'本课公式':'Equations from this lesson')+'</span>'+l.equations.map(x=>'<code>'+x+'</code>').join('')+'</div>':'');
   }
 
   function updateProgress(){
@@ -1120,6 +1128,29 @@
       if(status)status.textContent=input.value.trim()?'Saved on this device':'Not answered yet';
     }));
 
+    $$('[data-textbook-help]',panel).forEach(btn=>btn.addEventListener('click',()=>{
+      const i=Number(btn.dataset.textbookHelp);
+      textbookMastery[l.n]=textbookMastery[l.n]||{};
+      textbookMastery[l.n][i]='help';
+      saveAll();
+      renderLesson();
+      requestAnimationFrame(()=>{
+        const d=panel.querySelector('.textbook-section[data-textbook-section="'+i+'"]');
+        if(d){d.open=true;d.querySelector('.textbook-model')?.setAttribute('open','');d.scrollIntoView({behavior:'smooth',block:'center'});}
+      });
+    }));
+    $$('[data-textbook-secure]',panel).forEach(btn=>btn.addEventListener('click',()=>{
+      const i=Number(btn.dataset.textbookSecure),chapter=localTextbook(l.n);
+      textbookMastery[l.n]=textbookMastery[l.n]||{};
+      textbookMastery[l.n][i]='secure';
+      saveAll();
+      renderLesson();
+      requestAnimationFrame(()=>{
+        const next=panel.querySelector('.textbook-section[data-textbook-section="'+Math.min(i+1,(chapter?.sections?.length||1)-1)+'"]');
+        if(next){next.open=true;next.scrollIntoView({behavior:'smooth',block:'center'});}
+      });
+    }));
+
     const bindActivity=()=>{
       $('#sequenceActivity')?.addEventListener('click',()=>l.sim?openView('lab',l.sim):openView(l.view||'quiz'));
       $('#sequenceAtomPractice')?.addEventListener('click',()=>{openView('lab','atom');setTimeout(()=>window.PARTICLELAB_ATOM_PRACTICE?.open?.(0),120)});
@@ -1225,7 +1256,7 @@
 
     $('#resetProgress')?.addEventListener('click',()=>{
       setTimeout(()=>{
-        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
+        completed.clear();stageDone={};chunkPosition={};starterAnswers={};textbookAnswers={};textbookMastery={};current=0;activeStage=0;saveAll();renderSummary();renderList();renderLesson();
       },0);
     });
 
