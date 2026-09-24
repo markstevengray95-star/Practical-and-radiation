@@ -43,9 +43,12 @@ jobs:
           node --check all-steps-verification.mjs
           node --check aqa-content-audit.mjs
           node --check lesson-chunk-smoke-test.mjs
+          node --check lesson-native-accordion.js
           node --check textbook-chapters.js
           node --check textbook-chapters-v2.js
+          node --check textbook-active-practice.js
           node --check textbook-chapter-smoke-test.mjs
+          node --check textbook-active-practice-smoke-test.mjs
           node --check mandarin-global.js
           node --check mandarin-lessons.js
           node --check mandarin-ui-smoke-test.mjs
@@ -91,10 +94,14 @@ jobs:
           test -s all-steps-verification.mjs
           test -s aqa-content-audit.mjs
           test -s lesson-chunk-smoke-test.mjs
+          test -s lesson-native-accordion.js
           test -s textbook-chapters.js
           test -s textbook-chapters-v2.js
           test -s textbook-chapters.css
+          test -s textbook-active-practice.js
+          test -s textbook-active-practice.css
           test -s textbook-chapter-smoke-test.mjs
+          test -s textbook-active-practice-smoke-test.mjs
           test -s mandarin-global.js
           test -s mandarin-lessons.js
           test -s mandarin-ui-smoke-test.mjs
@@ -178,6 +185,17 @@ jobs:
             sleep 1
           done
           TEST_URL=http://127.0.0.1:4177/ timeout 240s node textbook-chapter-smoke-test.mjs
+
+      - name: Active textbook practice verification
+        run: |
+          python3 -m http.server 4178 --bind 127.0.0.1 >/tmp/particle-active-practice-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4178/ >/dev/null; then break; fi
+            sleep 1
+          done
+          TEST_URL=http://127.0.0.1:4178/ timeout 240s node textbook-active-practice-smoke-test.mjs
 
       - name: Exhaustive guided-step verification
         run: |
